@@ -2,10 +2,9 @@
   "name": "buccaneer-web-edition",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cross-env NODE_ENV=development webpack-dev-server"
+    "start": "webpack-dev-server"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +12,11 @@
   "devDependencies": {
     "babylonjs": "^4.2.0",
     "webpack": "^5.58.1",
-    "webpack-cli": "^4.9.0"
+    "webpack-cli": "^4.9.0",
+    "webpack-dev-server": "^4.3.1"
+  },
+  "dependencies": {
+    "html-webpack-live-reload-plugin": "^1.0.12",
+    "html-webpack-plugin": "^5.3.2"
   }
 }

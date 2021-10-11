@@ -1,4 +1,9 @@
 const path = require('path');
+const HtmlWebPackPlugin = require('html-webpack-plugin');
+const HtmlWebpackLiveReload = require('html-webpack-live-reload-plugin');
+const isDevelopment = process.env.NODE_ENV !== 'production';
+const webpack = require("webpack");
+const chokidar = require("chokidar");
 
 module.exports = {
   mode: 'development',
