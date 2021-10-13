@@ -3,11 +3,15 @@ import 'babylonjs-materials';
 import 'babylonjs-loaders';
 // import * from 'babylon.gridMaterial.min.js';
 import { GridMaterial, WaterMaterial } from 'babylonjs-materials'
+import { createPointerLock } from "./pointerLock.js"
+import { isMobileDevice } from './utils.js';
 
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
+canvas.onselectstart = function () { return false; }
+
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 
-var colorArray = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
+const colorArray = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
     '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
     '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A',
     '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
@@ -19,6 +23,23 @@ var colorArray = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
     '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'];
 
 let selectedBoat = null;
+
+const settings = {
+    reflectionResolution: 512,
+    useAntialiasing: false,
+    gridTileSize: 0.81,
+    gridOffset: new BABYLON.Vector3(-0.07, 0, 0),
+}
+
+const updateGame = function () {
+    // console.log("yoo");
+
+
+    if (selectedBoat !== null) {
+        selectedBoat.rotate(new BABYLON.Vector3(0, 1, 0), 0.02, BABYLON.Space.WORLD);
+    }
+}
+
 
 // show axis
 var showAxis = function (size) {
@@ -59,73 +80,32 @@ var showAxis = function (size) {
 
 // Add your code here matching the playground format
 const createScene = function () {
-
-
-    // 	const scene = new BABYLON.Scene(engine);
-
-    // 	var camera = new BABYLON.ArcRotateCamera("Camera", 3 * Math.PI / 2, Math.PI / 4, 100, BABYLON.Vector3.Zero(), scene);
-    // 	camera.attachControl(canvas, true);
-
-    // 	var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
-
-    // 	// Skybox
-    // 	var skybox = BABYLON.Mesh.CreateBox("skyBox", 1000.0, scene);
-    //     var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
-    // 	skyboxMaterial.backFaceCulling = false;
-    // 	skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/skybox/skybox", scene);
-    // 	skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-    // 	skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-    // 	skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-    // 	skyboxMaterial.disableLighting = true;
-    // 	skybox.material = skyboxMaterial;
-
-    // 	// Ground
-    // 	var groundTexture = new BABYLON.Texture("assets/sand.jpg", scene);
-    // 	groundTexture.vScale = groundTexture.uScale = 4.0;
-
-    // 	var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
-    // 	groundMaterial.diffuseTexture = groundTexture;
-
-    // 	var ground = BABYLON.Mesh.CreateGround("ground", 512, 512, 32, scene, false);
-    // 	ground.position.y = -1;
-    // 	ground.material = groundMaterial;
-
-    // 	// Water
-    // 	var waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 512, 512, 32, scene, false);
-    // 	var water = new WaterMaterial("water", scene, new BABYLON.Vector2(1024, 1024));
-    // 	water.backFaceCulling = true;
-    // 	water.bumpTexture = new BABYLON.Texture("assets/waterbump.png", scene);
-    // 	water.windForce = -5;
-    // 	water.waveHeight = 0.5;
-    // 	water.bumpHeight = 0.1;
-    // 	water.waveLength = 0.1;
-    // 	water.colorBlendFactor = 0;
-    // 	water.addToRenderList(skybox);
-    // 	water.addToRenderList(ground);
-    // 	waterMesh.material = water;
-
-    //     return scene;
-    // };
-
-    // var t = function () {
-
-
-
-
-
-
-
     engine.displayLoadingUI();
 
     const scene = new BABYLON.Scene(engine);
 
-
-    const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, new BABYLON.Vector3(0, 0, 0));
-    camera.lowerRadiusLimit = 2;
-    camera.upperRadiusLimit = 100;
-    camera.attachControl(canvas, true);
-    camera.inertia = 0.4;
-    camera.inputs.attached.pointers.panningSensibility = 2000;
+    let camera;
+    if (true) { // TODO isMobileDevice()) {
+        camera = new BABYLON.ArcRotateCamera("camera", -3 * Math.PI / 4, Math.PI / 3, 50, new BABYLON.Vector3(0, 0, 0));
+        camera.lowerRadiusLimit = 5;
+        camera.upperRadiusLimit = 50;
+        camera.attachControl(canvas, true);
+        camera.inertia = 0.0;
+        camera.panningInertia = 0.0;
+        camera.inputs.attached.pointers.panningSensibility = 150;
+        camera.inputs.attached.pointers.angularSensibility = 10;
+        camera.wheelPrecision = 1;
+        // camera.inputs.attached.pointers.panningSensibility = 2000;
+    }
+    else {
+        camera = new BABYLON.UniversalCamera("camera", new BABYLON.Vector3(0, 10, -10), scene);
+        // camera.lowerRadiusLimit = 2;
+        // camera.upperRadiusLimit = 50;
+        camera.inertia = 0.0;
+        camera.attachControl(canvas, true);
+        camera.angularSensibility = 400;
+        // camera.inputs.attached.pointers.panningSensibility = 2000;
+    }
 
     var pipeline = new BABYLON.DefaultRenderingPipeline(
         "defaultPipeline", // The name of the pipeline
@@ -133,44 +113,30 @@ const createScene = function () {
         scene, // The scene instance
         [camera] // The list of cameras to be attached to
     );
-    // pipeline.samples = 16; TODO add settings
+    if (settings.useAntialiasing)
+        pipeline.samples = 16;
 
-
-
-
-
-    // BABYLON.SceneLoader.ImportMesh("", "/assets/", "AllIslands.gltf");
-    // BABYLON.SceneLoader.ImportMesh("", "/assets/", "Boat.gltf");
-
-    var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, scene);
-    var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+    const skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, scene);
+    let skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
     skyboxMaterial.backFaceCulling = false;
-    skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/skybox/skybox", scene);
+    skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/skybox_sunny/TropicalSunnyDay", scene);
     skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
     skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
     skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
     skybox.material = skyboxMaterial;
 
-
-
-
-
-
     // scene.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("/assets/environment.dds", scene);
-
 
     scene.actionManager = new BABYLON.ActionManager(scene);
     scene.actionManager.registerAction(
         new BABYLON.ExecuteCodeAction(
             {
-                trigger: BABYLON.ActionManager.OnPickTrigger
-                // parameter: 'r'
+                trigger: BABYLON.ActionManager.OnKeyDownTrigger,
+                parameter: 'r'
             },
             function () { console.log('r button was pressed'); }
         )
     );
-
-
 
     // const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
     const ambientLight = new BABYLON.HemisphericLight("HemiLight", new BABYLON.Vector3(0, 1, 0), scene);
@@ -188,28 +154,35 @@ const createScene = function () {
         var sea = scene.getMeshByName("Sea");
         var castle = scene.getMeshByName("Castle");
         var edgeIslands = scene.getMeshByName("EdgeIslands");
+        let cardMesh = scene.getMeshByName("Card");
+        let sand = scene.getMeshByName("Sand");
 
-        // sea.setEnabled(false);
-        
-        
-        for (let mesh of scene.meshes)
-        mesh.isPickable = false;
-        
-        
-        
-        
-        // Ground
+        // cardMesh.setEnabled(false);
+        cardMesh.actionManager = new BABYLON.ActionManager(scene);
+        cardMesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+            {
+                trigger: BABYLON.ActionManager.OnPickTrigger
+            },
+            function () {
+                cardMesh.setEnabled(false);
+            }
+        ));
+
+        // for (let mesh of scene.meshes)
+        // mesh.isPickable = false;
+
         var groundTexture = new BABYLON.Texture("assets/sand.jpg", scene);
         groundTexture.vScale = groundTexture.uScale = 4.0;
-        
+
         var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
         groundMaterial.diffuseTexture = groundTexture;
-        
+        groundMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+
         var ground = sea.clone();
         ground.position.y = -0.19;
         ground.material = groundMaterial;
         ground.material.backFaceCulling = false;
-        
+
         let gridMaterial = new GridMaterial("grid", scene);
         var grid = sea.clone();
         grid.position.y = 0.001;
@@ -223,44 +196,49 @@ const createScene = function () {
         // gridMaterial.
         gridMaterial.opacity = 0.2;
         grid.material = gridMaterial;
-        
-        var water = new WaterMaterial("water", scene, new BABYLON.Vector2(2048, 2048));
+
+        let water = new WaterMaterial("water", scene, new BABYLON.Vector2(settings.reflectionResolution, settings.reflectionResolution));
         water.backFaceCulling = true;
         water.bumpTexture = new BABYLON.Texture("assets/waterbump.png", scene);
         water.windForce = -5;
         water.waveHeight = 0.0;
         water.bumpHeight = 0.1;
         water.waveLength = 0.2;
-        water.colorBlendFactor = 0.3;
-        water.waterColor = new BABYLON.Color3(0.1, 0.4, 0.8);
+        water.colorBlendFactor = 0.5;
+        // water.waterColor = new BABYLON.Color3(0.1, 0.4, 0.8);
+        water.waterColor = new BABYLON.Color3(0.1, 0.5, 0.8);
         water.addToRenderList(skybox);
         water.addToRenderList(ground);
-        
         sea.material = water;
 
-        // console.log(edgeIslands);
-
-        // treasureIsland.setEnabled(false);
-
-        var shadowGenerator = new BABYLON.ShadowGenerator(2048, light);
-        // shadowGenerator.bias = 0;
-        // shadowGenerator.bias = 0.001;
-        // shadowGenerator.normalBias = 0.02;
-        // light.shadowMaxZ = 100;
-        // light.shadowMinZ = 10;
-        // shadowGenerator.useContactHardeningShadow = true;
-        // shadowGenerator.contactHardeningLightSizeUVRatio = 0.05;
-        // shadowGenerator.setDarkness(0.0);
-        shadowGenerator.getShadowMap().renderList.push(boat);
-        // shadowGenerator.getShadowMap().renderList.push(castle);
-        shadowGenerator.getShadowMap().renderList.push(edgeIslands);
-        shadowGenerator.useExponentialShadowMap = true;
-        shadowGenerator.useBlurExponentialShadowMap = true;
-
-        shadowGenerator.addShadowCaster(castle);
+        // var shadowGenerator = new BABYLON.ShadowGenerator(2048, light);
+        // // shadowGenerator.bias = 0;
+        // // shadowGenerator.bias = 0.001;
+        // // shadowGenerator.normalBias = 0.02;
+        // // light.shadowMaxZ = 100;
+        // // light.shadowMinZ = 10;
+        // // shadowGenerator.useContactHardeningShadow = true;
+        // // shadowGenerator.contactHardeningLightSizeUVRatio = 0.05;
+        // // shadowGenerator.setDarkness(0.0);
+        // shadowGenerator.getShadowMap().renderList.push(boat);
+        // // shadowGenerator.getShadowMap().renderList.push(castle);
+        // shadowGenerator.getShadowMap().renderList.push(edgeIslands);
+        // shadowGenerator.useExponentialShadowMap = true;
+        // shadowGenerator.useBlurExponentialShadowMap = true;
+        // shadowGenerator.addShadowCaster(castle);
 
         water.addToRenderList(edgeIslands);
         water.addToRenderList(castle);
+
+        let matWhite = new BABYLON.StandardMaterial(scene);
+        matWhite.diffuseColor = new BABYLON.Color3(1, 0, 0);
+        matWhite.specularColor = new BABYLON.Color3(0, 0, 0);
+        matWhite.alpha = 0.1;
+        let selectionSquare = BABYLON.Mesh.CreateGround("square2", settings.gridTileSize, settings.gridTileSize, 0, scene);
+        selectionSquare.material = matWhite;
+        selectionSquare.position.y = 0;
+        selectionSquare.position.x = settings.gridTileSize * 4.5 + settings.gridOffset.x;
+        selectionSquare.position.z = settings.gridTileSize * 4.5 + settings.gridOffset.z;
 
         // shadowGenerator.usePoissonSampling = true;
         // sea.receiveShadows = true;
@@ -270,19 +248,15 @@ const createScene = function () {
         // edgeIslands.receiveShadows = true;
         // sea.showBoundingBox = true;
 
-        var spinnerPivotParent = new BABYLON.TransformNode("spinnerPivotParent");
+        // var spinnerPivotParent = new BABYLON.TransformNode("spinnerPivotParent");
         // spinnerPivotParent.setPivotPoint(new BABYLON.Vector3(0, 0, 3));
-        boat.setParent(spinnerPivotParent);
-        spinnerPivotParent.translate(new BABYLON.Vector3(0, 0, 3), 1, BABYLON.Space.WORLD);
+        // boat.setParent(spinnerPivotParent);
+        // spinnerPivotParent.translate(new BABYLON.Vector3(0, 0, 3), settings.gridTileSize, BABYLON.Space.WORLD);
 
         // BABYLON.Animation.CreateAndStartAnimation("spinnerRotation", spinnerPivotParent, "rotation.y", 30, 120, BABYLON.Tools.ToRadians(0), BABYLON.Tools.ToRadians(360), 1);
 
         scene.registerBeforeRender(function () {
-            if (selectedBoat !== null) {
-                selectedBoat.rotate(new BABYLON.Vector3(0, 1, 0), 0.02, BABYLON.Space.WORLD);
-            }
-
-            boat.rotate(new BABYLON.Vector3(0, 1, 0), 0.02, BABYLON.Space.WORLD);
+            updateGame();
         });
 
         function mousemovef() {
@@ -305,36 +279,12 @@ const createScene = function () {
         var material;// = new WaterMaterial("water_material", scene);
         // material.addToRenderList(skybox);
 
-        // var water = new WaterMaterial("water", scene, new BABYLON.Vector2(1024, 1024));
-        // water.backFaceCulling = false;
-        // water.bumpTexture = new BABYLON.Texture("assets/waterbump.png", scene);
-        // water.windForce = -5;
-        // water.waveHeight = 0.5;
-        // water.bumpHeight = 0.1;
-        // water.waveLength = 0.1;
-        // water.colorBlendFactor = 0;
-        // water.addToRenderList(skybox);
-        // // water.addToRenderList(ground);
-        // // material.diffuseColor = new BABYLON.Color3(0.4, 0.8, 1.0);
-        // // material.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-        // sea.material = water;
-
-        // var waterMaterial = new BABYLON.WaterMaterial("water_material", scene);
-        // waterMaterial.windForce = 45; // Represents the wind force applied on the water surface
-        // waterMaterial.waveHeight = 1.3; // Represents the height of the waves
-        // waterMaterial.bumpHeight = 0.3; // According to the bump map, represents the pertubation of reflection and refraction
-        // waterMaterial.windDirection = new BABYLON.Vector2(1.0, 1.0); // The wind direction on the water surface (on width and height)
-        // waterMaterial.waterColor = new BABYLON.Color3(0.1, 0.1, 0.6); // Represents the water color mixed with the reflected and refracted world
-        // waterMaterial.colorBlendFactor = 2.0; // Factor to determine how the water color is blended with the reflected and refracted world
-        // waterMaterial.waveLength = 0.1; // The lenght of waves. With smaller values, more waves are generated
-        // sea.material = waterMaterial;
-
-        for (let i = 0; i < 4; i++) {
-            if (i == 0)
-                continue;
+        for (let i = 0; i < 8; i++) {
+            // if (i == 0)
+            // continue;
 
             const boat2 = boat.clone("boat" + i);
-            shadowGenerator.getShadowMap().renderList.push(boat2);
+            // shadowGenerator.getShadowMap().renderList.push(boat2);
             water.addToRenderList(boat2);
             boat2.isPickable = true;
 
@@ -344,18 +294,30 @@ const createScene = function () {
             boat2.actionManager.registerAction(
                 new BABYLON.ExecuteCodeAction(
                     {
-                        trigger: BABYLON.ActionManager.OnPickTrigger
+                        trigger: BABYLON.ActionManager.OnLeftPickTrigger
                         // parameter: 'r'
                     },
                     function () {
-                        if (selectedBoat !== null) {
-                            selectedBoat.material.alpha = 1.0;
-                        }
-            
-                        if (true) {
-                            selectedBoat = boat2;
-                            selectedBoat.material.alpha = 0.5;
-                        }
+                        // if (selectedBoat !== null) {
+                        //     selectedBoat.material.alpha = 1.0;
+                        // }
+
+                        // if (true) {
+                        //     selectedBoat = boat2;
+                        //     selectedBoat.material.alpha = 0.5;
+                        // }
+
+                        CoT.rotate(BABYLON.Axis.Y, BABYLON.Tools.ToRadians(45), BABYLON.Space.WORLD);
+                    }
+                )
+            );
+            boat2.actionManager.registerAction(
+                new BABYLON.ExecuteCodeAction(
+                    {
+                        trigger: BABYLON.ActionManager.OnRightPickTrigger
+                    },
+                    function () {
+                        CoT.rotate(BABYLON.Axis.Y, BABYLON.Tools.ToRadians(-45), BABYLON.Space.WORLD);
                     }
                 )
             );
@@ -363,10 +325,10 @@ const createScene = function () {
             let CoT = new BABYLON.TransformNode("");
             boat2.setParent(CoT);
 
-            if (i % 2 == 0)
-                CoT.translate(new BABYLON.Vector3(i * 0.25, 0, 1), 1, BABYLON.Space.WORLD);
-            else
-                CoT.translate(new BABYLON.Vector3(-i * 0.25, 0, 1), 1, BABYLON.Space.WORLD);
+            CoT.translate(new BABYLON.Vector3(Math.floor(Math.random() * 22) - 11, 0, Math.floor(Math.random() * 22) - 11), settings.gridTileSize, BABYLON.Space.WORLD);
+            CoT.translate(settings.gridOffset, 1, BABYLON.Space.WORLD);
+            CoT.translate(new BABYLON.Vector3(0.5, 0, 0.5), settings.gridTileSize, BABYLON.Space.WORLD);
+            CoT.rotate(BABYLON.Axis.Y, BABYLON.Tools.ToRadians(45 * Math.floor(Math.random() * 8)), BABYLON.Space.WORLD);
 
             // let pbr = new BABYLON.PBRMaterial("pbr", scene);
             // pbr.albedoColor = BABYLON.Color3.FromHexString(colorArray[i]);
@@ -400,12 +362,17 @@ const createScene = function () {
         material.specularColor = new BABYLON.Color3(0, 0, 0);
         castle.material = material;
 
+        material = new BABYLON.StandardMaterial(scene);
+        material.diffuseColor = new BABYLON.Color3(1, 0.9, 0.7);
+        material.specularColor = new BABYLON.Color3(0, 0, 0);
+        sand.material = material;
 
-        castle.overlayColor = BABYLON.Color3.Black();
-        castle.renderOverlay = true;
-        castle.overlayAlpha = 0.3;
 
-        showAxis(5);
+        // castle.overlayColor = BABYLON.Color3.Black();
+        // castle.renderOverlay = true;
+        // castle.overlayAlpha = 0.3;
+
+        // showAxis(5);
 
         engine.hideLoadingUI();
     });
@@ -413,7 +380,8 @@ const createScene = function () {
     return scene;
 };
 
-const scene = createScene(); //Call the createScene function
+const scene = createScene();
+// createPointerLock(scene);
 
 // Register a render loop to repeatedly render the scene
 engine.runRenderLoop(function () {
