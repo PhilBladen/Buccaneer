@@ -4,6 +4,20 @@ const isMobileDevice = function () {
     return check;
 };
 
+const cosineInterpolate = function (startValue, endValue, i) {
+    let mu2 = (1 - Math.cos(i * Math.PI)) / 2;
+    return (startValue * (1 - mu2) + endValue * mu2);
+}
+
+const cosineInterpolateV3D = function (startVector, endVector, i, outputVector) {
+    let mu2 = (1 - Math.cos(i * Math.PI)) / 2;
+    outputVector.x = (startVector.x * (1 - mu2) + endVector.x * mu2);
+    outputVector.y = (startVector.y * (1 - mu2) + endVector.y * mu2);
+    outputVector.z = (startVector.z * (1 - mu2) + endVector.z * mu2);
+}
+
 export {
     isMobileDevice,
+    cosineInterpolate,
+    cosineInterpolateV3D,
 }
