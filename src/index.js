@@ -12,6 +12,8 @@ canvas.onselectstart = function () { return false; }
 
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 
+console.log(engine.getCaps().maxTextureSize);
+
 const colorArray = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
     '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
     '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A',
@@ -579,7 +581,7 @@ const createScene = function () {
         material.specularColor = new BABYLON.Color3(0, 0, 0);
         sand.material = material;
 
-        showAxis(2);
+        // showAxis(2);
 
         engine.hideLoadingUI();
     });
