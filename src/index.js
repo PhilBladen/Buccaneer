@@ -65,6 +65,28 @@ let wasBoatAtPirateIsland = false;
 let chestAnimationStartTime = 0;
 let createdParticleSystem = false;
 
+let cardDeck = [];
+for (let cardIndex = 0; cardIndex < 30; cardIndex++) {
+    cardDeck.push(cardIndex);
+}
+// Randomly swap pairs of cards
+for (let i = 0; i < 3000; i++) {
+    let cardIndex = Math.floor(Math.random() * 29);
+    let c1 = cardDeck[cardIndex];
+    let c2 = cardDeck[cardIndex + 1];
+    cardDeck[cardIndex] = c2;
+    cardDeck[cardIndex + 1] = c1;
+}
+
+function drawCard() {
+    let card = cardDeck[0];
+    cardDeck.shift();
+    cardDeck.push(card);
+    return card;
+}
+
+let drawnCard;
+
 const updateGame = function () {
     time++;
 
@@ -94,6 +116,12 @@ const updateGame = function () {
 
         if (boatAtPirateIsland) {
             chestOpen.play();
+
+            drawnCard = drawCard();
+            let cardMesh = scene.getMeshByName("Face");
+            cardMesh.material.albedoTexture.uOffset = (drawnCard % 8) * (1 / 8);
+            cardMesh.material.albedoTexture.vOffset = Math.floor(drawnCard / 8) * 0.19034;
+
             scene.getAnimationGroupByName("ChanceReveal").play();
         }
         else {
@@ -257,7 +285,8 @@ const createScene = function () {
         chestLid = scene.getNodeByID("ChestLid");
 
         scene.getAnimationGroupByName("ChanceReveal").onAnimationEndObservable.add(() => {
-            $("#chancecard").attr("src", "assets/cards/Chance 1.png");
+            // var card = drawCard();
+            $("#chancecard").attr("src", "assets/cards/Chance " + (drawnCard + 1) + ".png");
             // $("#chancecard").load(function() {
                 // $("#popup").css("opacity", "1.0");
                 $("#popup").fadeIn();
