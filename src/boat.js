@@ -1,14 +1,18 @@
 import * as Utils from './utils';
 
 const boatColors = ['#B37F39', '#6A9023', '#A5739C', '#82B3CC', '#F9D42C', '#F88642', '#E84D4C', '#E25E9F'];
+let scene, settings;
 
 class Boat {
-    constructor(x, z, scene, settings, boatIndex) {
+    constructor(x, z, _scene, _settings, boatIndex) {
         let self = this;
+        scene = _scene;
+        settings = _settings;
 
-        this.sailingStrength = 2 + Math.floor(Math.random() * 8);
+        this.sailingStrength = Math.floor(Math.random() * 8);
         this.x = x;
         this.z = z;
+        this.boatIndex = boatIndex;
         this.squares = [];
         this.originalAngle = 0;
         this.originalLocation = new BABYLON.Vector3(0, 0, 0);
@@ -17,7 +21,9 @@ class Boat {
         this.moveAnimateStartTime = 0;
 
         let boatMesh = scene.getMeshByName("Boat");
-        const mesh = boatMesh.clone("");
+        let mesh = boatMesh.clone("Boat" + boatIndex);
+        // mesh.setParent(null);
+        // mesh.name
         mesh.setEnabled(true);
         // water.addToRenderList(mesh);
         mesh.isPickable = true;
@@ -30,149 +36,12 @@ class Boat {
                     trigger: BABYLON.ActionManager.OnLeftPickTrigger
                 },
                 function () {
-                    if (self.squares.length > 0) {
-                        for (let s of self.squares)
-                            s.dispose();
-                        self.squares = [];
-                    }
-
-                    // self.angle += BABYLON.Tools.ToRadians(45);
-
-                    let matRed = new BABYLON.StandardMaterial(scene);
-                    matRed.diffuseColor = new BABYLON.Color3(1, 0, 0);
-                    matRed.specularColor = new BABYLON.Color3(0, 0, 0);
-                    matRed.alpha = 0.1;
-
-                    let matWhite = new BABYLON.StandardMaterial(scene);
-                    matWhite.diffuseColor = new BABYLON.Color3(1, 1, 1);
-                    matWhite.specularColor = new BABYLON.Color3(0, 0, 0);
-                    matWhite.alpha = 0.1;
-
-                    let selectionSquare = BABYLON.Mesh.CreateGround("", settings.gridTileSize, settings.gridTileSize, 0, scene);
-                    selectionSquare.material = matWhite;
-                    // selectionSquare.position.y = 0.01;
-
-                    selectionSquare.isPickable = true;
-
-                    let x = 0;
-                    let z = 0;
-
-                    for (let i = 0; i < 32; i++) {
-                        let square = selectionSquare.clone();
-                        self.squares.push(square);
-                        if (i < self.sailingStrength)
-                            square.material = matWhite;
-                        else
-                            square.material = matRed;
-
-                        let d = self.direction % 8;
-                        if (d < 0)
-                            d += 8;
-                        if (d == 7 || d == 0 || d == 1) {
-                            x = i + 1;
-                        }
-                        else if (d == 3 || d == 4 || d == 5) {
-                            x = -i - 1;
-                        }
-                        else
-                            x = 0;
-                        //
-                        if (d == 1 || d == 2 || d == 3) {
-                            z = -i - 1;
-                        }
-                        else if (d == 5 || d == 6 || d == 7) {
-                            z = i + 1;
-                        }
-                        else
-                            z = 0;
-
-                        x += self.x;
-                        z += self.z;
-
-                        if (!Utils.isSquareAllowed(x, z))
-                            break;
-
-                        square.overlayColor = new BABYLON.Color3(0, 0, 0);
-                        square.overlayAlpha = 0.0;
-                        square.renderOverlay = true;
-
-
-
-                        square['gridX'] = x;
-                        square['gridZ'] = z;
-
-                        square.isPickable = true;
-
-                        square.actionManager = new BABYLON.ActionManager(scene);
-                        square.actionManager.registerAction(
-                            new BABYLON.ExecuteCodeAction(
-                                {
-                                    trigger: BABYLON.ActionManager.OnPointerOverTrigger
-                                },
-                                function () {
-                                    square.overlayAlpha = 0.3;
-                                }
-                            )
-                        );
-                        square.actionManager.registerAction(
-                            new BABYLON.ExecuteCodeAction(
-                                {
-                                    trigger: BABYLON.ActionManager.OnPointerOutTrigger
-                                },
-                                function () {
-                                    square.overlayAlpha = 0.0;
-                                }
-                            )
-                        );
-                        square.actionManager.registerAction(
-                            new BABYLON.ExecuteCodeAction(
-                                {
-                                    trigger: BABYLON.ActionManager.OnLeftPickTrigger,
-                                    parameter: {}
-                                },
-                                function () {
-                                    self.x = square.gridX;
-                                    self.z = square.gridZ;
-                                    self.originalLocation = self.CoT.position.clone();
-                                    self.moveAnimateStartTime = self.time;
-                                    self.targetLocation.x = (self.x + 0.5) * settings.gridTileSize;
-                                    self.targetLocation.z = (self.z + 0.5) * settings.gridTileSize;
-
-                                    for (let s of self.squares)
-                                        s.dispose();
-                                    self.squares = [];
-                                }
-                            )
-                        );
-
-
-                        square.position.x = settings.gridTileSize * (x + 0.5);
-                        square.position.z = settings.gridTileSize * (z + 0.5);
-                    }
-                    // selectionSquare.setEnabled(false);
+                    self.showLegalSquares();
                 }
             )
         );
-        // mesh.actionManager.registerAction(
-        //     new BABYLON.ExecuteCodeAction(
-        //         {
-        //             trigger: BABYLON.ActionManager.OnRightPickTrigger
-        //         },
-        //         function () {
-        //             self.direction += 1;
-        //             self.originalAngle = self.angle;
-        //             self.animateStartTime = self.time;
 
-        //             if (self.squares.length > 0) {
-        //                 for (let s of self.squares)
-        //                     s.dispose();
-        //                 self.squares = [];
-        //             }
-        //         }
-        //     )
-        // );
-
-        let CoT = new BABYLON.TransformNode("");
+        let CoT = new BABYLON.TransformNode("Boat" + boatIndex + " transform");
         mesh.setParent(CoT);
 
         if (x <= -12)
@@ -188,20 +57,14 @@ class Boat {
 
         this.CoT = CoT;
 
-
-
         let cw;
         let ccw;
         for (let n of mesh.getChildren()) {
-            if (n.name == ".RotateCW")
-               cw = n;
-            if (n.name == ".RotateCCW")
+            if (n.name == "Boat" + boatIndex + ".RotateCW")
+                cw = n;
+            if (n.name == "Boat" + boatIndex + ".RotateCCW")
                 ccw = n;
         }
-
-
-        // let cw = mesh. ("RotateCW");
-        // let ccw = scene.getMeshByName("RotateCCW");
 
         cw.material = new BABYLON.StandardMaterial("", scene);
         cw.material.specularColor = new BABYLON.Color3(0, 0, 0);
@@ -242,6 +105,9 @@ class Boat {
                     self.direction -= 1;
                     self.originalAngle = self.angle;
                     self.animateStartTime = self.time;
+
+                    if (self.squares.length > 0)
+                        self.showLegalSquares();
                 }
             )
         );
@@ -281,33 +147,20 @@ class Boat {
                     self.direction += 1;
                     self.originalAngle = self.angle;
                     self.animateStartTime = self.time;
+
+                    if (self.squares.length > 0)
+                        self.showLegalSquares();
                 }
             )
         );
 
-
-
-
-
-
-
-        let splashTexture = new BABYLON.Texture("assets/splash.png", scene);
-        let splashMaterial = new BABYLON.StandardMaterial("", scene);
-        splashTexture.hasAlpha = true;
-        // groundTexture.vScale = groundTexture.uScale = 4.0;
-
-        splashMaterial.diffuseTexture = splashTexture;
-        splashMaterial.useAlphaFromDiffuseTexture = true;
-        splashMaterial.useSpecularOverAlpha = true;
-        // splashMaterial.transparencyMode = BABYLON.Material.MATERIAL_ALPHATESTANDBLEND;
-        splashMaterial.specularColor = new BABYLON.Color3(0.0, 0.0, 0.0);
-        
         this.splashes = [];
         for (let i = 0; i < 3; i++) {
-            let splash = BABYLON.Mesh.CreateGround("", settings.gridTileSize, settings.gridTileSize, 0, scene);
+            let splash = BABYLON.Mesh.CreateGround("Splash", settings.gridTileSize, settings.gridTileSize, 0, scene);
             splash.isPickable = false;
-   
-            splash.material = splashMaterial;
+            splash.alphaIndex = 500;
+
+            splash.material = Utils.getSplashMaterial(scene);
 
             splash.position.x = CoT.position.x;
             splash.position.z = CoT.position.z;
@@ -321,7 +174,137 @@ class Boat {
         mat.roughness = 0;
         mesh.material = mat;
 
+        this.mesh = mesh;
+
         this.offset = Math.random();
+    }
+
+    clearSquares() {
+        if (this.squares.length > 0) {
+            for (let s of this.squares)
+                s.dispose();
+            this.squares = [];
+        }
+    }
+
+    showLegalSquares() {
+        let self = this;
+
+        this.clearSquares();
+
+        let matRed = new BABYLON.StandardMaterial("red", scene);
+        matRed.diffuseColor = new BABYLON.Color3(1, 0, 0);
+        matRed.specularColor = new BABYLON.Color3(0, 0, 0);
+        matRed.alpha = 0.1;
+
+        let matWhite = new BABYLON.StandardMaterial("white", scene);
+        matWhite.diffuseColor = new BABYLON.Color3(1, 1, 1);
+        matWhite.specularColor = new BABYLON.Color3(0, 0, 0);
+        matWhite.alpha = 0.1;
+
+        let selectionSquareRed = new BABYLON.MeshBuilder.CreateGround("Selection square", {width: settings.gridTileSize, height: settings.gridTileSize}, scene);
+        selectionSquareRed.material = matRed;
+        let selectionSquareWhite = new BABYLON.MeshBuilder.CreateGround("Selection square", {width: settings.gridTileSize, height: settings.gridTileSize}, scene);
+        selectionSquareWhite.material = matWhite;
+        // selectionSquare.position.y = 0.01;
+        // selectionSquare.isPickable = true;
+
+        let x = 0;
+        let z = 0;
+
+        if (this.sailingStrength > 0) {
+            for (let i = 0; i < 32; i++) {
+                let d = this.direction % 8;
+                if (d < 0)
+                    d += 8;
+                if (d == 7 || d == 0 || d == 1) {
+                    x = i + 1;
+                }
+                else if (d == 3 || d == 4 || d == 5) {
+                    x = -i - 1;
+                }
+                else
+                    x = 0;
+                //
+                if (d == 1 || d == 2 || d == 3) {
+                    z = -i - 1;
+                }
+                else if (d == 5 || d == 6 || d == 7) {
+                    z = i + 1;
+                }
+                else
+                    z = 0;
+
+                x += this.x;
+                z += this.z;
+
+                if (!Utils.isSquareAllowed(x, z))
+                    break;
+
+                let square;
+                if (i < this.sailingStrength)
+                    square = selectionSquareWhite.createInstance("");
+                else
+                    square = selectionSquareRed.createInstance("");
+                this.squares.push(square);
+                square.overlayColor = new BABYLON.Color3(0, 0, 0);
+                square.overlayAlpha = 0.0;
+                square.renderOverlay = true;
+
+                square['gridX'] = x;
+                square['gridZ'] = z;
+
+                square.isPickable = true;
+
+                square.actionManager = new BABYLON.ActionManager(scene);
+                square.actionManager.registerAction(
+                    new BABYLON.ExecuteCodeAction(
+                        {
+                            trigger: BABYLON.ActionManager.OnPointerOverTrigger
+                        },
+                        function () {
+                            square.overlayAlpha = 0.3;
+                        }
+                    )
+                );
+                square.actionManager.registerAction(
+                    new BABYLON.ExecuteCodeAction(
+                        {
+                            trigger: BABYLON.ActionManager.OnPointerOutTrigger
+                        },
+                        function () {
+                            square.overlayAlpha = 0.0;
+                        }
+                    )
+                );
+                square.actionManager.registerAction(
+                    new BABYLON.ExecuteCodeAction(
+                        {
+                            trigger: BABYLON.ActionManager.OnLeftPickTrigger,
+                            parameter: {}
+                        },
+                        function () {
+                            self.x = square.gridX;
+                            self.z = square.gridZ;
+                            self.originalLocation = self.CoT.position.clone();
+                            self.moveAnimateStartTime = self.time;
+                            self.targetLocation.x = (self.x + 0.5) * settings.gridTileSize;
+                            self.targetLocation.z = (self.z + 0.5) * settings.gridTileSize;
+
+                            for (let s of self.squares)
+                                s.dispose();
+                            self.squares = [];
+                        }
+                    )
+                );
+
+
+                square.position.x = settings.gridTileSize * (x + 0.5);
+                square.position.z = settings.gridTileSize * (z + 0.5);
+            }
+        }
+        // selectionSquareRed.dispose();
+        // selectionSquareWhite.dispose();
     }
 
     update(time) {
@@ -347,16 +330,13 @@ class Boat {
         for (let i = 0; i < 3; i++) {
             let splash = this.splashes[i];
             let t = dilatedTime + i * 8;
-            splash.scaling.x = splash.scaling.z = 0 + (t % 20) / 10;
-            splash.material.alpha = 1 - (t % 20) / 20;
-
-            // if (i == 0)
-            // console.log(splash.material.alpha);
+            splash.scaling.x = splash.scaling.z = 0 + (t % 24) / 12;
+            splash.material.alpha = 1 - (t % 24) / 24;
 
             splash.position.x = this.CoT.position.x;
             splash.position.z = this.CoT.position.z;
 
-            if (t % 20 == 0)
+            if (t % 24 == 0)
                 splash.rotate(BABYLON.Axis.Y, Math.random() * Math.PI * 2, BABYLON.Space.WORLD);
         }
     }

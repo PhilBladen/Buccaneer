@@ -53,8 +53,9 @@
 
             position: relative;
             /* z-index: 2; */
-            pointer-events: none;
-            filter: blur(20px);
+            
+            /* pointer-events: none; */
+            /* filter: blur(20px); */
 
             background-color: black;
 
@@ -76,12 +77,7 @@
         } */
     </style>
 
-    <!-- <script src="https://cdn.babylonjs.com/babylon.js"></script> -->
-    <!-- <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script> -->
     <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
-    <!-- <script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.js"></script> -->
-    <!-- <script src="/babyon.gridMaterial.min.js" async></script> -->
-
     <script>
         const startClicked = function () {
             document.getElementById('btnStartGame').style.display = 'none';
@@ -92,18 +88,15 @@
 </head>
 
 <body>
-
     <!-- <div class="canvas-wrapper"> -->
-        <canvas id="renderCanvas" class="canvas" touch-action="none"></canvas>
-        <!-- touch-action="none" for best results from PEP -->
+    <canvas id="renderCanvas" class="canvas" touch-action="none"></canvas>
+    <!-- touch-action="none" for best results from PEP -->
     <!-- </div> -->
 
-    <div id="btnStartGame"
+    <!-- <div id="btnStartGame"
         style="padding: 0.5em; z-index: 0.1; position: absolute; background-color: crimson; text-align: center; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-size: xxx-large; color: white; cursor: pointer; outline: solid; outline-color: white; outline-width: 5px;"
-        onclick="javascript: startClicked();">Set Sail</div>
+        onclick="javascript: startClicked();">Set Sail</div> -->
 
     <script src="main.js"></script>
-
 </body>
-
 </html>

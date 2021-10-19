@@ -18,6 +18,7 @@
     "webpack-dev-server": "^4.3.1"
   },
   "dependencies": {
+    "babylonjs-inspector": "^4.2.0",
     "html-webpack-live-reload-plugin": "^1.0.12",
     "html-webpack-plugin": "^5.3.2",
     "util": "^0.12.4"

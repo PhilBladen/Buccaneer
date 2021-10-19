@@ -16,7 +16,7 @@ const cosineInterpolateV3D = function (startVector, endVector, i, outputVector) 
     outputVector.z = (startVector.z * (1 - mu2) + endVector.z * mu2);
 }
 
-const showAxis = function (size) {
+const showAxis = function (size, scene) {
     var makeTextPlane = function (text, color, size) {
         var dynamicTexture = new BABYLON.DynamicTexture("DynamicTexture", 50, scene, true);
         dynamicTexture.hasAlpha = true;
@@ -79,6 +79,26 @@ const portLocations = [
     new BABYLON.Vector3(-13, 0, 3),
 ];
 
+let splashTexture = null;
+const getSplashMaterial = function (scene) {
+    // if (splashMaterial !== null)
+        // return splashMaterial;
+
+    if (splashTexture === null) {
+        splashTexture = new BABYLON.Texture("assets/splash.png", scene);
+        splashTexture.hasAlpha = true;
+    }
+
+    let splashMaterial = new BABYLON.StandardMaterial("", scene);
+    splashMaterial.diffuseTexture = splashTexture;
+    splashMaterial.useAlphaFromDiffuseTexture = true;
+    splashMaterial.useSpecularOverAlpha = true;
+    // splashMaterial.transparencyMode = BABYLON.Material.MATERIAL_ALPHATESTANDBLEND;
+    splashMaterial.specularColor = new BABYLON.Color3(0.0, 0.0, 0.0);
+
+    return splashMaterial;
+}
+
 export {
     isMobileDevice,
     cosineInterpolate,
@@ -86,4 +106,5 @@ export {
     showAxis,
     isSquareAllowed,
     portLocations,
+    getSplashMaterial,
 }

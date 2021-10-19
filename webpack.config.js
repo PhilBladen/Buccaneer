@@ -32,6 +32,12 @@ module.exports = {
     ],
   },
   resolve: {
+    extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
+    alias: {
+    "babylonjs": path.resolve(__dirname, 'node_modules/babylonjs/babylon.max.js'),
+    "babylonjs-loaders": path.resolve(__dirname, 'node_modules/babylonjs-loaders/babylonjs.loaders.js'),
+    "babylonjs-inspector": path.resolve(__dirname, 'node_modules/babylonjs-inspector/babylon.inspector.bundle.max.js')
+    },
     fallback: {
       util: require.resolve("util/")
     }
