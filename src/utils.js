@@ -59,8 +59,8 @@ const isSquareAllowed = function (x, z) {
         return false;
     if (x >= 8 && x <= 10 && z >= -11 && z <= -8) // Pirate island
         return false;
-    for (let port of portLocations) {
-        if (x == port.x && z == port.z)
+    for (let port of ports) {
+        if (x == port.portLocation.x && z == port.portLocation.z)
             return true;
     }
     if (x < -12 || z < -12 || x > 11 || z > 11) // Border
@@ -68,15 +68,23 @@ const isSquareAllowed = function (x, z) {
     return true;
 }
 
-const portLocations = [
-    new BABYLON.Vector3(-5, 0, 12),
-    new BABYLON.Vector3(3, 0, 12),
-    new BABYLON.Vector3(12, 0, 4),
-    new BABYLON.Vector3(12, 0, -4),
-    new BABYLON.Vector3(4, 0, -13),
-    new BABYLON.Vector3(-4, 0, -13),
-    new BABYLON.Vector3(-13, 0, -5),
-    new BABYLON.Vector3(-13, 0, 3),
+class Port {
+    constructor(portLocation, portColor, portName) {
+        this.portLocation = portLocation;
+        this.portColor = portColor;
+        this.portName = portName;
+    }
+}
+
+const ports = [
+    new Port(new BABYLON.Vector3(12, 0, 4), "#6A9023", "Bombay"),
+    new Port(new BABYLON.Vector3(12, 0, -4), "#82B3CC", "Cadiz"),
+    new Port(new BABYLON.Vector3(4, 0, -13), "#A5739C", "Bristol"),
+    new Port(new BABYLON.Vector3(-4, 0, -13), "#F88642", "London"),
+    new Port(new BABYLON.Vector3(-13, 0, -5), "#F9D42C", "Genoa"),
+    new Port(new BABYLON.Vector3(-13, 0, 3), "#E25E9F", "Venice"),
+    new Port(new BABYLON.Vector3(-5, 0, 12), "#B37F39", "Amsterdam"),
+    new Port(new BABYLON.Vector3(3, 0, 12), "#E84D4C", "Marseilles"),
 ];
 
 let splashTexture = null;
@@ -105,6 +113,6 @@ export {
     cosineInterpolateV3D,
     showAxis,
     isSquareAllowed,
-    portLocations,
+    ports,
     getSplashMaterial,
 }

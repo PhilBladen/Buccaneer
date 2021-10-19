@@ -1,6 +1,5 @@
 import * as Utils from './utils';
 
-const boatColors = ['#B37F39', '#6A9023', '#A5739C', '#82B3CC', '#F9D42C', '#F88642', '#E84D4C', '#E25E9F'];
 let scene, settings;
 
 class Boat {
@@ -170,7 +169,7 @@ class Boat {
         }
 
         let mat = new BABYLON.StandardMaterial("boat", scene);
-        mat.diffuseColor = BABYLON.Color3.FromHexString(boatColors[boatIndex]);
+        mat.diffuseColor = BABYLON.Color3.FromHexString(Utils.ports[boatIndex].portColor);
         mat.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
         mat.roughness = 0;
         mesh.material = mat;

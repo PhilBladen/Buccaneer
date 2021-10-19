@@ -7,7 +7,7 @@ import 'babylonjs-inspector';
 // import * from 'babylon.gridMaterial.min.js';
 import { GridMaterial, WaterMaterial, CustomMaterial } from 'babylonjs-materials'
 import { createPointerLock } from "./pointerLock.js"
-import { cosineInterpolate, cosineInterpolateV3D, isMobileDevice, portLocations, showAxis } from './utils.js';
+import { cosineInterpolate, cosineInterpolateV3D, isMobileDevice, ports, showAxis } from './utils.js';
 import { Boat } from './boat.js';
 
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
@@ -242,10 +242,10 @@ const createScene = function () {
         var edgeIslands = scene.getMeshByName("Grass");
         let rivers = scene.getMeshByName("Rivers");
         let frame = scene.getMeshByName("Frame");
-        let ports = [];
+        let portMeshes = [];
         for (let i = 0; i < 8; i++) {
-            ports[i] = scene.getMeshByName("Dock" + i);
-            console.log(ports[i]);
+            portMeshes[i] = scene.getMeshByName("Dock" + i);
+            console.log(portMeshes[i]);
         }
         let safes = [];
         for (let i = 0; i < 8; i++) {
@@ -258,7 +258,11 @@ const createScene = function () {
 
         scene.getAnimationGroupByName("ChanceReveal").onAnimationEndObservable.add(() => {
             $("#chancecard").attr("src", "assets/cards/Chance 1.png");
-            $("#popup").show();
+            // $("#chancecard").load(function() {
+                // $("#popup").css("opacity", "1.0");
+                $("#popup").fadeIn();
+            // });
+            
         });
 
         // cardAnimation = scene.getAnimationGroupByName("FlipChanceCard");
@@ -368,8 +372,8 @@ const createScene = function () {
 
 
         for (let i = 0; i < 8; i++) {
-            let port = portLocations[i];
-            let boat = new Boat(port.x, port.z, scene, settings, boatIndex++);
+            let portLocation = ports[i].portLocation;
+            let boat = new Boat(portLocation.x, portLocation.z, scene, settings, boatIndex++);
             boats.push(boat);
             water.addToRenderList(boat.mesh);
         }
@@ -431,65 +435,35 @@ const createScene = function () {
 
         // ruby.setEnabled(false);
 
-        let i = 0;
-
-        let portNames = [
-            "amsterdam",
-            "bombay",
-            "bristol",
-            "cadiz",
-            "genoa",
-            "london",
-            "marseilles",
-            "venice"
-        ];
-        for (let port of ports) {
-            // if (port instanceof BABYLON.Mesh) {
-            //     const mat1 = new CustomMaterial("", scene);
-            //     mat1.AddUniform('uvc','vec2');
-            //     mat1.diffuseTexture = new BABYLON.Texture("assets/Merged Map_2048.png", scene);
-            //     mat1.Fragment_Custom_Diffuse('result = texture2D(test1,vec2(time*0.01,0.)+vDiffuseUV).rgb;');
-            //     //mat1.AddUniform("uvc", "vec2");
-            //     // mat1.AddAttribute("uvc");
-            //     // sphere.material = mat1;
-            //     port.material = material;
-
-            //     mat1.Vertex_Definitions('attribute vec2 uvc;');
-            //     mat1.Vertex_Before_PositionUpdated('uvUpdated += uvc;');
-
-            //     // port.registerInstancedBuffer("color", 4);
-            //     port.registerInstancedBuffer("uvc", 2);
-            //     port.instancedBuffers.uvc = new BABYLON.Vector2(0, 0);
-            // }
-            // else {
-            //     if ('instancedBuffers' in port)
-            //         port.instancedBuffers.uvc = new BABYLON.Vector2(1, 0);
-            // }
-
+        let portIndex = 0;
+        for (let port of portMeshes) {
             material = new BABYLON.StandardMaterial("", scene);
             material.specularColor = new BABYLON.Color3(0, 0, 0);
 
             let portTexture = new BABYLON.Texture("assets/Merged Map_2048.png", scene, true);
             portTexture.vScale = -1;
-            portTexture.uOffset = (i % 2) * 0.25;
-            portTexture.vOffset = -Math.floor(i / 2) * 0.1416;
+            portTexture.uOffset = Math.floor(portIndex / 4) * 0.25;
+            portTexture.vOffset = -(portIndex % 4) * 0.1416;
 
             material.diffuseTexture = portTexture;
             port.material = material;
-            // portTexture.vOffset = 0.01;
-            // port.material.diffuseTexture.
-            // material.
-            i++;
+
+            portIndex++;
         }
-        i = 0;
+        portIndex = 0;
         for (let safe of safes) {
+            let isActive = true;
+
             material = new BABYLON.StandardMaterial("", scene);
-            material.specularColor = new BABYLON.Color3(0, 0, 0);
-            let texture = new BABYLON.Texture("assets/docks/" + portNames[i] + "-safe-active.png", scene);
-            material.diffuseTexture = texture;
+            let portTexture = new BABYLON.Texture("assets/Merged Map_2048.png", scene, true);
+            portTexture.vScale = -1;
+            portTexture.uOffset = portIndex * 0.11194;
+            portTexture.vOffset = isActive ? -0.1791 : 0;
+
+            material.diffuseTexture = portTexture;
             safe.material = material;
-            safe.material.diffuseTexture.vScale = -1.0;
-            i++;
+
+            portIndex++;
         }
 
         let anchor = scene.getMeshByName("Anchor");
