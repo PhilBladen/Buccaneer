@@ -70,6 +70,7 @@ class Boat {
         cw.material.specularColor = new BABYLON.Color3(0, 0, 0);
         cw.material.diffuseTexture = new BABYLON.Texture("assets/arrows.png", scene);
         cw.material.diffuseTexture.hasAlpha = true;
+        // cw.material.transparencyMode = BABYLON.StandardMaterial.MATERIAL_ALPHABLEND;
         cw.material.useAlphaFromDiffuseTexture = true;
         cw.isPickable = true;
         cw.overlayAlpha = 0.0;
@@ -241,11 +242,13 @@ class Boat {
                 if (!Utils.isSquareAllowed(x, z))
                     break;
 
-                let square;
-                if (i < this.sailingStrength)
-                    square = selectionSquareWhite.createInstance("");
-                else
-                    square = selectionSquareRed.createInstance("");
+                let square = new BABYLON.MeshBuilder.CreateGround("Move square", {width: settings.gridTileSize, height: settings.gridTileSize}, scene);
+                if (i < this.sailingStrength) {
+                    square.material = matWhite;
+                }
+                else {
+                    square.material = matRed;
+                }
                 this.squares.push(square);
                 square.overlayColor = new BABYLON.Color3(0, 0, 0);
                 square.overlayAlpha = 0.0;

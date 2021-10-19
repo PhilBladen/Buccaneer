@@ -33,9 +33,7 @@ let boatIndex = 0;
 
 const settingsLow = {
     reflections: false,
-    reflectionResolution: 512,
-    riverReflectionResolution: 64,
-    useAntialiasing: true,
+    useAntialiasing: false,
     gridTileSize: 1,
 }
 
@@ -100,7 +98,7 @@ const updateGame = function () {
         }
         else {
             chestClose.play();
-            scene.getAnimationGroupByName("ChanceReturn").play();
+            
             createdParticleSystem = false;
         }
     }
@@ -119,7 +117,7 @@ const updateGame = function () {
 
             var emissionPlane = scene.getMeshByName("ChestEmitPlane");
             var emissionPlaneBounds = emissionPlane.getBoundingInfo();
-            
+
             particleSystem.createBoxEmitter(new BABYLON.Vector3(0, 2, 0), new BABYLON.Vector3(0, 0.1, 0), emissionPlaneBounds.boundingBox.minimumWorld, emissionPlaneBounds.boundingBox.maximumWorld);
             particleSystem.start();
 
@@ -258,6 +256,11 @@ const createScene = function () {
         let ruby = scene.getMeshByName("Ruby");
         chestLid = scene.getNodeByID("ChestLid");
 
+        scene.getAnimationGroupByName("ChanceReveal").onAnimationEndObservable.add(() => {
+            $("#chancecard").attr("src", "assets/cards/Chance 1.png");
+            $("#popup").show();
+        });
+
         // cardAnimation = scene.getAnimationGroupByName("FlipChanceCard");
         // cardAnimation.loopAnimation = false;
 
@@ -327,7 +330,7 @@ const createScene = function () {
 
         let terrainParent = scene.getNodeByName("TerrainParent");
         for (let mesh of terrainParent.getChildren(undefined, false)) {
-            if (mesh instanceof BABYLON.Mesh)
+            if (mesh instanceof BABYLON.Mesh || mesh instanceof BABYLON.InstancedMesh)
                 water.addToRenderList(mesh);
             // console.log(mesh);
         }
@@ -521,19 +524,42 @@ const createScene = function () {
         //         mesh.material.freeze();
         // }
 
-        engine.hideLoadingUI();
+        
+        if (!isMobileDevice())
         scene.debugLayer.show();
-
+        
         // BABYLON.SceneOptimizer.OptimizeAsync(scene, BABYLON.SceneOptimizerOptions.ModerateDegradationAllowed(),
         //     function () {
-        //         console.log("Optimization success");
-        //     }, function () {
-        //         // FPS target not reached
-        //     });
+            //         console.log("Optimization success");
+            //     }, function () {
+                //         // FPS target not reached
+                //     });
+                
+                
+                // var utilLayer = new BABYLON.UtilityLayerRenderer(scene);
+                // var overlayBox = BABYLON.Mesh.CreateBox("box", 1, utilLayer.utilityLayerScene);
+                // overlayBox.position.z = 0.5
+                // overlayBox.position.y = 3.5;
+                // // Create a different light for the overlay scene
+                // var overlayLight = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 0, 1), utilLayer.utilityLayerScene);
+                // overlayLight.intensity = 0.7;
+                // utilLayer.utilityLayerScene.autoClearDepthAndStencil=false
+
+        $("#btnClosePopup").click(() => {
+            scene.getAnimationGroupByName("ChanceReturn").play();
+            scene.getAnimationGroupByName("StackReturn").play();
+        });
+
+
+        engine.hideLoadingUI();
     });
 
     return scene;
 };
+
+window.addEventListener("orientationchange", function () {
+    console.log("The orientation of the screen is: " + window.orientation);
+  });
 
 const scene = createScene();
 // createPointerLock(scene);
