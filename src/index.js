@@ -528,8 +528,8 @@ const createScene = function () {
         // }
 
         
-        if (!isMobileDevice())
-        scene.debugLayer.show();
+        // if (!isMobileDevice())
+        // scene.debugLayer.show();
         
         // BABYLON.SceneOptimizer.OptimizeAsync(scene, BABYLON.SceneOptimizerOptions.ModerateDegradationAllowed(),
         //     function () {

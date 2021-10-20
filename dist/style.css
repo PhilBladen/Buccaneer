@@ -19,6 +19,9 @@ body {
     user-select: none;
     outline: none;
     -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
 }
 
 .canvas-wrapper {
@@ -46,20 +49,16 @@ body {
     width: 100%;
     height: 100%;
     touch-action: none;
-
     position: relative;
     /* z-index: 2; */
-
     /* pointer-events: none; */
     /* filter: blur(20px); */
-
     background-color: black;
-
     transition: filter ease-in-out 0.5s;
-
     overflow: hidden;
     /* transform: scale(1.5); */
 }
+
 
 /* #renderCanvas::before {
     content: "";
@@ -92,6 +91,7 @@ body {
     border-radius: 10px;
     pointer-events: all;
 }
+
 .btn:hover {
     background-color: darkred;
 }
@@ -111,7 +111,6 @@ body {
     /* opacity: 0.0; */
     /* visibility: hidden; */
     /* transition: opacity ease-in-out 0.5; */
-
     pointer-events: none;
     bottom: 30vh;
 }
@@ -128,7 +127,7 @@ body {
 .actionbtn {
     /* flex: 1 1 auto; */
     /* margin: 0 30px; */
-    padding: 10px;
+    padding: 0 10px;
     background-color: #a10000;
     text-align: center;
     max-width: fit-content;
@@ -142,21 +141,52 @@ body {
     outline-width: 6px;
     border-radius: 10px;
     pointer-events: all;
+    /* min-height: 60px; */
+    line-height: 70px;
 }
+
 .actionbtn:hover {
     background-color: darkred;
+}
+
+.minimap {
+    aspect-ratio: 1;
+    height: 300px;
+    object-fit: fill;
+    display: block;
+}
+
+@media only screen and (max-width: 1500px) {
+    .actionbtn {
+        font-size: x-large;
+        text-align: center;
+    }
+    .minimap {
+        height: 200px;
+    }
+}
+
+@media only screen and (max-width: 800px) {
+    .actionbtn {
+        font-size: large;
+        text-align: center;
+    }
+    .minimap {
+        height: 150px;
+    }
 }
 
 .disabled {
     background-color: #acacac;
     color: #7a7a7a;
 }
+
 .disabled:hover {
     background-color: #acacac;
 }
 
 #hudleft {
-    flex: 0 0 30%;
+    flex: 0 0 400px;
     max-width: 600px;
     margin-left: 20px;
     background-color: #acacac;
@@ -165,12 +195,13 @@ body {
 }
 
 #hudright {
-    flex: 0 0 20%;
-    max-width: 400px;
+    flex: 0 0;
+    /* max-width: 400px; */
     margin-right: 20px;
-    background-color: #acacac;
+    /* background-color: #acacac; */
     outline: 6px black solid;
     border-radius: 10px;
+    padding: 0;
 }
 
 .card {
@@ -189,27 +220,78 @@ body {
     transition: transform ease-in-out 0.1s;
     pointer-events: all;
     /* transform: translate(0, -50px); */
-
     /* border */
 }
+
 .card img {
     width: 100%;
     /* object-fit: cover; */
-
-    
 }
 
-.card:nth-child(1) {transform: rotate(-10deg) translate(0, 15px)}
-.card:nth-child(2) {transform: rotate(0deg)}
-.card:nth-child(3) {transform: rotate(10deg) translate(0, 15px)}
-.card:nth-child(4) {transform: rotate(20deg) translate(-5px, 60px)}
+.card:nth-child(1) {
+    transform: rotate(-10deg) translate(0, 15px);
+}
 
-.card:nth-child(1):hover {transform: translate(0, -30px) rotate(-10deg)}
-.card:nth-child(2):hover {transform: translate(0, -45px) rotate(0deg)}
-.card:nth-child(3):hover {transform: translate(0, -30px) rotate(10deg)}
-.card:nth-child(4):hover {transform: translate(0, 0px) rotate(20deg)}
+.card:nth-child(2) {
+    transform: rotate(0deg);
+}
 
-/* .dbg1 {background-color: darkseagreen; } */
-/* .dbg2 {background-color: coral; } */
-/* .dbg3 {background-color: darkslategrey; } */
-/* .dbg4 {background-color: honeydew; } */
+.card:nth-child(3) {
+    transform: rotate(10deg) translate(0, 15px);
+}
+
+.card:nth-child(4) {
+    transform: rotate(20deg) translate(-5px, 60px);
+}
+
+.card:nth-child(1):hover {
+    transform: translate(0, -30px) rotate(-10deg);
+}
+
+.card:nth-child(2):hover {
+    transform: translate(0, -45px) rotate(0deg);
+}
+
+.card:nth-child(3):hover {
+    transform: translate(0, -30px) rotate(10deg);
+}
+
+.card:nth-child(4):hover {
+    transform: translate(0, 0px) rotate(20deg);
+}
+
+#hudtop {
+    z-index: 10;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    /* padding: 2px 0px; */
+    pointer-events: all;
+    flex-direction: row;
+    justify-content: center;
+    font-family: pirate;
+    font-size: xx-large;
+    outline: solid black 3px;
+    background-color: #709BB0;
+}
+
+.dbg1 {
+    /* background-color: darkseagreen; */
+}
+
+.dbg2 {
+    /* background-color: coral; */
+}
+
+.dbg3 {
+    /* background-color: darkslategrey; */
+}
+
+.dbg4 {
+    /* background-color: honeydew; */
+}
+
+.settings:hover {
+    color: gray;
+}
