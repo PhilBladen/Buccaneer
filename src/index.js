@@ -40,7 +40,7 @@ let boatIndex = 0;
 
 const settingsLow = {
     reflections: false,
-    useAntialiasing: false,
+    useAntialiasing: true,
     gridTileSize: 1,
 }
 
@@ -563,26 +563,27 @@ const createScene = function() {
 
 window.addEventListener("orientationchange", function() {
     console.log("The orientation of the screen is: " + window.orientation);
-    // return;
+    return;
 
     var vpwidth = "device-width";
     var vlwidth = "device-height";
-    var scale = 1.0;
+    var scale = .5;
     var viewport = document.querySelector("meta[name=viewport]");
 
     switch (window.orientation) {
         case 0: //portrait
             //set the viewport attributes to whatever you want!
-            viewport.setAttribute('content', 'width=' + vpwidth + ', initial-scale=' + scale + ', maximum-scale=1.0;')
+            viewport.setAttribute('content', 'width=' + vpwidth + ', initial-scale=' + scale + ', maximum-scale=1.0')
+            console.log(viewport.getAttribute("content"))
             break;
         case 90:
         case -90: //landscape
             //set the viewport attributes to whatever you want!
-            viewport.setAttribute('content', 'width=' + vlwidth + ', initial-scale=' + scale + ', maximum-scale=1.0;')
+            viewport.setAttribute('content', 'width=' + vlwidth + ', initial-scale=' + scale + ', maximum-scale=1.0')
             break;
         default:
             //set the viewport attributes to whatever you want!
-            viewport.setAttribute('content', 'width=' + vpwidth + ', initial-scale=' + scale + ', maximum-scale=1.0;')
+            viewport.setAttribute('content', 'width=' + vpwidth + ', initial-scale=' + scale + ', maximum-scale=1.0')
             break;
     }
 });
@@ -598,6 +599,6 @@ engine.runRenderLoop(function() {
 // Watch for browser/canvas resize events
 window.addEventListener("resize", function() {
     engine.resize();
-    // console.log(canvas.clientWidth)
-    // console.log(canvas.clientHeight)
+    console.log(canvas.clientWidth)
+    console.log(canvas.clientHeight)
 });

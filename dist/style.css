@@ -364,6 +364,12 @@ img {
     height: 300px;
 }
 
+#actionbtnwrapper2 {
+    flex: 1 1;
+    justify-content: center;
+    align-items: flex-end;
+}
+
 @media only screen and (max-width: 1600px) {
     .actionbtn {
         font-size: x-large;
@@ -414,15 +420,12 @@ img {
         text-align: center;
         outline-width: 3px;
     }
-    #actionbtnwrapper {
-        flex: 0 0;
-    }
-    #minimapwrapper {
-        display: none;
-    }
     #hudleft,
     #hudright {
         outline-width: 3px;
+    }
+    #minimapwrapper {
+        display: none;
     }
     .icon {
         max-height: 32px;
@@ -452,6 +455,16 @@ img {
         border-radius: 5px;
         outline-width: 3px;
         /* text-align: center; */
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    #actionbtnwrapper2 {
+        justify-content: flex-end;
+        margin-right: 10px;
+    }
+    #minimapwrapper {
+        display: none;
     }
     #buttons {
         flex-direction: column;
