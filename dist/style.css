@@ -24,6 +24,10 @@ body {
     -ms-text-size-adjust: 100%;
 }
 
+img {
+    min-height: 0;
+}
+
 .canvas-wrapper {
     background: no-repeat center center fixed;
     background-size: cover;
@@ -59,6 +63,10 @@ body {
     /* transform: scale(1.5); */
 }
 
+#renderCanvas:focus {
+    outline: none;
+}
+
 
 /* #renderCanvas::before {
     content: "";
@@ -85,11 +93,8 @@ body {
     font-size: xx-large;
     color: white;
     cursor: pointer;
-    outline: solid;
-    outline-color: black;
-    outline-width: 5px;
+    outline: solid black 5px;
     border-radius: 10px;
-    pointer-events: all;
 }
 
 .btn:hover {
@@ -97,26 +102,21 @@ body {
 }
 
 .popup {
-    position: fixed;
+    /* position: fixed; */
     /* top: 50vh; */
-    left: 50vw;
-    transform: translate(-50%, -50%);
-    z-index: 0.1;
-    max-height: 40vh;
-    max-width: 60vw;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-flow: column;
+    /* left: 50vw; */
+    /* transform: translate(-50%, -50%); */
+    /* z-index: 0.1; */
+    /* max-height: 40vh; */
+    /* max-width: 60vw; */
+    /* width: 100%; */
+    /* height: 100%; */
+    /* flex-flow: column; */
     /* opacity: 0.0; */
     /* visibility: hidden; */
     /* transition: opacity ease-in-out 0.5; */
-    pointer-events: none;
-    bottom: 30vh;
-}
-
-#renderCanvas:focus {
-    outline: none;
+    /* pointer-events: none; */
+    /* bottom: 30vh; */
 }
 
 .container {
@@ -124,13 +124,23 @@ body {
     /* or inline-flex */
 }
 
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+}
+
 .actionbtn {
     /* flex: 1 1 auto; */
-    /* margin: 0 30px; */
+    margin: 10px 10px 0 10px;
     padding: 0 10px;
     background-color: #a10000;
     text-align: center;
-    max-width: fit-content;
+    /* max-width: fit-content; */
     max-height: fit-content;
     font-family: pirate;
     font-size: xxx-large;
@@ -156,24 +166,41 @@ body {
     display: block;
 }
 
-@media only screen and (max-width: 1500px) {
-    .actionbtn {
-        font-size: x-large;
-        text-align: center;
-    }
-    .minimap {
-        height: 200px;
-    }
+.cardcount {
+    font-family: pirate;
+    font-size: xxx-large;
+    padding: 0 10px;
+    font-weight: bolder;
 }
 
-@media only screen and (max-width: 800px) {
-    .actionbtn {
-        font-size: large;
-        text-align: center;
-    }
-    .minimap {
-        height: 150px;
-    }
+.treasure {
+    outline: solid #915029 2px;
+    background-color: #D68F64;
+    border-radius: 10px;
+    width: 50px;
+    height: 50px;
+    margin-top: -45px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.treasure img {
+    display: block;
+    width: 45px;
+    height: 45px;
+}
+
+.boat {
+    width: 300px;
+    height: 107px;
+    min-height: 0px;
+    min-width: 0px;
+}
+
+.icon {
+    height: 64px;
 }
 
 .disabled {
@@ -185,20 +212,47 @@ body {
     background-color: #acacac;
 }
 
+.layoutonly {
+    pointer-events: none;
+}
+
+.clickable {
+    pointer-events: auto;
+}
+
 #hudleft {
     flex: 0 0 400px;
     max-width: 600px;
     margin-left: 20px;
-    background-color: #acacac;
     outline: 6px black solid;
     border-radius: 10px;
 }
 
+.city {
+    font-family: pirate;
+    font-size: xxx-large;
+    text-align: center;
+}
+
+.btnrules {
+    outline: solid rgba(1, 1, 1, 0.2) 3px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+}
+
+.btnrules:hover img {
+    transform: scale(1.1);
+    transition: transform ease-in-out 0.2s;
+}
+
 #hudright {
-    flex: 0 0;
+    flex: 0 0 auto;
     /* max-width: 400px; */
     margin-right: 20px;
     /* background-color: #acacac; */
+    overflow: hidden;
     outline: 6px black solid;
     border-radius: 10px;
     padding: 0;
@@ -261,11 +315,6 @@ body {
 }
 
 #hudtop {
-    z-index: 10;
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
     /* padding: 2px 0px; */
     pointer-events: all;
     flex-direction: row;
@@ -277,21 +326,146 @@ body {
 }
 
 .dbg1 {
-    /* background-color: darkseagreen; */
+    background-color: darkseagreen;
 }
 
 .dbg2 {
-    /* background-color: coral; */
+    background-color: coral;
 }
 
 .dbg3 {
-    /* background-color: darkslategrey; */
+    background-color: darkslategrey;
 }
 
 .dbg4 {
-    /* background-color: honeydew; */
+    background-color: honeydew;
+}
+
+.dbg5 {
+    background-color: orange;
 }
 
 .settings:hover {
     color: gray;
 }
+
+#buttons {
+    /* flex-direction: row; */
+    /* align-items: stretch; */
+    /* justify-content: center; */
+}
+
+#hudbottom {
+    justify-content: center;
+}
+
+#actionbtnwrapper {
+    flex: 2 1;
+    height: 300px;
+}
+
+@media only screen and (max-width: 1600px) {
+    .actionbtn {
+        font-size: x-large;
+        text-align: center;
+        outline-width: 3px;
+    }
+    .minimap {
+        height: 200px;
+    }
+    #hudleft,
+    #hudright {
+        outline-width: 3px;
+    }
+    .icon {
+        max-height: 32px;
+    }
+    .cardcount {
+        font-size: x-large;
+    }
+    .treasure {
+        width: 25px;
+        height: 25px;
+        border-radius: 5px;
+        margin-top: -25px;
+    }
+    .treasure img {
+        width: 22px;
+        height: 22px;
+    }
+    .boat {
+        width: 150px;
+        height: 54px;
+    }
+    .city {
+        font-size: x-large;
+    }
+    .btn {
+        font-size: large;
+        border-radius: 5px;
+        outline-width: 3px;
+        /* text-align: center; */
+    }
+}
+
+@media only screen and (max-width: 1000px) {
+    .actionbtn {
+        font-size: large;
+        text-align: center;
+        outline-width: 3px;
+    }
+    #actionbtnwrapper {
+        flex: 0 0;
+    }
+    #minimapwrapper {
+        display: none;
+    }
+    #hudleft,
+    #hudright {
+        outline-width: 3px;
+    }
+    .icon {
+        max-height: 32px;
+    }
+    .cardcount {
+        font-size: large;
+    }
+    .treasure {
+        width: 25px;
+        height: 25px;
+        border-radius: 5px;
+        margin-top: -25px;
+    }
+    .treasure img {
+        width: 22px;
+        height: 22px;
+    }
+    .boat {
+        width: 150px;
+        height: 54px;
+    }
+    .city {
+        font-size: large;
+    }
+    .btn {
+        font-size: medium;
+        border-radius: 5px;
+        outline-width: 3px;
+        /* text-align: center; */
+    }
+    #buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+
+/* @media only screen and (max-width: 1200px) {
+    .actionbtn {
+        font-size: large;
+        text-align: center;
+    }
+    .minimap {
+        height: 150px;
+    }
+} */

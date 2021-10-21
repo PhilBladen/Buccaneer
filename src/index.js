@@ -11,11 +11,18 @@ import { cosineInterpolate, cosineInterpolateV3D, isMobileDevice, ports, showAxi
 import { Boat } from './boat.js';
 
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
-canvas.onselectstart = function () { return false; }
+canvas.onselectstart = function() { return false; }
 
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 
 // engine.enterFullscreen(); TODO add user option
+
+$(window).focus(function() {
+    BABYLON.Engine.audioEngine.setGlobalVolume(1);
+}).blur(function() {
+    // Pause when window loses focus
+    BABYLON.Engine.audioEngine.setGlobalVolume(0);
+});
 
 let selectedBoat = null;
 let camera = null;
@@ -87,7 +94,7 @@ function drawCard() {
 
 let drawnCard;
 
-const updateGame = function () {
+const updateGame = function() {
     time++;
 
     let boatAtPirateIsland = false;
@@ -123,10 +130,9 @@ const updateGame = function () {
             cardMesh.material.albedoTexture.vOffset = Math.floor(drawnCard / 8) * 0.19034;
 
             scene.getAnimationGroupByName("ChanceReveal").play();
-        }
-        else {
+        } else {
             chestClose.play();
-            
+
             createdParticleSystem = false;
         }
     }
@@ -167,7 +173,7 @@ const updateGame = function () {
 }
 
 // Add your code here matching the playground format
-const createScene = function () {
+const createScene = function() {
     engine.displayLoadingUI();
 
     const scene = new BABYLON.Scene(engine);
@@ -187,8 +193,7 @@ const createScene = function () {
         camera.inputs.attached.pointers.angularSensibility = 10;
         camera.wheelPrecision = 1;
         // camera.inputs.attached.pointers.panningSensibility = 2000;
-    }
-    else {
+    } else {
         camera = new BABYLON.UniversalCamera("camera", new BABYLON.Vector3(0, 10, -10), scene);
         // camera.lowerRadiusLimit = 2;
         // camera.upperRadiusLimit = 50;
@@ -222,8 +227,7 @@ const createScene = function () {
 
     scene.actionManager = new BABYLON.ActionManager(scene);
     scene.actionManager.registerAction(
-        new BABYLON.ExecuteCodeAction(
-            {
+        new BABYLON.ExecuteCodeAction({
                 trigger: BABYLON.ActionManager.OnKeyDownTrigger,
                 parameter: 'r'
             },
@@ -231,8 +235,7 @@ const createScene = function () {
         )
     );
     scene.actionManager.registerAction(
-        new BABYLON.ExecuteCodeAction(
-            {
+        new BABYLON.ExecuteCodeAction({
                 trigger: BABYLON.ActionManager.OnKeyDownTrigger,
                 parameter: 'a'
             },
@@ -242,7 +245,7 @@ const createScene = function () {
 
     chestOpen = new BABYLON.Sound("chestopen", "assets/chestopen.wav", scene);
     chestClose = new BABYLON.Sound("chestopen", "assets/chestclose.wav", scene);
-    var music = new BABYLON.Sound("water", "assets/water.mp3", scene, function () {
+    var music = new BABYLON.Sound("water", "assets/water.mp3", scene, function() {
         // Sound has been downloaded & decoded
         music.play();
     }, { loop: true });
@@ -258,7 +261,7 @@ const createScene = function () {
     Promise.all([
         BABYLON.SceneLoader.AppendAsync("assets/AllIslands.glb"),
         BABYLON.SceneLoader.AppendAsync("assets/Boat.gltf")
-    ]).then(function () {
+    ]).then(function() {
         // scene.debugLayer.show();
         // return;
 
@@ -288,10 +291,10 @@ const createScene = function () {
             // var card = drawCard();
             $("#chancecard").attr("src", "assets/cards/Chance " + (drawnCard + 1) + ".png");
             // $("#chancecard").load(function() {
-                // $("#popup").css("opacity", "1.0");
-                $("#popup").fadeIn();
+            // $("#popup").css("opacity", "1.0");
+            $("#popup").fadeIn();
             // });
-            
+
         });
 
         // cardAnimation = scene.getAnimationGroupByName("FlipChanceCard");
@@ -378,8 +381,7 @@ const createScene = function () {
 
         if (settings.reflections) {
             sea.material = water;
-        }
-        else {
+        } else {
             sea.material = waterDiffuseMaterial;
             // sea.material.needAlphaTesting = true;
             sea.alphaIndex = 500;
@@ -391,11 +393,11 @@ const createScene = function () {
         // }
         // BABYLON.Mesh.MergeMeshes(meshes, true, true, undefined, false, true);
 
-        scene.registerBeforeRender(function () {
+        scene.registerBeforeRender(function() {
             updateGame();
         });
 
-        scene.onPointerMove = function () {
+        scene.onPointerMove = function() {
             // TODO
         };
 
@@ -433,8 +435,7 @@ const createScene = function () {
 
         if (settings.reflections) {
             rivers.material = water;
-        }
-        else {
+        } else {
             rivers.material = waterDiffuseMaterial;
         }
 
@@ -527,26 +528,26 @@ const createScene = function () {
         //         mesh.material.freeze();
         // }
 
-        
+
         // if (!isMobileDevice())
         // scene.debugLayer.show();
-        
+
         // BABYLON.SceneOptimizer.OptimizeAsync(scene, BABYLON.SceneOptimizerOptions.ModerateDegradationAllowed(),
         //     function () {
-            //         console.log("Optimization success");
-            //     }, function () {
-                //         // FPS target not reached
-                //     });
-                
-                
-                // var utilLayer = new BABYLON.UtilityLayerRenderer(scene);
-                // var overlayBox = BABYLON.Mesh.CreateBox("box", 1, utilLayer.utilityLayerScene);
-                // overlayBox.position.z = 0.5
-                // overlayBox.position.y = 3.5;
-                // // Create a different light for the overlay scene
-                // var overlayLight = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 0, 1), utilLayer.utilityLayerScene);
-                // overlayLight.intensity = 0.7;
-                // utilLayer.utilityLayerScene.autoClearDepthAndStencil=false
+        //         console.log("Optimization success");
+        //     }, function () {
+        //         // FPS target not reached
+        //     });
+
+
+        // var utilLayer = new BABYLON.UtilityLayerRenderer(scene);
+        // var overlayBox = BABYLON.Mesh.CreateBox("box", 1, utilLayer.utilityLayerScene);
+        // overlayBox.position.z = 0.5
+        // overlayBox.position.y = 3.5;
+        // // Create a different light for the overlay scene
+        // var overlayLight = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 0, 1), utilLayer.utilityLayerScene);
+        // overlayLight.intensity = 0.7;
+        // utilLayer.utilityLayerScene.autoClearDepthAndStencil=false
 
         $("#btnClosePopup").click(() => {
             scene.getAnimationGroupByName("ChanceReturn").play();
@@ -560,19 +561,43 @@ const createScene = function () {
     return scene;
 };
 
-window.addEventListener("orientationchange", function () {
+window.addEventListener("orientationchange", function() {
     console.log("The orientation of the screen is: " + window.orientation);
-  });
+    // return;
+
+    var vpwidth = "device-width";
+    var vlwidth = "device-height";
+    var scale = 1.0;
+    var viewport = document.querySelector("meta[name=viewport]");
+
+    switch (window.orientation) {
+        case 0: //portrait
+            //set the viewport attributes to whatever you want!
+            viewport.setAttribute('content', 'width=' + vpwidth + ', initial-scale=' + scale + ', maximum-scale=1.0;')
+            break;
+        case 90:
+        case -90: //landscape
+            //set the viewport attributes to whatever you want!
+            viewport.setAttribute('content', 'width=' + vlwidth + ', initial-scale=' + scale + ', maximum-scale=1.0;')
+            break;
+        default:
+            //set the viewport attributes to whatever you want!
+            viewport.setAttribute('content', 'width=' + vpwidth + ', initial-scale=' + scale + ', maximum-scale=1.0;')
+            break;
+    }
+});
 
 const scene = createScene();
 // createPointerLock(scene);
 
 // Register a render loop to repeatedly render the scene
-engine.runRenderLoop(function () {
+engine.runRenderLoop(function() {
     scene.render();
 });
 
 // Watch for browser/canvas resize events
-window.addEventListener("resize", function () {
+window.addEventListener("resize", function() {
     engine.resize();
+    // console.log(canvas.clientWidth)
+    // console.log(canvas.clientHeight)
 });
