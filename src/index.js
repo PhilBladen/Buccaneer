@@ -2,15 +2,13 @@ import * as BABYLON from 'babylonjs';
 import 'babylonjs-materials';
 import { GLTFLoaderAnimationStartMode } from 'babylonjs-loaders';
 import 'babylonjs-inspector';
-// import "@babylonjs/core/Debug/debugLayer";
-
-// import * from 'babylon.gridMaterial.min.js';
 import { GridMaterial, WaterMaterial, CustomMaterial } from 'babylonjs-materials'
 import { createPointerLock } from "./pointerLock.js"
 import { cosineInterpolate, cosineInterpolateV3D, isMobileDevice, showAxis } from './utils.js';
 import { Boat } from './boat.js';
 import { Port, ports } from './port.js';
 import { SoundEngine } from './soundengine.js';
+import { AssetManager } from './assets.js';
 
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 canvas.onselectstart = function() { return false; }
@@ -21,6 +19,7 @@ const engine = new BABYLON.Engine(canvas, true, {}, true); // Generate the BABYL
 // engine.enterFullscreen(); TODO add user option
 
 const soundEngine = new SoundEngine();
+const assetManager = new AssetManager();
 
 $(window).focus(function() {
     BABYLON.Engine.audioEngine.setGlobalVolume(1);
@@ -337,8 +336,11 @@ const createScene = function() {
 
     Promise.all([
         BABYLON.SceneLoader.AppendAsync("assets/AllIslands.glb"),
-        BABYLON.SceneLoader.AppendAsync("assets/Boat.gltf")
+        BABYLON.SceneLoader.AppendAsync("assets/Boat.glb"),
+        BABYLON.SceneLoader.AppendAsync("assets/3DAssets.glb")
     ]).then(function() {
+        assetManager.load(scene);
+
         boatMesh = scene.getMeshByName("Boat");
         // boatMesh.setEnabled(false);
 
@@ -427,7 +429,7 @@ const createScene = function() {
         }
 
         for (let port of ports) {
-            port.init(scene);
+            port.init(scene, assetManager);
         }
 
         // let meshes = [];
@@ -554,13 +556,15 @@ const createScene = function() {
         soundEngine.init(scene);
 
         $("#btnClosePopup").click(() => {
-            scene.getAnimationGroupByName("ChanceReturn").play();
+            scene.getAnimationGroupByName("ChanceReturn.001").play();
             scene.getAnimationGroupByName("StackReturn").play();
         });
 
         nextTurn();
 
-        engine.hideLoadingUI();
+        scene.executeWhenReady(function() {
+            engine.hideLoadingUI();
+        });
     });
 
     return scene;

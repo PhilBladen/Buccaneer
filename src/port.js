@@ -1,12 +1,15 @@
+let portIndex = 0;
+
 class Port {
     constructor(portLocation, portColor, portName, inventoryLocation) {
         this.portLocation = portLocation;
         this.portColor = portColor;
         this.portName = portName;
         this.inventoryLocation = inventoryLocation;
+        this.portIndex = portIndex++;
     }
 
-    init(scene) {
+    init(scene, assetManager) {
         let inventoryTransform = new BABYLON.TransformNode(this.portName, scene);
 
         let l = this.portLocation;
@@ -56,13 +59,21 @@ class Port {
             cardMesh.position.y = -i * 0.001;
         }
 
-        let cardMesh = scene.getMeshByName("GenericCardFace").clone(this.portName + " card");
-        cardMesh.parent = null;
-        cardMesh.scaling.x = 1;
-        cardMesh.scaling.y = 1;
-        cardMesh.scaling.z = 1;
-        cardMesh.parent = new BABYLON.TransformNode(this.portName, scene);
-        cardMesh.parent.position = scene.getMeshByName("Dock0").position;
+        // if (this.portName != "Bombay") return;
+
+        let cardMesh;
+        let rand = Math.floor(Math.random() * 3);
+        if (rand == 0)
+            cardMesh = assetManager.getRubyInstance();
+        else if (rand == 1) {
+            cardMesh = assetManager.getGoldInstance();
+        } else if (rand == 2) {
+            cardMesh = assetManager.getBarrelInstance();
+        }
+        cardMesh.parent = new BABYLON.TransformNode("", scene);
+        cardMesh.parent.setDirection(BABYLON.Axis.Z, Math.random() * Math.PI * 2, 0, 0);
+        cardMesh.parent.position = scene.getMeshByName("Dock" + this.portIndex).getAbsolutePosition();
+        // cardMesh.position.y += 0.1;
     }
 }
 
