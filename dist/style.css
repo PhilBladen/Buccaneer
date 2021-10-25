@@ -206,6 +206,7 @@ img {
 .disabled {
     background-color: #acacac;
     color: #7a7a7a;
+    pointer-events: none;
 }
 
 .disabled:hover {
@@ -322,7 +323,6 @@ img {
     font-family: pirate;
     font-size: xx-large;
     outline: solid black 3px;
-    background-color: #709BB0;
 }
 
 .dbg1 {

@@ -66,12 +66,14 @@ if (isMobileDevice())
 else
     settings = settingsMed;
 
-var chestOpen;
-var chestClose;
+let chestOpenSound;
+let chestCloseSound;
 
 let wasBoatAtPirateIsland = false;
 let chestAnimationStartTime = 0;
 let createdParticleSystem = false;
+
+let currentTurnPortIndex = 0;
 
 let cardDeck = [];
 for (let cardIndex = 0; cardIndex < 30; cardIndex++) {
@@ -93,16 +95,22 @@ function drawCard() {
     return card;
 }
 
+function nextTurn() {
+    let currentTurnPort = ports[currentTurnPortIndex];
+
+    currentTurnPortIndex++;
+    currentTurnPortIndex %= 8; // TODO deal with only real players
+
+    let newTurnPort = ports[currentTurnPortIndex];
+    updateTurn(currentTurnPort, newTurnPort);
+}
+
 function renderMinimap() {
     let minimapCanvas = document.getElementById("minimap");
     minimapCanvas.width = 300;
     minimapCanvas.height = 300;
     let ctx = minimapCanvas.getContext("2d");
-    // context.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#FF0000";
-    // ctx.fillRect(0, 0, 150, 75);
-
-    let img = document.getElementById("boatdir");
 
     for (let boat of boats) {
         let boatX = boat.CoT.position.x;
@@ -116,12 +124,7 @@ function renderMinimap() {
         ctx.save();
         ctx.translate(boatX * ratio, boatY * ratio);
         ctx.rotate(boat.CoT.rotation.y + Math.PI);
-        // ctx.rotate(boats[0].CoT.rotation.y);
-        // ctx.drawImage(img, -12.5, -16, 25, 32);
-        // ctx.drawT
 
-
-        // the triangle
         ctx.beginPath();
         let w = 12;
         let h = 16;
@@ -134,15 +137,29 @@ function renderMinimap() {
         ctx.strokeStyle = '#666666';
         ctx.stroke();
 
-        // the fill color
         ctx.fillStyle = boat.port.portColor;
         ctx.fill();
 
         ctx.restore();
-        // console.log(boatX);
-
-        // console.log(boats[0].CoT.rotation.y);
     }
+}
+
+function updateTurn(currentPort, newPort) {
+    if (currentPort.boat.x >= -3 && currentPort.boat.z >= -3 && currentPort.boat.x <= 2 && currentPort.boat.z <= 2) {
+        drawnCard = drawCard();
+        let cardMesh = scene.getMeshByName("Face");
+        cardMesh.material.albedoTexture.uOffset = (drawnCard % 8) * (1 / 8);
+        cardMesh.material.albedoTexture.vOffset = Math.floor(drawnCard / 8) * 0.19034;
+
+        scene.getAnimationGroupByName("ChanceReveal").play();
+    }
+
+    currentPort.boat.deactivate();
+    newPort.boat.activate();
+
+    $("#currentturnportname").html(newPort.portName + "'s Turn");
+    $("#hudtop").css("background-color", newPort.portColor);
+
 }
 
 let drawnCard;
@@ -152,7 +169,6 @@ const updateGame = function() {
     if (Date.now() - lastFPSUpdate > 1000) {
         $("#fps").html(engine.getFps().toFixed() + " fps");
         lastFPSUpdate = Date.now();
-        // console.log(engine.getFps().toFixed() + " fps");
     }
 
     time++;
@@ -184,16 +200,11 @@ const updateGame = function() {
         chestAnimationStartTime = time;
 
         if (boatAtPirateIsland) {
-            chestOpen.play();
+            chestOpenSound.play();
 
-            drawnCard = drawCard();
-            let cardMesh = scene.getMeshByName("Face");
-            cardMesh.material.albedoTexture.uOffset = (drawnCard % 8) * (1 / 8);
-            cardMesh.material.albedoTexture.vOffset = Math.floor(drawnCard / 8) * 0.19034;
 
-            scene.getAnimationGroupByName("ChanceReveal").play();
         } else {
-            chestClose.play();
+            chestCloseSound.play();
 
             createdParticleSystem = false;
         }
@@ -238,6 +249,10 @@ const updateGame = function() {
 const createScene = function() {
     engine.displayLoadingUI();
 
+    $("#actionbtnturn").click(function() {
+        nextTurn();
+    });
+
     const scene = new BABYLON.Scene(engine);
 
     BABYLON.SceneLoader.OnPluginActivatedObservable.addOnce(loader => {
@@ -267,7 +282,7 @@ const createScene = function() {
 
     var pipeline = new BABYLON.DefaultRenderingPipeline(
         "defaultPipeline", // The name of the pipeline
-        true, // Do you want the pipeline to use HDR texture?
+        false, // Do you want the pipeline to use HDR texture?
         scene, // The scene instance
         [camera] // The list of cameras to be attached to
     );
@@ -305,8 +320,8 @@ const createScene = function() {
         )
     );
 
-    chestOpen = new BABYLON.Sound("chestopen", "assets/chestopen.wav", scene);
-    chestClose = new BABYLON.Sound("chestopen", "assets/chestclose.wav", scene);
+    chestOpenSound = new BABYLON.Sound("chestopen", "assets/chestopen.wav", scene);
+    chestCloseSound = new BABYLON.Sound("chestopen", "assets/chestclose.wav", scene);
     var music = new BABYLON.Sound("water", "assets/water.mp3", scene, function() {
         // Sound has been downloaded & decoded
         music.play();
@@ -616,6 +631,7 @@ const createScene = function() {
             scene.getAnimationGroupByName("StackReturn").play();
         });
 
+        nextTurn();
 
         engine.hideLoadingUI();
     });
