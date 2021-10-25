@@ -2,6 +2,8 @@ import * as Utils from './utils';
 
 let scene, settings;
 
+let boatRotate = null;
+
 class Boat {
     constructor(x, z, _scene, _settings, boatIndex) {
         let self = this;
@@ -19,6 +21,10 @@ class Boat {
         this.animateStartTime = 0;
         this.moveAnimateStartTime = 0;
 
+        if (boatRotate == null) {
+            boatRotate = new BABYLON.Sound("boatrotate", "assets/boat-rotate.wav", scene);
+        }
+
         let boatMesh = scene.getMeshByName("Boat");
         let mesh = boatMesh.clone("Boat" + boatIndex);
         // mesh.setParent(null);
@@ -30,11 +36,10 @@ class Boat {
 
         mesh.actionManager = new BABYLON.ActionManager(scene);
         mesh.actionManager.registerAction(
-            new BABYLON.ExecuteCodeAction(
-                {
+            new BABYLON.ExecuteCodeAction({
                     trigger: BABYLON.ActionManager.OnLeftPickTrigger
                 },
-                function () {
+                function() {
                     self.showLegalSquares();
                 }
             )
@@ -77,31 +82,31 @@ class Boat {
         cw.overlayColor = new BABYLON.Color3(0, 0, 0);
         cw.actionManager = new BABYLON.ActionManager(scene);
         cw.actionManager.registerAction(
-            new BABYLON.ExecuteCodeAction(
-                {
+            new BABYLON.ExecuteCodeAction({
                     trigger: BABYLON.ActionManager.OnPointerOverTrigger
                 },
-                function () {
+                function() {
                     cw.overlayAlpha = 0.3;
                 }
             )
         );
         cw.actionManager.registerAction(
-            new BABYLON.ExecuteCodeAction(
-                {
+            new BABYLON.ExecuteCodeAction({
                     trigger: BABYLON.ActionManager.OnPointerOutTrigger
                 },
-                function () {
+                function() {
                     cw.overlayAlpha = 0.0;
                 }
             )
         );
         cw.actionManager.registerAction(
-            new BABYLON.ExecuteCodeAction(
-                {
+            new BABYLON.ExecuteCodeAction({
                     trigger: BABYLON.ActionManager.OnLeftPickTrigger
                 },
-                function () {
+                function() {
+                    boatRotate.stop();
+                    boatRotate.play();
+
                     self.direction -= 1;
                     self.originalAngle = self.angle;
                     self.animateStartTime = self.time;
@@ -119,31 +124,31 @@ class Boat {
         ccw.material = cw.material;
         ccw.actionManager = new BABYLON.ActionManager(scene);
         ccw.actionManager.registerAction(
-            new BABYLON.ExecuteCodeAction(
-                {
+            new BABYLON.ExecuteCodeAction({
                     trigger: BABYLON.ActionManager.OnPointerOverTrigger
                 },
-                function () {
+                function() {
                     ccw.overlayAlpha = 0.3;
                 }
             )
         );
         ccw.actionManager.registerAction(
-            new BABYLON.ExecuteCodeAction(
-                {
+            new BABYLON.ExecuteCodeAction({
                     trigger: BABYLON.ActionManager.OnPointerOutTrigger
                 },
-                function () {
+                function() {
                     ccw.overlayAlpha = 0.0;
                 }
             )
         );
         ccw.actionManager.registerAction(
-            new BABYLON.ExecuteCodeAction(
-                {
+            new BABYLON.ExecuteCodeAction({
                     trigger: BABYLON.ActionManager.OnLeftPickTrigger
                 },
-                function () {
+                function() {
+                    boatRotate.stop();
+                    boatRotate.play();
+
                     self.direction += 1;
                     self.originalAngle = self.angle;
                     self.animateStartTime = self.time;
@@ -202,9 +207,9 @@ class Boat {
         matWhite.specularColor = new BABYLON.Color3(0, 0, 0);
         matWhite.alpha = 0.1;
 
-        let selectionSquareRed = new BABYLON.MeshBuilder.CreateGround("Selection square", {width: settings.gridTileSize, height: settings.gridTileSize}, scene);
+        let selectionSquareRed = new BABYLON.MeshBuilder.CreateGround("Selection square", { width: settings.gridTileSize, height: settings.gridTileSize }, scene);
         selectionSquareRed.material = matRed;
-        let selectionSquareWhite = new BABYLON.MeshBuilder.CreateGround("Selection square", {width: settings.gridTileSize, height: settings.gridTileSize}, scene);
+        let selectionSquareWhite = new BABYLON.MeshBuilder.CreateGround("Selection square", { width: settings.gridTileSize, height: settings.gridTileSize }, scene);
         selectionSquareWhite.material = matWhite;
         // selectionSquare.position.y = 0.01;
         // selectionSquare.isPickable = true;
@@ -219,20 +224,16 @@ class Boat {
                     d += 8;
                 if (d == 7 || d == 0 || d == 1) {
                     x = i + 1;
-                }
-                else if (d == 3 || d == 4 || d == 5) {
+                } else if (d == 3 || d == 4 || d == 5) {
                     x = -i - 1;
-                }
-                else
+                } else
                     x = 0;
                 //
                 if (d == 1 || d == 2 || d == 3) {
                     z = -i - 1;
-                }
-                else if (d == 5 || d == 6 || d == 7) {
+                } else if (d == 5 || d == 6 || d == 7) {
                     z = i + 1;
-                }
-                else
+                } else
                     z = 0;
 
                 x += this.x;
@@ -241,11 +242,10 @@ class Boat {
                 if (!Utils.isSquareAllowed(x, z))
                     break;
 
-                let square = new BABYLON.MeshBuilder.CreateGround("Move square", {width: settings.gridTileSize, height: settings.gridTileSize}, scene);
+                let square = new BABYLON.MeshBuilder.CreateGround("Move square", { width: settings.gridTileSize, height: settings.gridTileSize }, scene);
                 if (i < this.sailingStrength) {
                     square.material = matWhite;
-                }
-                else {
+                } else {
                     square.material = matRed;
                 }
                 this.squares.push(square);
@@ -260,32 +260,29 @@ class Boat {
 
                 square.actionManager = new BABYLON.ActionManager(scene);
                 square.actionManager.registerAction(
-                    new BABYLON.ExecuteCodeAction(
-                        {
+                    new BABYLON.ExecuteCodeAction({
                             trigger: BABYLON.ActionManager.OnPointerOverTrigger
                         },
-                        function () {
+                        function() {
                             square.overlayAlpha = 0.3;
                         }
                     )
                 );
                 square.actionManager.registerAction(
-                    new BABYLON.ExecuteCodeAction(
-                        {
+                    new BABYLON.ExecuteCodeAction({
                             trigger: BABYLON.ActionManager.OnPointerOutTrigger
                         },
-                        function () {
+                        function() {
                             square.overlayAlpha = 0.0;
                         }
                     )
                 );
                 square.actionManager.registerAction(
-                    new BABYLON.ExecuteCodeAction(
-                        {
+                    new BABYLON.ExecuteCodeAction({
                             trigger: BABYLON.ActionManager.OnLeftPickTrigger,
                             parameter: {}
                         },
-                        function () {
+                        function() {
                             self.x = square.gridX;
                             self.z = square.gridZ;
                             self.originalLocation = self.CoT.position.clone();

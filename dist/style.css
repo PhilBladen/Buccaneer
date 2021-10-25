@@ -425,7 +425,11 @@ img {
         outline-width: 3px;
     }
     #minimapwrapper {
-        display: none;
+        /* display: none; */
+    }
+    #buttons {
+        flex-direction: column;
+        align-items: stretch;
     }
     .icon {
         max-height: 32px;

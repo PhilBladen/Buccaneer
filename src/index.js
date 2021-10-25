@@ -13,7 +13,8 @@ import { Boat } from './boat.js';
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 canvas.onselectstart = function() { return false; }
 
-const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+const engine = new BABYLON.Engine(canvas, true, {}, true); // Generate the BABYLON 3D engine
+// engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
 
 // engine.enterFullscreen(); TODO add user option
 
@@ -40,7 +41,7 @@ let boatIndex = 0;
 
 const settingsLow = {
     reflections: false,
-    useAntialiasing: true,
+    useAntialiasing: false,
     gridTileSize: 1,
 }
 
@@ -93,8 +94,15 @@ function drawCard() {
 }
 
 let drawnCard;
-
+let lastFPSUpdate = Date.now();
 const updateGame = function() {
+
+    if (Date.now() - lastFPSUpdate > 1000) {
+        $("#fps").html(engine.getFps().toFixed() + " fps");
+        lastFPSUpdate = Date.now();
+        // console.log(engine.getFps().toFixed() + " fps");
+    }
+
     time++;
 
     let boatAtPirateIsland = false;
@@ -599,6 +607,7 @@ engine.runRenderLoop(function() {
 // Watch for browser/canvas resize events
 window.addEventListener("resize", function() {
     engine.resize();
-    console.log(canvas.clientWidth)
-    console.log(canvas.clientHeight)
+    console.log("Canvas:" + canvas.clientWidth + ":" + canvas.clientHeight)
+    console.log("Window:" + window.innerWidth * window.devicePixelRatio + ":" + window.innerHeight * window.devicePixelRatio)
+        // console.log()
 });

@@ -7,6 +7,7 @@
     <!-- <meta name="viewport" content="width=1200, initial-scale=20, user-scalable=yes"> -->
     <!-- <meta name="viewport" id="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5;" /> -->
     <!-- <meta name="viewport" id="viewport" content="width=device-width, initial-scale=0.5" /> -->
+    <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1" />
     <title>Buccaneer</title>
 
     <link rel="stylesheet" href="style.css">
@@ -36,15 +37,17 @@
     <div id="hud" class="container" style="position: fixed; left: 0; right: 0; top: 0; bottom: 0; flex-direction: column; overflow: auto; pointer-events: none; overflow: hidden;">
 
         <!-- Top of screen HUD -->
-        <div id="hudtop" class="dbg1 container clickable" style="flex: 0 0 auto;">
-            <div class="" style="min-width: 200px;">
+        <div id="hudtop" class="container clickable" style="flex: 0 0 auto;">
+            <div class="" style="flex: 1 1 200px;">
                 <i id="settings" class="fa fa-gear" style="font-size:36px; padding: 0 10px; color: black; margin-right: 5px; cursor: pointer;"></i>
                 <i class="fa fa-arrow" style="font-size:36px; padding: 0 10px; color: black"></i>
             </div>
-            <div class="" style="flex: 1; text-align: center;">
+            <div class="" style="flex: 1 0; text-align: center; min-width: fit-content;">
                 Cadiz's Move
             </div>
-            <div class="" style="width:200px;"></div>
+            <div id="fps" class="" style="min-width: fit-content; flex: 1 1 200px; text-align: right; padding-right: 20px;">
+
+            </div>
         </div>
 
         <div class="container" style="flex: 1 1 auto; ">
@@ -212,6 +215,13 @@
                 hudVisible = !hudVisible;
             }
         );
+
+        window.onload = function() {
+            var ratio = window.devicePixelRatio || 1;
+            var w = screen.width * ratio;
+            var h = screen.height * ratio;
+            console.log(w + ":" + h);
+        }
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
