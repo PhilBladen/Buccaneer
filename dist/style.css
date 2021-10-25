@@ -415,18 +415,6 @@ img {
 }
 
 @media only screen and (max-width: 1000px) {
-    .actionbtn {
-        font-size: large;
-        text-align: center;
-        outline-width: 3px;
-    }
-    #hudleft,
-    #hudright {
-        outline-width: 3px;
-    }
-    #minimapwrapper {
-        /* display: none; */
-    }
     #buttons {
         flex-direction: column;
         align-items: stretch;
@@ -434,35 +422,9 @@ img {
     .icon {
         max-height: 32px;
     }
-    .cardcount {
-        font-size: large;
-    }
-    .treasure {
-        width: 25px;
-        height: 25px;
-        border-radius: 5px;
-        margin-top: -25px;
-    }
-    .treasure img {
-        width: 22px;
-        height: 22px;
-    }
-    .boat {
-        width: 150px;
-        height: 54px;
-    }
-    .city {
-        font-size: large;
-    }
-    .btn {
-        font-size: medium;
-        border-radius: 5px;
-        outline-width: 3px;
-        /* text-align: center; */
-    }
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 650px) {
     #actionbtnwrapper2 {
         justify-content: flex-end;
         margin-right: 10px;

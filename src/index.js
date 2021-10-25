@@ -93,6 +93,58 @@ function drawCard() {
     return card;
 }
 
+function renderMinimap() {
+    let minimapCanvas = document.getElementById("minimap");
+    minimapCanvas.width = 300;
+    minimapCanvas.height = 300;
+    let ctx = minimapCanvas.getContext("2d");
+    // context.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#FF0000";
+    // ctx.fillRect(0, 0, 150, 75);
+
+    let img = document.getElementById("boatdir");
+
+    for (let boat of boats) {
+        let boatX = boat.CoT.position.x;
+        let boatY = boat.CoT.position.z;
+
+        boatX = 28.5 / 2 - boatX;
+        boatY += 28.5 / 2;
+
+        let ratio = 300 / 28.5;
+
+        ctx.save();
+        ctx.translate(boatX * ratio, boatY * ratio);
+        ctx.rotate(boat.CoT.rotation.y + Math.PI);
+        // ctx.rotate(boats[0].CoT.rotation.y);
+        // ctx.drawImage(img, -12.5, -16, 25, 32);
+        // ctx.drawT
+
+
+        // the triangle
+        ctx.beginPath();
+        let w = 12;
+        let h = 16;
+        ctx.moveTo(-w, h);
+        ctx.lineTo(0, -h);
+        ctx.lineTo(w, h);
+        ctx.closePath();
+
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = '#666666';
+        ctx.stroke();
+
+        // the fill color
+        ctx.fillStyle = boat.port.portColor;
+        ctx.fill();
+
+        ctx.restore();
+        // console.log(boatX);
+
+        // console.log(boats[0].CoT.rotation.y);
+    }
+}
+
 let drawnCard;
 let lastFPSUpdate = Date.now();
 const updateGame = function() {
@@ -104,6 +156,8 @@ const updateGame = function() {
     }
 
     time++;
+
+    renderMinimap();
 
     let boatAtPirateIsland = false;
     for (let boat of boats) {

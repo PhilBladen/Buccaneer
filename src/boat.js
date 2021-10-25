@@ -23,6 +23,7 @@ class Boat {
 
         if (boatRotate == null) {
             boatRotate = new BABYLON.Sound("boatrotate", "assets/boat-rotate.wav", scene);
+            boatRotate.setVolume(0.5);
         }
 
         let boatMesh = scene.getMeshByName("Boat");
@@ -178,6 +179,8 @@ class Boat {
         mat.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
         mat.roughness = 0;
         mesh.material = mat;
+
+        this.port = Utils.ports[boatIndex];
 
         this.mesh = mesh;
 
