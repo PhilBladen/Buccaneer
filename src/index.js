@@ -7,8 +7,9 @@ import 'babylonjs-inspector';
 // import * from 'babylon.gridMaterial.min.js';
 import { GridMaterial, WaterMaterial, CustomMaterial } from 'babylonjs-materials'
 import { createPointerLock } from "./pointerLock.js"
-import { cosineInterpolate, cosineInterpolateV3D, isMobileDevice, ports, showAxis } from './utils.js';
+import { cosineInterpolate, cosineInterpolateV3D, isMobileDevice, showAxis } from './utils.js';
 import { Boat } from './boat.js';
+import { Port, ports } from './port.js';
 import { SoundEngine } from './soundengine.js';
 
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
@@ -250,15 +251,14 @@ const updateGame = function() {
     chestLid.setDirection(BABYLON.Axis.Z, 0.0, 0.0, chestAngle);
 }
 
-// Add your code here matching the playground format
 const createScene = function() {
     engine.displayLoadingUI();
+
+    const scene = new BABYLON.Scene(engine);
 
     $("#actionbtnturn").click(function() {
         nextTurn();
     });
-
-    const scene = new BABYLON.Scene(engine);
 
     BABYLON.SceneLoader.OnPluginActivatedObservable.addOnce(loader => {
         loader.animationStartMode = GLTFLoaderAnimationStartMode.NONE;
@@ -286,10 +286,9 @@ const createScene = function() {
     }
 
     var pipeline = new BABYLON.DefaultRenderingPipeline(
-        "defaultPipeline", // The name of the pipeline
-        true, // Do you want the pipeline to use HDR texture?
-        scene, // The scene instance
-        [camera] // The list of cameras to be attached to
+        "defaultPipeline",
+        true, // HDR texture
+        scene, [camera]
     );
     if (settings.useAntialiasing)
         pipeline.samples = 16;
@@ -326,7 +325,7 @@ const createScene = function() {
     );
 
 
-
+    $("#debug").click(function() { scene.debugLayer.show({ handleResize: true, overlay: true }) });
 
     // const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
     const ambientLight = new BABYLON.HemisphericLight("HemiLight", new BABYLON.Vector3(0, 1, 0), scene);
@@ -340,9 +339,6 @@ const createScene = function() {
         BABYLON.SceneLoader.AppendAsync("assets/AllIslands.glb"),
         BABYLON.SceneLoader.AppendAsync("assets/Boat.gltf")
     ]).then(function() {
-        // scene.debugLayer.show();
-        // return;
-
         boatMesh = scene.getMeshByName("Boat");
         // boatMesh.setEnabled(false);
 
@@ -354,7 +350,6 @@ const createScene = function() {
         let portMeshes = [];
         for (let i = 0; i < 8; i++) {
             portMeshes[i] = scene.getMeshByName("Dock" + i);
-            console.log(portMeshes[i]);
         }
         let safes = [];
         for (let i = 0; i < 8; i++) {
@@ -366,38 +361,9 @@ const createScene = function() {
         chestLid = scene.getNodeByID("ChestLid");
 
         scene.getAnimationGroupByName("ChanceReveal").onAnimationEndObservable.add(() => {
-            // var card = drawCard();
             $("#chancecard").attr("src", "assets/cards/Chance " + (drawnCard + 1) + ".png");
-            // $("#chancecard").load(function() {
-            // $("#popup").css("opacity", "1.0");
             $("#popup").fadeIn();
-            // });
-
         });
-
-        // cardAnimation = scene.getAnimationGroupByName("FlipChanceCard");
-        // cardAnimation.loopAnimation = false;
-
-        // let sand = scene.getMeshByName("Sand");
-        // let needles = scene.getMeshByName("Needles");
-        // let splash = scene.getMeshByName("Splash");
-        // splash.setEnabled(false);
-
-        // cardMesh.setEnabled(false);
-        // let cardMesh = scene.getMeshByName("Card");
-        // cardMesh.actionManager = new BABYLON.ActionManager(scene);
-        // cardMesh.isPickable = true;
-        // cardMesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
-        //     {
-        //         trigger: BABYLON.ActionManager.OnPickTrigger
-        //     },
-        //     function () {
-        //         cardMesh.setEnabled(false);
-        //     }
-        // ));
-
-        // for (let mesh of scene.meshes)
-        // mesh.isPickable = false;
 
         var groundTexture = new BABYLON.Texture("assets/sand.jpg", scene);
         groundTexture.vScale = groundTexture.uScale = 4.0;
@@ -428,20 +394,15 @@ const createScene = function() {
         water.bumpHeight = 0.05;
         water.waveLength = 0.2;
         water.colorBlendFactor = 0.5;
-        // water.waterColor = new BABYLON.Color3(0.1, 0.4, 0.8);
         water.waterColor = new BABYLON.Color3(0.1, 0.5, 0.8);
-        // water.addToRenderList(needles)
 
         for (let mesh of scene.meshes) {
-            // if (mesh !== sea && mesh !== grid)
-            // water.addToRenderList(mesh);
             mesh.isPickable = false;
         }
-        // water.addToRenderList(edgeIslands);
-        // water.addToRenderList(castle);
+
+        // Water reflections:
         water.addToRenderList(skybox);
         water.addToRenderList(ground);
-
         let terrainParent = scene.getNodeByName("TerrainParent");
         for (let mesh of terrainParent.getChildren(undefined, false)) {
             if (mesh instanceof BABYLON.Mesh || mesh instanceof BABYLON.InstancedMesh)
@@ -463,6 +424,10 @@ const createScene = function() {
             sea.material = waterDiffuseMaterial;
             // sea.material.needAlphaTesting = true;
             sea.alphaIndex = 500;
+        }
+
+        for (let port of ports) {
+            port.init(scene);
         }
 
         // let meshes = [];
@@ -584,48 +549,7 @@ const createScene = function() {
         anchor.material = anchorMaterial;
         anchor.alphaIndex = 100;
 
-
-
-        // ccw.material.albedoTexture.hasAlpha = true;
-        // ccw.material.useAlphaFromAlbedoTexture = true;
-        // splashTexture.hasAlpha = true;
-        // groundTexture.vScale = groundTexture.uScale = 4.0;
-
-        // var splashMaterial = new BABYLON.StandardMaterial("", scene);
-        // splashMaterial.diffuseTexture = splashTexture;
-        // splashMaterial.useAlphaFromDiffuseTexture = true;
-        // splashMaterial.useSpecularOverAlpha = true;
-
-        // console.log(cw);
-        // console.log(ccw);
-
         boatMesh.parent.dispose();
-
-        // for (let mesh of scene.meshes) {
-        //     if (mesh.material !== null)
-        //         mesh.material.freeze();
-        // }
-
-
-        // if (!isMobileDevice())
-        // scene.debugLayer.show();
-
-        // BABYLON.SceneOptimizer.OptimizeAsync(scene, BABYLON.SceneOptimizerOptions.ModerateDegradationAllowed(),
-        //     function () {
-        //         console.log("Optimization success");
-        //     }, function () {
-        //         // FPS target not reached
-        //     });
-
-
-        // var utilLayer = new BABYLON.UtilityLayerRenderer(scene);
-        // var overlayBox = BABYLON.Mesh.CreateBox("box", 1, utilLayer.utilityLayerScene);
-        // overlayBox.position.z = 0.5
-        // overlayBox.position.y = 3.5;
-        // // Create a different light for the overlay scene
-        // var overlayLight = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 0, 1), utilLayer.utilityLayerScene);
-        // overlayLight.intensity = 0.7;
-        // utilLayer.utilityLayerScene.autoClearDepthAndStencil=false
 
         soundEngine.init(scene);
 
@@ -642,45 +566,12 @@ const createScene = function() {
     return scene;
 };
 
-window.addEventListener("orientationchange", function() {
-    console.log("The orientation of the screen is: " + window.orientation);
-    return;
-
-    var vpwidth = "device-width";
-    var vlwidth = "device-height";
-    var scale = .5;
-    var viewport = document.querySelector("meta[name=viewport]");
-
-    switch (window.orientation) {
-        case 0: //portrait
-            //set the viewport attributes to whatever you want!
-            viewport.setAttribute('content', 'width=' + vpwidth + ', initial-scale=' + scale + ', maximum-scale=1.0')
-            console.log(viewport.getAttribute("content"))
-            break;
-        case 90:
-        case -90: //landscape
-            //set the viewport attributes to whatever you want!
-            viewport.setAttribute('content', 'width=' + vlwidth + ', initial-scale=' + scale + ', maximum-scale=1.0')
-            break;
-        default:
-            //set the viewport attributes to whatever you want!
-            viewport.setAttribute('content', 'width=' + vpwidth + ', initial-scale=' + scale + ', maximum-scale=1.0')
-            break;
-    }
-});
-
 const scene = createScene();
-// createPointerLock(scene);
 
-// Register a render loop to repeatedly render the scene
 engine.runRenderLoop(function() {
     scene.render();
 });
 
-// Watch for browser/canvas resize events
 window.addEventListener("resize", function() {
     engine.resize();
-    console.log("Canvas:" + canvas.clientWidth + ":" + canvas.clientHeight)
-    console.log("Window:" + window.innerWidth * window.devicePixelRatio + ":" + window.innerHeight * window.devicePixelRatio)
-        // console.log()
 });

@@ -33,7 +33,6 @@ class SoundEngine {
     doAmbientSounds() {
         if (Date.now() >= this.timeToNextAmbientSound) {
             let index = Math.floor(Math.random() * 6);
-            console.log("Whale" + index);
             this.whaleSounds[index].play();
             this.timeToNextAmbientSound = Date.now() + Math.random() * 20000; // + 30000;
         }

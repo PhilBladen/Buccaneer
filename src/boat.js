@@ -1,4 +1,5 @@
 import * as Utils from './utils';
+import { Port, ports } from './port.js';
 
 let scene, settings;
 
@@ -172,12 +173,12 @@ class Boat {
         }
 
         let mat = new BABYLON.StandardMaterial("boat", scene);
-        mat.diffuseColor = BABYLON.Color3.FromHexString(Utils.ports[boatIndex].portColor);
+        mat.diffuseColor = BABYLON.Color3.FromHexString(ports[boatIndex].portColor);
         mat.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
         mat.roughness = 0;
         mesh.material = mat;
 
-        this.port = Utils.ports[boatIndex];
+        this.port = ports[boatIndex];
         this.port.boat = this;
 
         this.mesh = mesh;
@@ -188,7 +189,7 @@ class Boat {
     }
 
     isInPort() {
-        for (let port of Utils.ports) {
+        for (let port of ports) {
             if (port.portLocation.x == this.x && port.portLocation.z == this.z) {
                 return true;
             }

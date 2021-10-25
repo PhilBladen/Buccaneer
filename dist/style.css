@@ -54,6 +54,10 @@ img {
     height: 100%;
     touch-action: none;
     position: relative;
+    /* top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0; */
     /* z-index: 2; */
     /* pointer-events: none; */
     /* filter: blur(20px); */
@@ -117,6 +121,13 @@ img {
     /* transition: opacity ease-in-out 0.5; */
     /* pointer-events: none; */
     /* bottom: 30vh; */
+}
+
+.menubtn {
+    font-size: 1em;
+    color: darkslategrey;
+    padding-right: 5px;
+    cursor: pointer;
 }
 
 .container {

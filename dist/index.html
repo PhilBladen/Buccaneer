@@ -7,7 +7,8 @@
     <title>Buccaneer</title>
 
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
     <link rel="manifest" href="manifest.webmanifest">
 
     <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
@@ -16,7 +17,7 @@
 </head>
 
 <body>
-    <canvas id="renderCanvas" class="canvas" touch-action="none"></canvas>
+    <canvas id="renderCanvas" class="" touch-action="none"></canvas>
 
     <!-- <div class=" " style="position: fixed; width: 100%; left: 0; bottom: 0; pointer-events: none; ">
         <div id="cards " class="container " style="max-width: 50%; height: 300px; margin-left: auto; margin-right: auto; bottom: 0; flex-direction: row; justify-content: space-evenly; ">
@@ -50,13 +51,14 @@
     </div> -->
 
     <!-- Whole HUD -->
-    <div id="hud" class="container" style="position: fixed; left: 0; right: 0; top: 0; bottom: 0; flex-direction: column; overflow: auto; pointer-events: none; overflow: hidden;">
+    <div id="hud" class="column" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none; overflow: hidden;">
 
         <!-- Top of screen HUD -->
         <div id="hudtop" class="container clickable" style="flex: 0 0 auto;">
             <div class="" style="flex: 1 1 200px;">
-                <i id="settings" class="fa fa-gear" style="font-size:36px; padding: 0 10px; color: black; margin-right: 5px; cursor: pointer;"></i>
-                <i class="fa fa-arrow" style="font-size:36px; padding: 0 10px; color: black"></i>
+                <i id="settings" class="fa fa-caret-square-down menubtn" style="padding-left: 5px;"></i>
+                <i id="debug" class="fa fa-bug menubtn"></i>
+                <!-- <i id="settings" class="fa fa-cog menubtn"></i> -->
             </div>
             <div id="currentturnportname" class="" style="flex: 1 0; text-align: center; min-width: fit-content;">
                 Cadiz's Move
@@ -165,8 +167,12 @@
                 let hud = $("#hudbottom");
                 if (hudVisible) {
                     hud.css("transform", "translate(0, 150%)");
+                    $("#settings").removeClass("fa-caret-square-down");
+                    $("#settings").addClass("fa-caret-square-up");
                 } else {
                     hud.css("transform", "translate(0, 0)");
+                    $("#settings").removeClass("fa-caret-square-up");
+                    $("#settings").addClass("fa-caret-square-down");
                 }
                 hudVisible = !hudVisible;
             }
