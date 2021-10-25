@@ -9,6 +9,7 @@ import { GridMaterial, WaterMaterial, CustomMaterial } from 'babylonjs-materials
 import { createPointerLock } from "./pointerLock.js"
 import { cosineInterpolate, cosineInterpolateV3D, isMobileDevice, ports, showAxis } from './utils.js';
 import { Boat } from './boat.js';
+import { SoundEngine } from './soundengine.js';
 
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 canvas.onselectstart = function() { return false; }
@@ -17,6 +18,8 @@ const engine = new BABYLON.Engine(canvas, true, {}, true); // Generate the BABYL
 // engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
 
 // engine.enterFullscreen(); TODO add user option
+
+const soundEngine = new SoundEngine();
 
 $(window).focus(function() {
     BABYLON.Engine.audioEngine.setGlobalVolume(1);
@@ -66,9 +69,6 @@ if (isMobileDevice())
 else
     settings = settingsMed;
 
-let chestOpenSound;
-let chestCloseSound;
-
 let wasBoatAtPirateIsland = false;
 let chestAnimationStartTime = 0;
 let createdParticleSystem = false;
@@ -107,8 +107,8 @@ function nextTurn() {
 
 function renderMinimap() {
     let minimapCanvas = document.getElementById("minimap");
-    minimapCanvas.width = 300;
-    minimapCanvas.height = 300;
+    minimapCanvas.width = 285;
+    minimapCanvas.height = 285;
     let ctx = minimapCanvas.getContext("2d");
     ctx.fillStyle = "#FF0000";
 
@@ -119,22 +119,25 @@ function renderMinimap() {
         boatX = 28.5 / 2 - boatX;
         boatY += 28.5 / 2;
 
-        let ratio = 300 / 28.5;
+        let ratio = minimapCanvas.width / 28.5;
 
         ctx.save();
         ctx.translate(boatX * ratio, boatY * ratio);
         ctx.rotate(boat.CoT.rotation.y + Math.PI);
 
         ctx.beginPath();
-        let w = 12;
-        let h = 16;
+        let w = 5;
+        let h = 7;
         ctx.moveTo(-w, h);
         ctx.lineTo(0, -h);
         ctx.lineTo(w, h);
         ctx.closePath();
 
-        ctx.lineWidth = 10;
-        ctx.strokeStyle = '#666666';
+        ctx.lineWidth = 5;
+        if (boat.activated)
+            ctx.strokeStyle = '#AAA';
+        else
+            ctx.strokeStyle = '#000000';
         ctx.stroke();
 
         ctx.fillStyle = boat.port.portColor;
@@ -175,6 +178,8 @@ const updateGame = function() {
 
     renderMinimap();
 
+    soundEngine.doAmbientSounds();
+
     let boatAtPirateIsland = false;
     for (let boat of boats) {
         // console.log(boat);
@@ -200,11 +205,11 @@ const updateGame = function() {
         chestAnimationStartTime = time;
 
         if (boatAtPirateIsland) {
-            chestOpenSound.play();
+            soundEngine.chestOpen();
 
 
         } else {
-            chestCloseSound.play();
+            soundEngine.chestClose();
 
             createdParticleSystem = false;
         }
@@ -282,7 +287,7 @@ const createScene = function() {
 
     var pipeline = new BABYLON.DefaultRenderingPipeline(
         "defaultPipeline", // The name of the pipeline
-        false, // Do you want the pipeline to use HDR texture?
+        true, // Do you want the pipeline to use HDR texture?
         scene, // The scene instance
         [camera] // The list of cameras to be attached to
     );
@@ -320,12 +325,8 @@ const createScene = function() {
         )
     );
 
-    chestOpenSound = new BABYLON.Sound("chestopen", "assets/chestopen.wav", scene);
-    chestCloseSound = new BABYLON.Sound("chestopen", "assets/chestclose.wav", scene);
-    var music = new BABYLON.Sound("water", "assets/water.mp3", scene, function() {
-        // Sound has been downloaded & decoded
-        music.play();
-    }, { loop: true });
+
+
 
     // const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
     const ambientLight = new BABYLON.HemisphericLight("HemiLight", new BABYLON.Vector3(0, 1, 0), scene);
@@ -481,7 +482,7 @@ const createScene = function() {
 
         for (let i = 0; i < 8; i++) {
             let portLocation = ports[i].portLocation;
-            let boat = new Boat(portLocation.x, portLocation.z, scene, settings, boatIndex++);
+            let boat = new Boat(portLocation.x, portLocation.z, scene, settings, boatIndex++, soundEngine);
             boats.push(boat);
             water.addToRenderList(boat.mesh);
         }
@@ -625,6 +626,8 @@ const createScene = function() {
         // var overlayLight = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 0, 1), utilLayer.utilityLayerScene);
         // overlayLight.intensity = 0.7;
         // utilLayer.utilityLayerScene.autoClearDepthAndStencil=false
+
+        soundEngine.init(scene);
 
         $("#btnClosePopup").click(() => {
             scene.getAnimationGroupByName("ChanceReturn").play();

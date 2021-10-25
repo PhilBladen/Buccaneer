@@ -2,13 +2,11 @@ import * as Utils from './utils';
 
 let scene, settings;
 
-let boatRotate = null;
-
 let matRed = null;
 let matWhite = null;
 
 class Boat {
-    constructor(x, z, _scene, _settings, boatIndex) {
+    constructor(x, z, _scene, _settings, boatIndex, soundEngine) {
         let self = this;
         scene = _scene;
         settings = _settings;
@@ -33,11 +31,6 @@ class Boat {
             matWhite.diffuseColor = new BABYLON.Color3(1, 1, 1);
             matWhite.specularColor = new BABYLON.Color3(0, 0, 0);
             matWhite.alpha = 0.1;
-        }
-
-        if (boatRotate == null) {
-            boatRotate = new BABYLON.Sound("boatrotate", "assets/boat-rotate.wav", scene);
-            boatRotate.setVolume(0.5);
         }
 
         let boatMesh = scene.getMeshByName("Boat");
@@ -82,6 +75,7 @@ class Boat {
         // cw.material.transparencyMode = BABYLON.StandardMaterial.MATERIAL_ALPHABLEND;
         cw.material.useAlphaFromDiffuseTexture = true;
         cw.isPickable = true;
+        cw.alphaIndex = 3000;
         cw.overlayAlpha = 0.0;
         cw.renderOverlay = true;
         cw.overlayColor = new BABYLON.Color3(0, 0, 0);
@@ -109,8 +103,7 @@ class Boat {
                     trigger: BABYLON.ActionManager.OnLeftPickTrigger
                 },
                 function() {
-                    boatRotate.stop();
-                    boatRotate.play();
+                    soundEngine.boatRotate();
 
                     self.direction -= 1;
                     self.originalAngle = self.angle;
@@ -123,6 +116,7 @@ class Boat {
         this.cw = cw;
 
         ccw.isPickable = true;
+        ccw.alphaIndex = 3000;
         ccw.renderOverlay = true;
         ccw.overlayAlpha = 0.0;
         ccw.overlayColor = new BABYLON.Color3(0, 0, 0);
@@ -151,8 +145,7 @@ class Boat {
                     trigger: BABYLON.ActionManager.OnLeftPickTrigger
                 },
                 function() {
-                    boatRotate.stop();
-                    boatRotate.play();
+                    soundEngine.boatRotate();
 
                     self.direction += 1;
                     self.originalAngle = self.angle;
@@ -241,6 +234,7 @@ class Boat {
         square.overlayColor = new BABYLON.Color3(0, 0, 0);
         square.overlayAlpha = 0.0;
         square.renderOverlay = true;
+        square.alphaIndex = 600;
 
         square['gridX'] = x;
         square['gridZ'] = z;
