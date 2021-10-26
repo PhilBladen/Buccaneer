@@ -20,38 +20,10 @@ import { GridMaterial, WaterMaterial } from "@babylonjs/materials";
 import { GLTFLoaderAnimationStartMode, GLTFFileLoader } from "@babylonjs/loaders/glTF";
 import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Texture, ParticleSystem, SceneLoader, Axis, PBRMaterial } from "@babylonjs/core";
 import * as BABYLON from "@babylonjs/core";
+import { AI } from "./ai";
 
-const canvas : HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("renderCanvas"); // Get the canvas element
-canvas.onselectstart = function() { return false; }
-
-const engine = new Engine(canvas, true, {}, true); // Generate the BABYLON 3D engine
-// engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
-
-// engine.enterFullscreen(); TODO add user option
-
-const soundEngine = new SoundEngine();
-const assetManager = new AssetManager();
-
-// Pause audio when window loses focus
-$(window).on("focus", () => {
-    Engine.audioEngine.setGlobalVolume(1);
-}).on("blur", () => {
-    Engine.audioEngine.setGlobalVolume(0);
-});
-
-let selectedBoat = null;
-let camera = null;
-let boatMesh = null;
-let water = null;
-let boats = [];
-let chestLid;
-let cardAnimation;
-
-let time = 0;
-
-let boatIndex = 0;
-
-
+const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("renderCanvas"); // Get the canvas element
+canvas.onselectstart = function () { return false; }
 
 const settingsLow = {
     reflections: false,
@@ -74,11 +46,66 @@ const settingsHigh = {
     gridTileSize: 1,
 }
 
-let settings;
-if (isMobileDevice())
-    settings = settingsLow;
-else
-    settings = settingsMed;
+class Buccaneer {
+    readonly scene: Scene;
+    readonly soundEngine: SoundEngine;
+    readonly assetManager: AssetManager;
+    readonly settings;
+
+    constructor(scene: Scene) {
+        this.scene = scene;
+        this.soundEngine = new SoundEngine();
+        this.assetManager = new AssetManager();
+
+        if (isMobileDevice())
+            this.settings = settingsLow;
+        else
+            this.settings = settingsMed;
+    }
+
+    nextTurn() {
+        let currentTurnPort = ports[currentTurnPortIndex];
+
+        currentTurnPortIndex++;
+        currentTurnPortIndex %= 8; // TODO deal with only real players
+
+        let newTurnPort = ports[currentTurnPortIndex];
+        updateTurn(currentTurnPort, newTurnPort);
+    }
+}
+
+export {
+    Buccaneer
+}
+
+
+
+const engine = new Engine(canvas, true, {}, true); // Generate the BABYLON 3D engine
+engine.displayLoadingUI();
+const scene = new Scene(engine);
+const buccaneer = new Buccaneer(scene);
+// engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
+
+// engine.enterFullscreen(); TODO add user option
+
+// Pause audio when window loses focus
+$(window).on("focus", () => {
+    Engine.audioEngine.setGlobalVolume(1);
+}).on("blur", () => {
+    Engine.audioEngine.setGlobalVolume(0);
+});
+
+let selectedBoat = null;
+let camera = null;
+let boatMesh = null;
+let water = null;
+let boats = [];
+let chestLid;
+let cardAnimation;
+
+let time = 0;
+
+let boatIndex = 0;
 
 let wasBoatAtPirateIsland = false;
 let chestAnimationStartTime = 0;
@@ -106,18 +133,8 @@ function drawCard() {
     return card;
 }
 
-function nextTurn() {
-    let currentTurnPort = ports[currentTurnPortIndex];
-
-    currentTurnPortIndex++;
-    currentTurnPortIndex %= 8; // TODO deal with only real players
-
-    let newTurnPort = ports[currentTurnPortIndex];
-    updateTurn(currentTurnPort, newTurnPort);
-}
-
 function renderMinimap() {
-    let minimapCanvas : HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("minimap");
+    let minimapCanvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("minimap");
     minimapCanvas.width = 285;
     minimapCanvas.height = 285;
     let ctx = minimapCanvas.getContext("2d");
@@ -161,9 +178,9 @@ function renderMinimap() {
 function updateTurn(currentPort, newPort) {
     if (currentPort.boat.x >= -3 && currentPort.boat.z >= -3 && currentPort.boat.x <= 2 && currentPort.boat.z <= 2) {
         drawnCard = drawCard();
-        let cardMesh : Mesh = <Mesh> scene.getMeshByName("Face");
-        let cardMaterial : PBRMaterial = <PBRMaterial> cardMesh.material;
-        let albedoTexture : Texture = <Texture> cardMaterial.albedoTexture;
+        let cardMesh: Mesh = <Mesh>scene.getMeshByName("Face");
+        let cardMaterial: PBRMaterial = <PBRMaterial>cardMesh.material;
+        let albedoTexture: Texture = <Texture>cardMaterial.albedoTexture;
         albedoTexture.uOffset = (drawnCard % 8) * (1 / 8);
         albedoTexture.vOffset = Math.floor(drawnCard / 8) * 0.19034;
 
@@ -171,16 +188,18 @@ function updateTurn(currentPort, newPort) {
     }
 
     currentPort.boat.deactivate();
-    newPort.boat.activate();
 
-    $("#currentturnportname").html(newPort.portName + "'s Turn");
-    $("#hudtop").css("background-color", newPort.portColor);
+    setTimeout(() => {
+        newPort.boat.activate();
 
+        $("#currentturnportname").html(newPort.portName + "'s Turn");
+        $("#hudtop").css("background-color", newPort.portColor);
+    }, 1000);
 }
 
 let drawnCard;
 let lastFPSUpdate = Date.now();
-const updateGame = function() {
+const updateGame = function () {
 
     if (Date.now() - lastFPSUpdate > 1000) {
         $("#fps").html(engine.getFps().toFixed() + " fps");
@@ -191,7 +210,7 @@ const updateGame = function() {
 
     renderMinimap();
 
-    soundEngine.doAmbientSounds();
+    buccaneer.soundEngine.doAmbientSounds();
 
     let boatAtPirateIsland = false;
     for (let boat of boats) {
@@ -218,11 +237,11 @@ const updateGame = function() {
         chestAnimationStartTime = time;
 
         if (boatAtPirateIsland) {
-            soundEngine.chestOpen();
+            buccaneer.soundEngine.chestOpen();
 
 
         } else {
-            soundEngine.chestClose();
+            buccaneer.soundEngine.chestClose();
 
             createdParticleSystem = false;
         }
@@ -263,17 +282,15 @@ const updateGame = function() {
     chestLid.setDirection(Axis.Z, 0.0, 0.0, chestAngle);
 }
 
-const createScene = function() {
-    engine.displayLoadingUI();
+const createScene = function () {
 
-    const scene = new Scene(engine);
 
-    $("#actionbtnturn").click(function() {
-        nextTurn();
+    $("#actionbtnturn").click(function () {
+        buccaneer.nextTurn();
     });
 
     SceneLoader.OnPluginActivatedObservable.addOnce(loader => {
-        (<GLTFFileLoader> loader).animationStartMode = GLTFLoaderAnimationStartMode.NONE;
+        (<GLTFFileLoader>loader).animationStartMode = GLTFLoaderAnimationStartMode.NONE;
     });
 
     camera = new ArcRotateCamera("camera", -3 * Math.PI / 4, Math.PI / 3, 50, new BABYLON.Vector3(0, 0, 0), scene);
@@ -291,7 +308,7 @@ const createScene = function() {
         true, // HDR texture
         scene, [camera]
     );
-    if (settings.useAntialiasing)
+    if (buccaneer.settings.useAntialiasing)
         pipeline.samples = 16;
     // new BABYLON.FxaaPostProcess("fxaa", 1.0, camera);
 
@@ -310,23 +327,23 @@ const createScene = function() {
     scene.actionManager = new BABYLON.ActionManager(scene);
     scene.actionManager.registerAction(
         new BABYLON.ExecuteCodeAction({
-                trigger: BABYLON.ActionManager.OnKeyDownTrigger,
-                parameter: 'r'
-            },
+            trigger: BABYLON.ActionManager.OnKeyDownTrigger,
+            parameter: 'r'
+        },
             () => scene.debugLayer.show()
         )
     );
     scene.actionManager.registerAction(
         new BABYLON.ExecuteCodeAction({
-                trigger: BABYLON.ActionManager.OnKeyDownTrigger,
-                parameter: 'a'
-            },
+            trigger: BABYLON.ActionManager.OnKeyDownTrigger,
+            parameter: 'a'
+        },
             () => showAxis(5, scene)
         )
     );
 
 
-    $("#debug").click(function() { scene.debugLayer.show({ handleResize: true, overlay: true }) });
+    $("#debug").click(function () { scene.debugLayer.show({ handleResize: true, overlay: true }) });
 
     // const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
     const ambientLight = new BABYLON.HemisphericLight("HemiLight", new BABYLON.Vector3(0, 1, 0), scene);
@@ -340,8 +357,8 @@ const createScene = function() {
         BABYLON.SceneLoader.AppendAsync("assets/AllIslands.glb"),
         BABYLON.SceneLoader.AppendAsync("assets/Boat.glb"),
         BABYLON.SceneLoader.AppendAsync("assets/3DAssets.glb")
-    ]).then(function() {
-        assetManager.load(scene);
+    ]).then(function () {
+        buccaneer.assetManager.load(scene);
 
         boatMesh = scene.getMeshByName("Boat");
         // boatMesh.setEnabled(false);
@@ -386,11 +403,11 @@ const createScene = function() {
         grid.position.y = 0.001;
         gridMaterial.lineColor = new BABYLON.Color3(1, 1, 1);
         gridMaterial.majorUnitFrequency = 1;
-        gridMaterial.gridRatio = settings.gridTileSize;
+        gridMaterial.gridRatio = buccaneer.settings.gridTileSize;
         gridMaterial.opacity = 0.2;
         grid.material = gridMaterial;
 
-        water = new WaterMaterial("water", scene, new BABYLON.Vector2(settings.reflectionResolution, settings.reflectionResolution));
+        water = new WaterMaterial("water", scene, new BABYLON.Vector2(buccaneer.settings.reflectionResolution, buccaneer.settings.reflectionResolution));
         water.backFaceCulling = true;
         water.bumpTexture = new BABYLON.Texture("assets/waterbump.png", scene);
         water.windForce = -5;
@@ -422,7 +439,7 @@ const createScene = function() {
         waterDiffuseMaterial.specularColor = new BABYLON.Color3(0.8, 0.8, 0.8);
         waterDiffuseMaterial.alpha = 0.8;
 
-        if (settings.reflections) {
+        if (buccaneer.settings.reflections) {
             sea.material = water;
         } else {
             sea.material = waterDiffuseMaterial;
@@ -431,7 +448,7 @@ const createScene = function() {
         }
 
         for (let port of ports) {
-            port.init(scene, assetManager);
+            port.init(scene, buccaneer.assetManager);
         }
 
         // let meshes = [];
@@ -440,18 +457,23 @@ const createScene = function() {
         // }
         // BABYLON.Mesh.MergeMeshes(meshes, true, true, undefined, false, true);
 
-        scene.registerBeforeRender(function() {
+        scene.registerBeforeRender(function () {
             updateGame();
         });
 
-        scene.onPointerMove = function() {
+        scene.onPointerMove = function () {
             // TODO
         };
 
 
         for (let i = 0; i < 8; i++) {
             let portLocation = ports[i].portLocation;
-            let boat = new Boat(portLocation.x, portLocation.z, scene, settings, boatIndex++, soundEngine);
+            let boat;
+            if (i == 0) {
+                boat = new Boat(portLocation.x, portLocation.z, boatIndex++, buccaneer);
+            } else {
+                boat = new AI(portLocation.x, portLocation.z, boatIndex++, buccaneer);
+            }
             boats.push(boat);
             water.addToRenderList(boat.mesh);
         }
@@ -480,7 +502,7 @@ const createScene = function() {
         material.specularColor = new BABYLON.Color3(0, 0, 0);
         rivers.material = material;
 
-        if (settings.reflections) {
+        if (buccaneer.settings.reflections) {
             rivers.material = water;
         } else {
             rivers.material = waterDiffuseMaterial;
@@ -555,29 +577,27 @@ const createScene = function() {
 
         boatMesh.parent.dispose();
 
-        soundEngine.init(scene);
+        buccaneer.soundEngine.init(scene);
 
         $("#btnClosePopup").click(() => {
-            scene.getAnimationGroupByName("ChanceReturn.001").play();
+            scene.getAnimationGroupByName("ChanceReturn").play();
             scene.getAnimationGroupByName("StackReturn").play();
         });
 
-        nextTurn();
+        buccaneer.nextTurn();
 
-        scene.executeWhenReady(function() {
+        scene.executeWhenReady(function () {
             engine.hideLoadingUI();
         });
     });
-
-    return scene;
 };
 
-const scene = createScene();
+createScene();
 
-engine.runRenderLoop(function() {
+engine.runRenderLoop(function () {
     scene.render();
 });
 
-window.addEventListener("resize", function() {
+window.addEventListener("resize", function () {
     engine.resize();
 });

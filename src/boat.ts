@@ -3,6 +3,7 @@ import * as BABYLON from "@babylonjs/core";
 import { Port, ports } from './port';
 import { Color3, Mesh, Scene, TransformNode, Vector3 } from '@babylonjs/core';
 import { SoundEngine } from './soundengine';
+import { Buccaneer } from '.';
 
 let scene, settings;
 
@@ -35,10 +36,10 @@ class Boat {
     turnStartDir : number;
     activated : boolean = false;
 
-    constructor(x : number, z : number, _scene : Scene, _settings : any, boatIndex : number, soundEngine : SoundEngine) {
+    constructor(x : number, z : number, boatIndex : number, buccaneer : Buccaneer) {
         let self = this;
-        scene = _scene;
-        settings = _settings;
+        scene = buccaneer.scene;
+        settings = buccaneer.settings;
 
         this.sailingStrength = Math.floor(Math.random() * 12) + 6;
         this.x = x;
@@ -113,7 +114,7 @@ class Boat {
             new BABYLON.ExecuteCodeAction({
                     trigger: BABYLON.ActionManager.OnPointerOverTrigger
                 },
-                function() {
+                () => {
                     cw.overlayAlpha = 0.3;
                 }
             )
@@ -122,7 +123,7 @@ class Boat {
             new BABYLON.ExecuteCodeAction({
                     trigger: BABYLON.ActionManager.OnPointerOutTrigger
                 },
-                function() {
+                () => {
                     cw.overlayAlpha = 0.0;
                 }
             )
@@ -131,8 +132,8 @@ class Boat {
             new BABYLON.ExecuteCodeAction({
                     trigger: BABYLON.ActionManager.OnLeftPickTrigger
                 },
-                function() {
-                    soundEngine.boatRotate();
+                () => {
+                    buccaneer.soundEngine.boatRotate();
 
                     self.direction -= 1;
                     self.originalAngle = self.angle;
@@ -173,8 +174,8 @@ class Boat {
             new BABYLON.ExecuteCodeAction({
                     trigger: BABYLON.ActionManager.OnLeftPickTrigger
                 },
-                function() {
-                    soundEngine.boatRotate();
+                () => {
+                    buccaneer.soundEngine.boatRotate();
 
                     self.direction += 1;
                     self.originalAngle = self.angle;
