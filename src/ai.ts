@@ -15,6 +15,13 @@ class AI extends Boat {
 
     activate() {
         super.activate();
+        
+        for (let s of this.squares) {
+            s.setEnabled(false);
+        }
+
+        this.cw.setEnabled(false);
+        this.ccw.setEnabled(false);
 
         this.makeMove();
     }

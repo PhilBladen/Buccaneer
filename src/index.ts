@@ -320,8 +320,9 @@ const createScene = function () {
         true, // HDR texture
         scene, [camera]
     );
-    if (buccaneer.settings.useAntialiasing)
+    if (buccaneer.settings.useAntialiasing) {
         pipeline.samples = 16;
+    }
     // new BABYLON.FxaaPostProcess("fxaa", 1.0, camera);
 
     const skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, scene);
@@ -489,7 +490,7 @@ const createScene = function () {
         }
 
         for (let port of ports) {
-            port.init(scene, buccaneer.assetManager);
+            port.init(buccaneer);
         }
 
         let material = new BABYLON.StandardMaterial("", scene);
@@ -546,39 +547,6 @@ const createScene = function () {
         material.alpha = 0.0;
         scene.getMeshByName("ChestEmitPlane").material = material;
 
-        // ruby.setEnabled(false);
-
-        let portIndex = 0;
-        for (let port of portMeshes) {
-            material = new BABYLON.StandardMaterial("", scene);
-            material.specularColor = new BABYLON.Color3(0, 0, 0);
-
-            let portTexture = new BABYLON.Texture("assets/Merged Map_2048.png", scene, true);
-            portTexture.vScale = -1;
-            portTexture.uOffset = Math.floor(portIndex / 4) * 0.25;
-            portTexture.vOffset = -(portIndex % 4) * 0.1416;
-
-            material.diffuseTexture = portTexture;
-            port.material = material;
-
-            portIndex++;
-        }
-        portIndex = 0;
-        for (let safe of safes) {
-            let isActive = true;
-
-            material = new BABYLON.StandardMaterial("", scene);
-            let portTexture = new BABYLON.Texture("assets/Merged Map_2048.png", scene, true);
-            portTexture.vScale = -1;
-            portTexture.uOffset = portIndex * 0.11194;
-            portTexture.vOffset = isActive ? -0.1791 : 0;
-
-            material.diffuseTexture = portTexture;
-            safe.material = material;
-
-            portIndex++;
-        }
-
         let anchor = scene.getMeshByName("Anchor");
         water.addToRenderList(anchor);
         let anchorMaterial = new BABYLON.StandardMaterial("", scene);
@@ -593,10 +561,13 @@ const createScene = function () {
 
         buccaneer.soundEngine.init(scene);
 
-        $("#btnClosePopup").click(() => {
+        $("#btnClosePopup").on("click", () => {
             scene.getAnimationGroupByName("ChanceReturn").play();
             scene.getAnimationGroupByName("StackReturn").play();
         });
+
+        scene.getAnimationGroupByName("ChanceReturn").start();
+        scene.getAnimationGroupByName("ChanceReturn").goToFrame(50);
 
         buccaneer.nextTurn();
 

@@ -70,7 +70,6 @@ class SoundEngine {
     }
 
     buttonHover() {
-        console.log("Hover");
         this.buttonHoverSound.play();
     }
 }

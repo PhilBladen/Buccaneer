@@ -1,5 +1,5 @@
 import { ports } from './port';
-import { Mesh, Vector3, DynamicTexture, StandardMaterial, Color3, Texture } from "@babylonjs/core";
+import { Mesh, Vector3, DynamicTexture, StandardMaterial, Color3, Texture, FloatArray, VertexBuffer } from "@babylonjs/core";
 
 declare global {
     interface Window {
@@ -105,6 +105,15 @@ function randomInt(max : number) : number {
     return Math.floor(Math.random() * (max + 1));
 }
 
+function offsetMeshUVs(mesh: Mesh, uOffset: number, vOffset: number) {
+    let vertexData: FloatArray = mesh.getVerticesData(VertexBuffer.UVKind);
+    for (let i = 0; i < vertexData.length / 2; i++) {
+        vertexData[2 * i] += uOffset;
+        vertexData[2 * i + 1] = -vertexData[2 * i + 1] - vOffset; // Invert V
+    }
+    mesh.setVerticesData(VertexBuffer.UVKind, vertexData);
+}
+
 export {
     isMobileDevice,
     cosineInterpolate,
@@ -113,4 +122,5 @@ export {
     isSquareAllowed,
     getSplashMaterial,
     randomInt,
+    offsetMeshUVs,
 }

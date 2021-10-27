@@ -1,16 +1,15 @@
 import * as Utils from './utils';
 import * as BABYLON from "@babylonjs/core";
 import { Port, ports } from './port';
-import { Color3, Mesh, Scene, TransformNode, Vector3 } from '@babylonjs/core';
+import { Color3, Mesh, Scene, StandardMaterial, TransformNode, Vector3 } from '@babylonjs/core';
 import { SoundEngine } from './soundengine';
 import { Buccaneer } from '.';
 
-let scene, settings;
+let scene: Scene;
+let settings: any;
 
 let matRed = null;
 let matWhite = null;
-
-let index = 0;
 
 class Boat {
     sailingStrength : number;
@@ -65,7 +64,7 @@ class Boat {
         }
 
         let boatMesh = scene.getMeshByName("Boat");
-        let mesh : Mesh = boatMesh.clone("Boat" + port.portName);
+        let mesh : Mesh = <Mesh> boatMesh.clone("Boat" + port.portName, null);
         // mesh.setParent(null);
         // mesh.name
         mesh.setEnabled(true);
@@ -92,21 +91,22 @@ class Boat {
 
         this.CoT = CoT;
 
-        let cw;
-        let ccw;
+        let cw : Mesh;
+        let ccw : Mesh;
         for (let n of mesh.getChildren()) {
             if (n.name == mesh.name + ".RotateCW")
-                cw = n;
+                cw = <Mesh> n;
             if (n.name == mesh.name + ".RotateCCW")
-                ccw = n;
+                ccw = <Mesh> n;
         }
 
-        cw.material = new BABYLON.StandardMaterial("", scene);
-        cw.material.specularColor = new BABYLON.Color3(0, 0, 0);
-        cw.material.diffuseTexture = new BABYLON.Texture("assets/arrows.png", scene);
-        cw.material.diffuseTexture.hasAlpha = true;
+        let material : StandardMaterial = new BABYLON.StandardMaterial("", scene);
+        cw.material = material;
+        material.specularColor = new BABYLON.Color3(0, 0, 0);
+        material.diffuseTexture = new BABYLON.Texture("assets/arrows.png", scene);
+        material.diffuseTexture.hasAlpha = true;
         // cw.material.transparencyMode = BABYLON.StandardMaterial.MATERIAL_ALPHABLEND;
-        cw.material.useAlphaFromDiffuseTexture = true;
+        material.useAlphaFromDiffuseTexture = true;
         cw.isPickable = true;
         cw.alphaIndex = 3000;
         cw.overlayAlpha = 0.0;
@@ -218,8 +218,6 @@ class Boat {
         this.offset = Math.random();
 
         this.deactivate();
-
-        index++;
     }
 
     isInPort() {

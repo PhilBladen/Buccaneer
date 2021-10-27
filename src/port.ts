@@ -1,29 +1,35 @@
 import * as BABYLON from "@babylonjs/core";
-import { Axis, Color3, Mesh, Scene, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
-import { SimpleMaterial } from "@babylonjs/materials";
+import { AbstractMesh, Axis, Color3, FloatArray, Mesh, Scene, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
+import { Buccaneer } from "src";
 import { AssetManager } from "./assets";
 import { Boat } from "./boat";
-import { randomInt } from "./utils";
+import { offsetMeshUVs, randomInt } from "./utils";
 
-let portIndex = 0;
+let portMaterial: StandardMaterial = null;
 
 class Port {
+    buccaneer: Buccaneer;
+
+    resourceIndex: number;
     portLocation: Vector3;
     portColor: string;
     portName: string;
     inventoryLocation: number[];
-    portIndex: number;
     boat: Boat;
+    mesh: Mesh;
 
-    constructor(portLocation, portColor, portName, inventoryLocation) {
+    constructor(resourceIndex: number, portLocation: Vector3, portColor: string, portName: string, inventoryLocation: number[]) {
+        this.resourceIndex = resourceIndex;
         this.portLocation = portLocation;
         this.portColor = portColor;
         this.portName = portName;
         this.inventoryLocation = inventoryLocation;
-        this.portIndex = portIndex++;
     }
 
-    init(scene: Scene, assetManager: AssetManager) {
+    generateInventory() {
+        let scene = this.buccaneer.scene;
+        let assetManager = this.buccaneer.assetManager;
+
         let inventoryTransform = new BABYLON.TransformNode(this.portName, scene);
 
         let l = this.portLocation;
@@ -41,7 +47,7 @@ class Port {
 
         let possibleCards = [20, 22, 23, 24, 25, 28, 34, 35, 36, 37, 38, 39];
 
-        let numCards = 2; //Math.floor(Math.random() * 3);
+        let numCards = 2;
         for (let i = 0; i < numCards; i++) {
             let cardMesh = scene.getMeshByName("GenericCardFace").clone(this.portName + " card", null);
             cardMesh.setParent(null);
@@ -67,7 +73,7 @@ class Port {
 
 
             let drawnCard = possibleCards[Math.floor(Math.random() * possibleCards.length)];
-            let cardTexture : Texture = <Texture> (<StandardMaterial> cardMesh.material).diffuseTexture;
+            let cardTexture: Texture = <Texture>(<StandardMaterial>cardMesh.material).diffuseTexture;
             cardTexture.uOffset = (drawnCard % 8) * (1 / 8);
             cardTexture.vOffset = 1 - Math.floor(drawnCard / 8) * 0.19034;
 
@@ -78,7 +84,7 @@ class Port {
         // if (this.portName != "Bombay") return;
         let treasures: number[] = [];
         for (let i = 0; i < 3; i++) {
-            let numOfThisType = randomInt(2);
+            let numOfThisType = 2;//randomInt(2);
             for (let j = 0; j < numOfThisType; j++) {
                 treasures.push(i);
             }
@@ -88,8 +94,9 @@ class Port {
         let i = 0;
 
         while (treasures.length > 0) {
-            let treasureMesh: Mesh;
+            let treasureMesh: AbstractMesh;
             let rand = treasures.splice(randomInt(treasures.length - 1), 1)[0];
+            // treasures.pop(); // TODO remove
             if (rand == 0)
                 treasureMesh = assetManager.getRubyInstance();
             else if (rand == 1) {
@@ -102,7 +109,7 @@ class Port {
 
 
 
-            parent.position.copyFrom(scene.getMeshByName("Dock" + this.portIndex).getAbsolutePosition());
+            parent.position.copyFrom(this.mesh.getAbsolutePosition());
 
             if (l.x < -10) { // West
                 parent.rotation.y = -Math.PI / 2;
@@ -124,17 +131,40 @@ class Port {
             i++;
         }
     }
+
+    init(buccaneer: Buccaneer) {
+        this.buccaneer = buccaneer;
+
+        if (portMaterial == null) {
+            portMaterial = new BABYLON.StandardMaterial("Port material", buccaneer.scene);
+            portMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+            let portTexture = new BABYLON.Texture("assets/Merged Map_2048.png", buccaneer.scene, true);
+            portMaterial.diffuseTexture = portTexture;
+        }
+
+        let isActive = this.boat != null;
+
+        this.mesh = <Mesh>buccaneer.scene.getMeshByID("Dock" + this.resourceIndex);
+        this.mesh.material = portMaterial;
+        offsetMeshUVs(this.mesh, Math.floor(this.resourceIndex / 4) * 0.25 + (isActive ? 0 : 0.5), (this.resourceIndex % 4) * 0.1416); // Adjust mesh UVs to correctly render port texture without requiring a unique material
+
+        let safeMesh = <Mesh>buccaneer.scene.getMeshByID("Safe" + this.resourceIndex);
+        safeMesh.material = portMaterial;
+        offsetMeshUVs(safeMesh, this.resourceIndex * 0.11194, isActive ? 0.1791 : 0); // Adjust mesh UVs to correctly render safe texture without requiring a unique material
+
+        this.generateInventory();
+    }
 }
 
 const ports = [
-    new Port(new BABYLON.Vector3(12, 0, 4), "#6A9023", "Bombay", [3, 2.5]),
-    new Port(new BABYLON.Vector3(12, 0, -4), "#82B3CC", "Cadiz", [3, -2.5]),
-    new Port(new BABYLON.Vector3(4, 0, -13), "#A5739C", "Bristol", [2.5, -3]),
-    new Port(new BABYLON.Vector3(-4, 0, -13), "#F88642", "London", [-2.5, -3]),
-    new Port(new BABYLON.Vector3(-13, 0, -5), "#F9D42C", "Genoa", [-3, -2.5]),
-    new Port(new BABYLON.Vector3(-13, 0, 3), "#E25E9F", "Venice", [-3, 2.5]),
-    new Port(new BABYLON.Vector3(-5, 0, 12), "#B37F39", "Amsterdam", [-2.5, 3]),
-    new Port(new BABYLON.Vector3(3, 0, 12), "#E84D4C", "Marseilles", [2.5, 3]),
+    new Port(0, new BABYLON.Vector3(12, 0, 4), "#6A9023", "Bombay", [3, 2.5]),
+    new Port(1, new BABYLON.Vector3(12, 0, -4), "#82B3CC", "Cadiz", [3, -2.5]),
+    new Port(2, new BABYLON.Vector3(4, 0, -13), "#A5739C", "Bristol", [2.5, -3]),
+    new Port(3, new BABYLON.Vector3(-4, 0, -13), "#F88642", "London", [-2.5, -3]),
+    new Port(4, new BABYLON.Vector3(-13, 0, -5), "#F9D42C", "Genoa", [-3, -2.5]),
+    new Port(5, new BABYLON.Vector3(-13, 0, 3), "#E25E9F", "Venice", [-3, 2.5]),
+    new Port(6, new BABYLON.Vector3(-5, 0, 12), "#B37F39", "Amsterdam", [-2.5, 3]),
+    new Port(7, new BABYLON.Vector3(3, 0, 12), "#E84D4C", "Marseilles", [2.5, 3]),
 ];
 
 export {

@@ -1,37 +1,68 @@
-import { Mesh } from "@babylonjs/core";
+import { Color3, Mesh, PBRMaterial, Scene, StandardMaterial } from "@babylonjs/core";
 
 class AssetManager {
+    scene: Scene;
+
     assets : Mesh[];
     barrel : Mesh;
     gold : Mesh;
     ruby : Mesh;
 
-    load(scene) {
+    load(scene: Scene) {
+        this.scene = scene;
+
         let container = scene.getNodeByName("Assets");
 
         this.assets = [];
         for (let child of container.getChildren()) {
             if (child.name == "Barrel") {
-                this.barrel = child;
+                this.barrel = <Mesh> child;
             }
             if (child.name == "Gold") {
-                this.gold = child;
+                this.gold = <Mesh> child;
             }
             if (child.name == "Ruby") {
-                this.ruby = child;
+                this.ruby = <Mesh> child;
                 this.ruby.alphaIndex = 10000;
             }
         }
+
+        let material = new StandardMaterial("", this.scene);
+        material.specularColor = new Color3(1, 1, 1);
+        material.specularPower = 10;
+        material.diffuseColor = new Color3(0.0, 0.5, 0);//new Color3(0.1, 0.1, 0.1);/
+        material.emissiveColor = new Color3(0.0, 0.1, 0);//new Color3(0.5, 0.5, 0.5);
+        material.alpha = 0.9;
+        material.backFaceCulling = true;
+        this.ruby.material = material;
+
+        
+        // let material = new PBRMaterial("", this.scene);
+        // // material.spec = new Color3(1, 1, 1);
+        // // material.specularPower = 0.1;
+        // // material.useSpecularOverAlpha = true;
+        // material.specularIntensity = 0.5;
+        // material.albedoColor = new Color3(1, 1, 1);//new Color3(0.5, 0, 0);
+        // // material.emissiveColor = new Color3(0.5, 0.5, 0.5);//new Color3(0.1, 0, 0);
+        // // material.alpha = 0.5;
+        // // material.backFaceCulling = true;
+        // material.indexOfRefraction = 2.4;
+        // this.ruby.material = material;
 
         container.setEnabled(false);
     }
 
     getRubyInstance() {
-        let inst = this.ruby.clone();
-        inst.setEnabled(true);
-        for (let child of inst.getChildren()) {
-            child.setEnabled(true);
-        }
+        // let inst = this.ruby.clone();
+        // inst.setEnabled(true);
+        // for (let child of inst.getChildren()) {
+        //     child.setEnabled(true);
+        // }
+
+        
+
+        
+        let inst = this.ruby.createInstance("");
         return inst;
         // return this.ruby.createInstance("Instance");
     }
