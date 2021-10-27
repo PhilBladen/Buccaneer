@@ -10,6 +10,8 @@ let scene, settings;
 let matRed = null;
 let matWhite = null;
 
+let index = 0;
+
 class Boat {
     sailingStrength : number;
     x : number;
@@ -36,7 +38,7 @@ class Boat {
     turnStartDir : number;
     activated : boolean = false;
 
-    constructor(x : number, z : number, boatIndex : number, buccaneer : Buccaneer) {
+    constructor(x : number, z : number, port : Port, buccaneer : Buccaneer) {
         let self = this;
         scene = buccaneer.scene;
         settings = buccaneer.settings;
@@ -44,7 +46,6 @@ class Boat {
         this.sailingStrength = Math.floor(Math.random() * 12) + 6;
         this.x = x;
         this.z = z;
-        this.boatIndex = boatIndex;
         this.squares = [];
         this.originalLocation = this.targetLocation = new BABYLON.Vector3((x + 0.5) * settings.gridTileSize, 0, (z + 0.5) * settings.gridTileSize);
         this.animateStartTime = 0;
@@ -64,7 +65,7 @@ class Boat {
         }
 
         let boatMesh = scene.getMeshByName("Boat");
-        let mesh = boatMesh.clone("Boat" + boatIndex);
+        let mesh : Mesh = boatMesh.clone("Boat" + port.portName);
         // mesh.setParent(null);
         // mesh.name
         mesh.setEnabled(true);
@@ -72,7 +73,9 @@ class Boat {
         mesh.isPickable = true;
         mesh.position.y = -0.03;
 
-        let CoT = new BABYLON.TransformNode("Boat" + boatIndex + " transform");
+        buccaneer.water.addToRenderList(mesh);
+
+        let CoT = new BABYLON.TransformNode("Boat" + port.portName + " transform");
         mesh.setParent(CoT);
 
         if (x <= -12)
@@ -92,9 +95,9 @@ class Boat {
         let cw;
         let ccw;
         for (let n of mesh.getChildren()) {
-            if (n.name == "Boat" + boatIndex + ".RotateCW")
+            if (n.name == mesh.name + ".RotateCW")
                 cw = n;
-            if (n.name == "Boat" + boatIndex + ".RotateCCW")
+            if (n.name == mesh.name + ".RotateCCW")
                 ccw = n;
         }
 
@@ -202,12 +205,12 @@ class Boat {
         }
 
         let mat = new BABYLON.StandardMaterial("boat", scene);
-        mat.diffuseColor = Color3.FromHexString(ports[boatIndex].portColor);
+        mat.diffuseColor = Color3.FromHexString(port.portColor);
         mat.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
         mat.roughness = 0;
         mesh.material = mat;
 
-        this.port = ports[boatIndex];
+        this.port = port;
         this.port.boat = this;
 
         this.mesh = mesh;
@@ -215,6 +218,8 @@ class Boat {
         this.offset = Math.random();
 
         this.deactivate();
+
+        index++;
     }
 
     isInPort() {

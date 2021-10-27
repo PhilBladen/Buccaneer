@@ -12,9 +12,6 @@
           "dom",
           "es6"
       ],
-      "rootDir": "src"
-    },
-    "awesomeTypescriptLoaderOptions": {
-      /* ... */
-  }
+      "rootDir": "."
+    }
   }

@@ -24,16 +24,26 @@ class AssetManager {
         }
 
         container.setEnabled(false);
-
-        console.log(this);
     }
 
     getRubyInstance() {
-        return this.ruby.createInstance("Instance");
+        let inst = this.ruby.clone();
+        inst.setEnabled(true);
+        for (let child of inst.getChildren()) {
+            child.setEnabled(true);
+        }
+        return inst;
+        // return this.ruby.createInstance("Instance");
     }
 
     getGoldInstance() {
-        return this.gold.createInstance("Instance");
+        let inst = this.gold.clone();
+        inst.setEnabled(true);
+        for (let child of inst.getChildren()) {
+            child.setEnabled(true);
+        }
+        return inst;
+        //return this.gold.createInstance("Instance");
     }
 
     getBarrelInstance() {

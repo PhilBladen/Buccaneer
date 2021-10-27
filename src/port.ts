@@ -1,16 +1,19 @@
 import * as BABYLON from "@babylonjs/core";
-import { Color3, Vector3 } from "@babylonjs/core";
+import { Axis, Color3, Mesh, Scene, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
+import { SimpleMaterial } from "@babylonjs/materials";
+import { AssetManager } from "./assets";
 import { Boat } from "./boat";
+import { randomInt } from "./utils";
 
 let portIndex = 0;
 
 class Port {
-    portLocation : Vector3;
-    portColor : string;
-    portName : string;
-    inventoryLocation : number[];
-    portIndex : number;
-    boat : Boat;
+    portLocation: Vector3;
+    portColor: string;
+    portName: string;
+    inventoryLocation: number[];
+    portIndex: number;
+    boat: Boat;
 
     constructor(portLocation, portColor, portName, inventoryLocation) {
         this.portLocation = portLocation;
@@ -20,7 +23,7 @@ class Port {
         this.portIndex = portIndex++;
     }
 
-    init(scene, assetManager) {
+    init(scene: Scene, assetManager: AssetManager) {
         let inventoryTransform = new BABYLON.TransformNode(this.portName, scene);
 
         let l = this.portLocation;
@@ -40,7 +43,7 @@ class Port {
 
         let numCards = 2; //Math.floor(Math.random() * 3);
         for (let i = 0; i < numCards; i++) {
-            let cardMesh = scene.getMeshByName("GenericCardFace").clone(this.portName + " card");
+            let cardMesh = scene.getMeshByName("GenericCardFace").clone(this.portName + " card", null);
             cardMesh.setParent(null);
             cardMesh.scaling.x = 1;
             cardMesh.scaling.y = 1;
@@ -64,28 +67,62 @@ class Port {
 
 
             let drawnCard = possibleCards[Math.floor(Math.random() * possibleCards.length)];
-            cardMesh.material.diffuseTexture.uOffset = (drawnCard % 8) * (1 / 8);
-            cardMesh.material.diffuseTexture.vOffset = 1 - Math.floor(drawnCard / 8) * 0.19034;
+            let cardTexture : Texture = <Texture> (<StandardMaterial> cardMesh.material).diffuseTexture;
+            cardTexture.uOffset = (drawnCard % 8) * (1 / 8);
+            cardTexture.vOffset = 1 - Math.floor(drawnCard / 8) * 0.19034;
 
             cardMesh.position.x = (i - numCards / 2 + 0.5) * 0.25;
             cardMesh.position.y = -i * 0.001;
         }
 
         // if (this.portName != "Bombay") return;
-
-        let cardMesh;
-        let rand = Math.floor(Math.random() * 3);
-        if (rand == 0)
-            cardMesh = assetManager.getRubyInstance();
-        else if (rand == 1) {
-            cardMesh = assetManager.getGoldInstance();
-        } else if (rand == 2) {
-            cardMesh = assetManager.getBarrelInstance();
+        let treasures: number[] = [];
+        for (let i = 0; i < 3; i++) {
+            let numOfThisType = randomInt(2);
+            for (let j = 0; j < numOfThisType; j++) {
+                treasures.push(i);
+            }
         }
-        cardMesh.parent = new BABYLON.TransformNode("", scene);
-        cardMesh.parent.setDirection(BABYLON.Axis.Z, Math.random() * Math.PI * 2, 0, 0);
-        cardMesh.parent.position = scene.getMeshByName("Dock" + this.portIndex).getAbsolutePosition();
-        // cardMesh.position.y += 0.1;
+
+        let numTreasures = treasures.length;
+        let i = 0;
+
+        while (treasures.length > 0) {
+            let treasureMesh: Mesh;
+            let rand = treasures.splice(randomInt(treasures.length - 1), 1)[0];
+            if (rand == 0)
+                treasureMesh = assetManager.getRubyInstance();
+            else if (rand == 1) {
+                treasureMesh = assetManager.getGoldInstance();
+            } else if (rand == 2) {
+                treasureMesh = assetManager.getBarrelInstance();
+            }
+            let parent = new BABYLON.TransformNode("", scene);
+
+
+
+
+            parent.position.copyFrom(scene.getMeshByName("Dock" + this.portIndex).getAbsolutePosition());
+
+            if (l.x < -10) { // West
+                parent.rotation.y = -Math.PI / 2;
+            } else if (l.x > 10) { // East
+                parent.rotation.y = Math.PI / 2;
+            } else if (l.z < -10) { // South
+                parent.rotation.y = Math.PI;
+            } else if (l.z > 10) { // North
+                parent.rotation.y = 0;
+            }
+
+            parent.translate(Axis.X, ((i % (numTreasures / 2)) - numTreasures / 4 + 0.5) * 0.6);
+            parent.translate(Axis.Z, i >= numTreasures / 2 ? 0.35 : -0.35);
+            parent.translate(new BABYLON.Vector3(Math.random() - 0.5, 0.01, Math.random() - 0.5), 0.3);
+            parent.rotation.y = Math.random() * Math.PI * 2;
+
+            treasureMesh.parent = parent;
+
+            i++;
+        }
     }
 }
 

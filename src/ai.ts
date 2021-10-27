@@ -1,13 +1,14 @@
 import { Scene } from "@babylonjs/core";
 import { Buccaneer } from ".";
 import { Boat } from "./boat";
+import { Port } from "./port";
 import { SoundEngine } from "./soundengine";
 
 class AI extends Boat {
     buccaneer: Buccaneer;
 
-    constructor(x: number, z: number, boatIndex: number, buccaneer: Buccaneer) {
-        super(x, z, boatIndex, buccaneer);
+    constructor(x: number, z: number, port: Port, buccaneer: Buccaneer) {
+        super(x, z, port, buccaneer);
 
         this.buccaneer = buccaneer;
     }
@@ -27,7 +28,7 @@ class AI extends Boat {
                 this.buccaneer.nextTurn();
                 return;
             }
-            
+
             if (!moveDone) {
                 let square = this.squares[Math.floor(Math.random() * this.squares.length)];
                 this.x = square['gridX'];

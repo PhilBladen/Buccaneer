@@ -98,6 +98,13 @@ const getSplashMaterial = function(scene) {
     return splashMaterial;
 }
 
+/**
+ * Generates a random integer from 0 to max inclusive.
+ */
+function randomInt(max : number) : number {
+    return Math.floor(Math.random() * (max + 1));
+}
+
 export {
     isMobileDevice,
     cosineInterpolate,
@@ -105,4 +112,5 @@ export {
     showAxis,
     isSquareAllowed,
     getSplashMaterial,
+    randomInt,
 }

@@ -5,7 +5,7 @@
 // import 'babylonjs-inspector';
 // import { GridMaterial, WaterMaterial, CustomMaterial } from 'babylonjs-materials'
 import { createPointerLock } from "./pointerLock.js"
-import { cosineInterpolate, cosineInterpolateV3D, isMobileDevice, showAxis } from './utils';
+import { cosineInterpolate, cosineInterpolateV3D, isMobileDevice, randomInt, showAxis } from './utils';
 import { Boat } from './boat';
 import { Port, ports } from './port';
 import { SoundEngine } from './soundengine';
@@ -52,6 +52,8 @@ class Buccaneer {
     readonly assetManager: AssetManager;
     readonly settings;
 
+    water : WaterMaterial;
+
     constructor(scene: Scene) {
         this.scene = scene;
         this.soundEngine = new SoundEngine();
@@ -64,12 +66,18 @@ class Buccaneer {
     }
 
     nextTurn() {
-        let currentTurnPort = ports[currentTurnPortIndex];
+        let currentTurnPort = ports[currentTurnPortIndex % 8];
+        while (currentTurnPort.boat == null) { // First turn only TODO
+            currentTurnPort = ports[++currentTurnPortIndex % 8];
+        }
 
         currentTurnPortIndex++;
         currentTurnPortIndex %= 8; // TODO deal with only real players
 
-        let newTurnPort = ports[currentTurnPortIndex];
+        let newTurnPort = ports[currentTurnPortIndex % 8];
+        while (newTurnPort.boat == null) {
+            newTurnPort = ports[++currentTurnPortIndex % 8];
+        }
         updateTurn(currentTurnPort, newTurnPort);
     }
 }
@@ -88,17 +96,16 @@ const buccaneer = new Buccaneer(scene);
 
 // engine.enterFullscreen(); TODO add user option
 
-// Pause audio when window loses focus
-$(window).on("focus", () => {
-    Engine.audioEngine.setGlobalVolume(1);
-}).on("blur", () => {
-    Engine.audioEngine.setGlobalVolume(0);
-});
+// Pause audio when window loses focus TODO
+// $(window).on("focus", () => {
+//     Engine.audioEngine.setGlobalVolume(1);
+// }).on("blur", () => {
+//     Engine.audioEngine.setGlobalVolume(0);
+// });
 
 let selectedBoat = null;
 let camera = null;
 let boatMesh = null;
-let water = null;
 let boats = [];
 let chestLid;
 let cardAnimation;
@@ -111,7 +118,7 @@ let wasBoatAtPirateIsland = false;
 let chestAnimationStartTime = 0;
 let createdParticleSystem = false;
 
-let currentTurnPortIndex = 0;
+let currentTurnPortIndex = 7;
 
 let cardDeck = [];
 for (let cardIndex = 0; cardIndex < 30; cardIndex++) {
@@ -202,7 +209,7 @@ let lastFPSUpdate = Date.now();
 const updateGame = function () {
 
     if (Date.now() - lastFPSUpdate > 1000) {
-        $("#fps").html(engine.getFps().toFixed() + " fps");
+        $("#fps").html(engine.getFps().toFixed() + "");
         lastFPSUpdate = Date.now();
     }
 
@@ -285,8 +292,13 @@ const updateGame = function () {
 const createScene = function () {
 
 
-    $("#actionbtnturn").click(function () {
-        buccaneer.nextTurn();
+    $("#actionbtnturn").on({
+        click: () => {
+            $("#actionbtnturn").addClass("disabled");
+            buccaneer.soundEngine.buttonClick();
+            buccaneer.nextTurn();
+        },
+        mouseover: () => { buccaneer.soundEngine.buttonHover() }
     });
 
     SceneLoader.OnPluginActivatedObservable.addOnce(loader => {
@@ -407,7 +419,7 @@ const createScene = function () {
         gridMaterial.opacity = 0.2;
         grid.material = gridMaterial;
 
-        water = new WaterMaterial("water", scene, new BABYLON.Vector2(buccaneer.settings.reflectionResolution, buccaneer.settings.reflectionResolution));
+        let water = new WaterMaterial("water", scene, new BABYLON.Vector2(buccaneer.settings.reflectionResolution, buccaneer.settings.reflectionResolution));
         water.backFaceCulling = true;
         water.bumpTexture = new BABYLON.Texture("assets/waterbump.png", scene);
         water.windForce = -5;
@@ -416,6 +428,7 @@ const createScene = function () {
         water.waveLength = 0.2;
         water.colorBlendFactor = 0.5;
         water.waterColor = new BABYLON.Color3(0.1, 0.5, 0.8);
+        buccaneer.water = water;
 
         for (let mesh of scene.meshes) {
             mesh.isPickable = false;
@@ -447,10 +460,6 @@ const createScene = function () {
             sea.alphaIndex = 500;
         }
 
-        for (let port of ports) {
-            port.init(scene, buccaneer.assetManager);
-        }
-
         // let meshes = [];
         // for (let m of scene.meshes) {
         // meshes.push(m);
@@ -465,17 +474,22 @@ const createScene = function () {
             // TODO
         };
 
+        let playerPort = ports[randomInt(7)];
+        boats.push(new Boat(playerPort.portLocation.x, playerPort.portLocation.z, playerPort, buccaneer));
 
-        for (let i = 0; i < 8; i++) {
-            let portLocation = ports[i].portLocation;
-            let boat;
-            if (i == 0) {
-                boat = new Boat(portLocation.x, portLocation.z, boatIndex++, buccaneer);
-            } else {
-                boat = new AI(portLocation.x, portLocation.z, boatIndex++, buccaneer);
-            }
+        let numPlayers = randomInt(5) + 2;
+        for (let i = 0; i < numPlayers; i++) {
+            let port = ports[i];
+            if (port.boat != null) continue;
+            let portLocation = port.portLocation;
+            let boat : Boat;
+            boat = new AI(portLocation.x, portLocation.z, port, buccaneer);
             boats.push(boat);
-            water.addToRenderList(boat.mesh);
+            
+        }
+
+        for (let port of ports) {
+            port.init(scene, buccaneer.assetManager);
         }
 
         let material = new BABYLON.StandardMaterial("", scene);
