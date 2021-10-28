@@ -128,7 +128,7 @@ class Player extends Boat {
             new ExecuteCodeAction({
                 trigger: ActionManager.OnPickTrigger
             },
-                (e) => {                    
+                (e) => {
                     this.x = Math.floor(this.mousePickPosition.x);
                     this.z = Math.floor(this.mousePickPosition.z);
 
@@ -152,25 +152,28 @@ class Player extends Boat {
             let scene = this.buccaneer.scene;
             let screenX = scene.pointerX;
             let screenY = scene.pointerY;
-            let screenPosition = new Vector3(screenX, screenY, 0);    
+            let screenPosition = new Vector3(screenX, screenY, 0);
             let engine = scene.getEngine();
-    
+            let s = engine.getHardwareScalingLevel();
+
             Vector3.UnprojectToRef(
                 screenPosition,
-                engine.getRenderWidth(),
-                engine.getRenderHeight(),
+                s * engine.getRenderWidth(),
+                s * engine.getRenderHeight(),
                 Matrix.Identity(),
                 scene.getViewMatrix(),
                 scene.getProjectionMatrix(),
                 screenPosition
             );
-    
+
             let cameraPosition: Vector3 = this.buccaneer.camera.position;
-            let ray = screenPosition.subtractInPlace(cameraPosition);    
+            let ray = screenPosition.subtractInPlace(cameraPosition);
             let f = cameraPosition.y / ray.y;
             let positionOnSea = cameraPosition.subtract(ray.multiplyByFloats(f, f, f));
-    
+
             this.mousePickPosition = positionOnSea;
+
+            //console.log("Screen pos: " + screenX + ":" + screenY + "    Render size: " + engine.getRenderWidth() + ":" + engine.getRenderHeight() + "    Scaled size: " + (s * engine.getRenderingCanvas().width) + ":" + (s * engine.getRenderingCanvas().height));
 
             mat2.getEffect().setVector3('pickedPoint', this.mousePickPosition);
             mat2.getEffect().setVector3('boatStart', this.boatStart);

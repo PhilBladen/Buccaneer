@@ -83,7 +83,7 @@ class Port {
 
         // if (this.portName != "Bombay") return;
         let treasures: number[] = [];
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 5; i++) {
             let numOfThisType = 2;//randomInt(2);
             for (let j = 0; j < numOfThisType; j++) {
                 treasures.push(i);
@@ -96,13 +96,25 @@ class Port {
         while (treasures.length > 0) {
             let treasureMesh: AbstractMesh;
             let rand = treasures.splice(randomInt(treasures.length - 1), 1)[0];
-            // treasures.pop(); // TODO remove
-            if (rand == 0)
-                treasureMesh = assetManager.getRubyInstance();
-            else if (rand == 1) {
-                treasureMesh = assetManager.getGoldInstance();
-            } else if (rand == 2) {
-                treasureMesh = assetManager.getBarrelInstance();
+
+            switch (rand) {
+                case 0:
+                    treasureMesh = assetManager.getRubyInstance();
+                    break;
+                case 1:
+                    treasureMesh = assetManager.getGoldInstance();
+                    break;
+                case 2:
+                    treasureMesh = assetManager.getBarrelInstance();
+                    break;
+                case 3:
+                    treasureMesh = assetManager.getPearlInstance();
+                    break;
+                case 4:
+                    treasureMesh = assetManager.getDiamondInstance();
+                    break;
+                default:
+                    // Sad
             }
             let parent = new BABYLON.TransformNode("", scene);
 
