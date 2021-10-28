@@ -10,7 +10,9 @@ class Player extends Boat {
     ccw: Mesh = null;
     movesMesh: Mesh;
 
-    dummyBall: Mesh = null;
+    mousePickPosition: Vector3 = Vector3.Zero();
+
+    turnStartTime: number;
 
     constructor(x: number, z: number, port: Port, buccaneer: Buccaneer) {
         super(x, z, port, buccaneer);
@@ -120,27 +122,6 @@ class Player extends Boat {
         this.cw.setEnabled(false);
         this.ccw.setEnabled(false);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        let pointerHover = new Vector3(this.x, 0, this.z);
-
-
-
-
-
-
         this.movesMesh = new Mesh("custom", scene);
         this.movesMesh.actionManager = new ActionManager(scene);
         this.movesMesh.actionManager.registerAction(
@@ -148,8 +129,8 @@ class Player extends Boat {
                 trigger: ActionManager.OnPickTrigger
             },
                 (e) => {                    
-                    this.x = Math.floor(this.dummyBall.position.x);
-                    this.z = Math.floor(this.dummyBall.position.z);
+                    this.x = Math.floor(this.mousePickPosition.x);
+                    this.z = Math.floor(this.mousePickPosition.z);
 
                     this.originalLocation = this.CoT.position.clone();
                     this.moveAnimateStartTime = this.time;
@@ -161,7 +142,6 @@ class Player extends Boat {
             )
         );
 
-        // this.movesMesh.material = mat;
         this.movesMesh.isPickable = true;
         this.movesMesh.enablePointerMoveEvents = true;
         this.movesMesh.alphaIndex = 600;
@@ -172,9 +152,7 @@ class Player extends Boat {
             let scene = this.buccaneer.scene;
             let screenX = scene.pointerX;
             let screenY = scene.pointerY;
-            let screenPosition = new Vector3(screenX, screenY, 0);
-            // console.log("Mouse:" + screenX + ":" + screenY);
-    
+            let screenPosition = new Vector3(screenX, screenY, 0);    
             let engine = scene.getEngine();
     
             Vector3.UnprojectToRef(
@@ -187,24 +165,24 @@ class Player extends Boat {
                 screenPosition
             );
     
-    
             let cameraPosition: Vector3 = this.buccaneer.camera.position;
-    
-            let ray = screenPosition.subtractInPlace(cameraPosition);
-            // ray.normalize();
-    
+            let ray = screenPosition.subtractInPlace(cameraPosition);    
             let f = cameraPosition.y / ray.y;
             let positionOnSea = cameraPosition.subtract(ray.multiplyByFloats(f, f, f));
     
-            this.dummyBall.position = positionOnSea;
+            this.mousePickPosition = positionOnSea;
 
-            mat2.getEffect().setVector3('pickedPoint', this.dummyBall.position);
+            mat2.getEffect().setVector3('pickedPoint', this.mousePickPosition);
             mat2.getEffect().setVector3('boatStart', this.boatStart);
-            mat2.getEffect().setFloat('sailingDist', this.sailingStrength + 0.5);
+            mat2.getEffect().setFloat('sailingDist', this.sailingStrength > 0 ? this.sailingStrength + 0.5 : 1.5);
+            mat2.getEffect().setFloat('t', (performance.now() - this.turnStartTime) * 0.001);
+            mat2.getEffect().setBool('show', this.activated);
         });
         mat2.AddUniform('pickedPoint', 'vec3', null);
         mat2.AddUniform('sailingDist', 'float', null);
         mat2.AddUniform('boatStart', 'vec3', null);
+        mat2.AddUniform('t', 'float', null);
+        mat2.AddUniform('show', 'bool', null);
         mat2.Fragment_Before_FragColor(`
         float radius = 0.5;
         float tickness = 0.05/radius;
@@ -212,44 +190,36 @@ class Player extends Boat {
         float x = floor(vPositionW.x);
         float z = floor(vPositionW.z);
 
-        // float dist = distance(vPositionW, boatStart);
+        float trigDist = distance(vPositionW, boatStart);
+
         vec3 toBoat = abs(vPositionW - boatStart);
         float dist = max(toBoat.x, toBoat.z);
 
+        float t2 = t;// * 0.05;
+
         vec4 c = vec4(vec3(0), 0.15);
         if (dist > sailingDist)
-            c = vec4(vec3(1, 0, 0), 0.3);
+            c = vec4(vec3(1, 0, 0), 0.15);
 
         if ((x == floor(pickedPoint.x)) && (z == floor(pickedPoint.z)))
             c.a = 0.5;
         
+        // if (show)
+        //     c *= vec4(vec3(1.0 - min(1.0, max(trigDist - (t2 - 0.1) * 50.0, 0.0))), 1.0 - min(1.0, max(trigDist - t2 * 50.0, 0.0)));
+        // else
+        //     c *= vec4(vec3(min(1.0, max(trigDist - (t2 - 0.1) * 50.0, 0.0))), min(1.0, max(trigDist - t2 * 50.0, 0.0)));
+
+        float a = clamp((trigDist - t2 * 50.0) * 0.1 + 1.0, 0.0, 1.0);
+        if (show)
+            c *= vec4(vec3(1), 1.0 - a);
+        else
+            c *= vec4(vec3(1), a);
+
         color.rgba = c;
         
         `);
 
         this.movesMesh.material = mat2;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // TODO delete
-        this.dummyBall = MeshBuilder.CreateIcoSphere("", { radius: 0.5 }, scene);
-        this.dummyBall.setEnabled(false);
-    }
-
-    clearSquares() {
-        this.movesMesh.setEnabled(false);
-        this.legalMoves = [];
     }
 
     showLegalSquares() {
@@ -270,7 +240,6 @@ class Player extends Boat {
 
         this.boatStart.x = this.x + 0.5;
         this.boatStart.z = this.z + 0.5;
-        console.log("SS:" + this.sailingStrength);
 
         this.movesMesh.setEnabled(true);
     }
@@ -295,6 +264,8 @@ class Player extends Boat {
         this.cw.setEnabled(true);
         this.ccw.setEnabled(true);
         this.showLegalSquares();
+
+        this.turnStartTime = performance.now();
     }
 
     deactivate() {
@@ -303,7 +274,10 @@ class Player extends Boat {
         if (this.cw != null) {
             this.cw.setEnabled(false);
             this.ccw.setEnabled(false);
+            // this.movesMesh.setEnabled(false);
         }
+
+        this.turnStartTime = performance.now();
     }
 
     update(time: number) {

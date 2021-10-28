@@ -189,11 +189,24 @@ class Boat {
                     if (!Utils.isSquareAllowed(x, z))
                         break;
 
-                        this.legalMoves.push([x, z]);
+                    this.legalMoves.push([x, z]);
+                }
+            }
+            this.legalMoves.push([this.x, this.z]);
+        } else { // Shipwrecked
+            for (let dx = -2; dx < 3; dx++) {
+                for (let dz = -2; dz < 3; dz ++) {
+                    x = this.x + dx;
+                    z = this.z + dz;
+
+                    if (!Utils.isSquareAllowed(x, z)) {
+                        continue;
+                    }
+
+                    this.legalMoves.push([x, z]);
                 }
             }
         }
-        this.legalMoves.push([this.x, this.z]);
     }
 
 
