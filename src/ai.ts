@@ -1,4 +1,4 @@
-import { Scene } from "@babylonjs/core";
+import { Mesh, Scene } from "@babylonjs/core";
 import { Buccaneer } from ".";
 import { Boat } from "./boat";
 import { Port } from "./port";
@@ -11,22 +11,34 @@ class AI extends Boat {
         super(x, z, port, buccaneer);
 
         this.buccaneer = buccaneer;
+
+        // TODO this shouldn't really be necessary:
+        let cw: Mesh;
+        let ccw: Mesh;
+        for (let n of this.mesh.getChildren()) {
+            if (n.name == this.mesh.name + ".RotateCW")
+                cw = <Mesh>n;
+            if (n.name == this.mesh.name + ".RotateCCW")
+                ccw = <Mesh>n;
+        }
+        cw.dispose();
+        ccw.dispose();
     }
 
     activate() {
         super.activate();
         
-        for (let s of this.squares) {
-            s.setEnabled(false);
-        }
-
-        this.cw.setEnabled(false);
-        this.ccw.setEnabled(false);
+        // TODO don't render move
+        // for (let m of this.legalMoves) {
+        //     s.setEnabled(false);
+        // }
 
         this.makeMove();
     }
 
     makeMove() {
+        // return;// TODO remove
+
         let rotateDone = false;
         let moveDone = false;
         let rotates = Math.floor(Math.random() * 8 - 4);
@@ -37,9 +49,9 @@ class AI extends Boat {
             }
 
             if (!moveDone) {
-                let square = this.squares[Math.floor(Math.random() * this.squares.length)];
-                this.x = square['gridX'];
-                this.z = square['gridZ']; // TODO dis nasty
+                let move = this.legalMoves[Math.floor(Math.random() * this.legalMoves.length)];
+                this.x = move[0];
+                this.z = move[1];
                 this.originalLocation = this.CoT.position.clone();
                 this.moveAnimateStartTime = this.time;
                 this.targetLocation.x = (this.x + 0.5);

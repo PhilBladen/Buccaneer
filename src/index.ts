@@ -18,9 +18,10 @@ import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import { GridMaterial, WaterMaterial } from "@babylonjs/materials";
 import { GLTFLoaderAnimationStartMode, GLTFFileLoader } from "@babylonjs/loaders/glTF";
-import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Texture, ParticleSystem, SceneLoader, Axis, PBRMaterial } from "@babylonjs/core";
+import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Texture, ParticleSystem, SceneLoader, Axis, PBRMaterial, Camera } from "@babylonjs/core";
 import * as BABYLON from "@babylonjs/core";
 import { AI } from "./ai";
+import { Player } from "./player";
 
 const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("renderCanvas"); // Get the canvas element
 canvas.onselectstart = function () { return false; }
@@ -50,6 +51,7 @@ class Buccaneer {
     readonly scene: Scene;
     readonly soundEngine: SoundEngine;
     readonly assetManager: AssetManager;
+    camera: Camera;
     readonly settings;
 
     water : WaterMaterial;
@@ -314,6 +316,7 @@ const createScene = function () {
     camera.inputs.attached.pointers.panningSensibility = 100;
     camera.inputs.attached.pointers.angularSensibility = 10;
     camera.wheelPrecision = 1;
+    buccaneer.camera = camera;
 
     var pipeline = new BABYLON.DefaultRenderingPipeline(
         "defaultPipeline",
@@ -476,7 +479,7 @@ const createScene = function () {
         };
 
         let playerPort = ports[randomInt(7)];
-        boats.push(new Boat(playerPort.portLocation.x, playerPort.portLocation.z, playerPort, buccaneer));
+        boats.push(new Player(playerPort.portLocation.x, playerPort.portLocation.z, playerPort, buccaneer));
 
         let numPlayers = randomInt(5) + 2;
         for (let i = 0; i < numPlayers; i++) {
