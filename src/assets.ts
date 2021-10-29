@@ -56,7 +56,7 @@ class AssetManager {
         material.indexOfRefraction = 2.4;
         // this.ruby.material = material;
 
-        this.diamond = this.ruby.clone("");
+        this.diamond = this.ruby.clone("Diamond");
         this.diamond.material = (<PBRMaterial> this.diamond.material).clone("");
         (<PBRMaterial>this.diamond.material).albedoColor = new Color3(1, 1, 1);
         (<PBRMaterial>this.diamond.material).alpha = 0.7;
@@ -97,13 +97,13 @@ class AssetManager {
     }
 
     getGoldInstance() {
-        let inst = this.gold.clone();
-        inst.setEnabled(true);
-        for (let child of inst.getChildren()) {
-            child.setEnabled(true);
-        }
-        return inst;
-        //return this.gold.createInstance("Instance");
+        // let inst = this.gold.clone();
+        // inst.setEnabled(true);
+        // for (let child of inst.getChildren()) {
+        //     child.setEnabled(true);
+        // }
+        // return inst;
+        return this.gold.createInstance("Instance");
     }
 
     getBarrelInstance() {

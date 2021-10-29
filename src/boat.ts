@@ -5,6 +5,7 @@ import { Color3, Mesh, Scene, StandardMaterial, TransformNode, Vector3 } from '@
 import { SoundEngine } from './soundengine';
 import { Buccaneer } from '.';
 import { CustomMaterial } from '@babylonjs/materials';
+import { MotionAnimator } from './motionanimator';
 
 let scene: Scene;
 let settings: any;
@@ -37,6 +38,8 @@ class Boat {
     turnStartDir: number;
     activated: boolean = false;
 
+    motionAnimator: MotionAnimator = new MotionAnimator();
+
     legalMoves: number[][];
 
     boatStart: Vector3 = new Vector3(0, 0, 0);
@@ -54,6 +57,8 @@ class Boat {
         this.animateStartTime = 0;
         this.moveAnimateStartTime = 0;
         this.legalMoves = [];
+
+        this.motionAnimator.setTrajectory(new Vector3(x + 0.5, 0, z + 0.5), 0, new Vector3(x + 0.5, 0, z + 0.5));
 
         if (matRed == null) {
             matRed = new BABYLON.StandardMaterial("red", scene);
@@ -232,24 +237,28 @@ class Boat {
 
     update(time: number) {
         this.time = time;
-        let dilatedTime = time * 0.02 + this.offset * 348;
+        let dilatedTime = time + this.offset * 348;
 
-        let rotationAnimationProgress = (time - this.animateStartTime) * 0.05;
+        let rotationAnimationProgress = (time - this.animateStartTime);
         this.angle = Utils.cosineInterpolate(this.originalAngle, BABYLON.Tools.ToRadians(45 * this.direction), rotationAnimationProgress);
         if (rotationAnimationProgress >= 1)
             this.originalAngle = this.angle;
 
-        let moveAnimationProgress = (time - this.moveAnimateStartTime) * 0.01;
-        if (moveAnimationProgress < 1)
-            Utils.cosineInterpolateV3D(this.originalLocation, this.targetLocation, moveAnimationProgress, this.CoT.position);
-        // else if (moveAnimationProgress >= 1)
-        // this.CoT.position = this.originalLocation = this.targetLocation;
+        let moveAnimationProgress = (time - this.moveAnimateStartTime);
+        // if (moveAnimationProgress < 1)
+        //     Utils.cosineInterpolateV3D(this.originalLocation, this.targetLocation, moveAnimationProgress, this.CoT.position);
+        // // else if (moveAnimationProgress >= 1)
+        // // this.CoT.position = this.originalLocation = this.targetLocation;
 
+        this.CoT.position = this.motionAnimator.getVectorPosition(moveAnimationProgress);
+
+        // Do random wave motion:
         let angleDeltaX = Math.sin(dilatedTime * 0.1) * 0.05;
         let angleDeltaY = Math.sin(dilatedTime * 0.67) * 0.05;
         let angleDeltaZ = Math.sin(dilatedTime * 0.315) * 0.05;
         this.CoT.setDirection(BABYLON.Axis.Y, angleDeltaX + this.angle, angleDeltaY + Math.PI / 2, angleDeltaZ);
 
+        // Do splashes:
         for (let i = 0; i < 3; i++) {
             let splash = this.splashes[i];
             let t = dilatedTime + i * 8;

@@ -215,7 +215,7 @@ const updateGame = function () {
         lastFPSUpdate = Date.now();
     }
 
-    time++;
+    time = performance.now() * 0.001;
 
     renderMinimap();
 
@@ -481,7 +481,7 @@ const createScene = function () {
         let playerPort = ports[randomInt(7)];
         boats.push(new Player(playerPort.portLocation.x, playerPort.portLocation.z, playerPort, buccaneer));
 
-        let numPlayers = randomInt(5) + 2;
+        let numPlayers = 1;//randomInt(5) + 2;
         for (let i = 0; i < numPlayers; i++) {
             let port = ports[i];
             if (port.boat != null) continue;

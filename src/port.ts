@@ -45,7 +45,7 @@ class Port {
             inventoryTransform.rotation.y = 0;
         }
 
-        let possibleCards = [20, 22, 23, 24, 25, 28, 34, 35, 36, 37, 38, 39];
+        let possibleCards = [34, 35, 36, 37, 38, 39];//[20, 22, 23, 24, 25, 28, 34, 35, 36, 37, 38, 39];
 
         let numCards = 2;
         for (let i = 0; i < numCards; i++) {
@@ -84,7 +84,7 @@ class Port {
         // if (this.portName != "Bombay") return;
         let treasures: number[] = [];
         for (let i = 0; i < 5; i++) {
-            let numOfThisType = 2;//randomInt(2);
+            let numOfThisType = randomInt(2);
             for (let j = 0; j < numOfThisType; j++) {
                 treasures.push(i);
             }

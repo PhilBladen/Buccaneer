@@ -2,6 +2,7 @@ import { ActionManager, Color3, ExecuteCodeAction, Matrix, Mesh, MeshBuilder, Sc
 import { CustomMaterial } from "@babylonjs/materials";
 import { Buccaneer } from ".";
 import { Boat } from "./boat";
+import { MotionAnimator } from "./motionanimator";
 import { Port } from "./port";
 import { SoundEngine } from "./soundengine";
 
@@ -137,6 +138,8 @@ class Player extends Boat {
                     this.targetLocation.x = this.x + 0.5;
                     this.targetLocation.z = this.z + 0.5;
 
+                    this.motionAnimator.setTrajectory(this.originalLocation, 0, this.targetLocation);
+
                     this.updateTurnButton();
                 }
             )
@@ -268,6 +271,8 @@ class Player extends Boat {
         this.ccw.setEnabled(true);
         this.showLegalSquares();
 
+        this.movesMesh.isPickable = true;
+
         this.turnStartTime = performance.now();
     }
 
@@ -278,6 +283,7 @@ class Player extends Boat {
             this.cw.setEnabled(false);
             this.ccw.setEnabled(false);
             // this.movesMesh.setEnabled(false);
+            this.movesMesh.isPickable = false;
         }
 
         this.turnStartTime = performance.now();
