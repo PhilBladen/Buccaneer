@@ -1,4 +1,4 @@
-import { ActionManager, Color3, ExecuteCodeAction, Matrix, Mesh, MeshBuilder, Scene, StandardMaterial, Texture, Vector3, VertexData } from "@babylonjs/core";
+import { ActionManager, BoundingBox, Color3, ExecuteCodeAction, Matrix, Mesh, MeshBuilder, Scene, StandardMaterial, Texture, Vector3, VertexData } from "@babylonjs/core";
 import { CustomMaterial } from "@babylonjs/materials";
 import { Buccaneer } from ".";
 import { Boat } from "./boat";
@@ -11,14 +11,12 @@ class Player extends Boat {
     ccw: Mesh = null;
     movesMesh: Mesh;
 
+    cwBounds: BoundingBox;
+    ccwBounds: BoundingBox;
+
     mousePickPosition: Vector3 = Vector3.Zero();
 
     turnStartTime: number;
-
-    s1;
-    s2;
-    options;
-    lines;
 
     constructor(x: number, z: number, port: Port, buccaneer: Buccaneer) {
         super(x, z, port, buccaneer);
@@ -128,6 +126,9 @@ class Player extends Boat {
         this.cw.setEnabled(false);
         this.ccw.setEnabled(false);
 
+        this.cwBounds = this.cw.getBoundingInfo().boundingBox;
+        this.ccwBounds = this.ccw.getBoundingInfo().boundingBox;
+
         this.movesMesh = new Mesh("custom", scene);
         this.movesMesh.actionManager = new ActionManager(scene);
         this.movesMesh.actionManager.registerAction(
@@ -156,47 +157,11 @@ class Player extends Boat {
         var mat2 = new CustomMaterial('s', scene);
         mat2.needAlphaBlending = () => { return true };
         mat2.onBindObservable.add(() => {
-            let scene = this.buccaneer.scene;
-            let screenX = scene.pointerX;
-            let screenY = scene.pointerY;
-            let screenPosition = new Vector3(screenX, screenY, 0);
-            let engine = scene.getEngine();
-            let s = engine.getHardwareScalingLevel();
-
-            Vector3.UnprojectToRef(
-                screenPosition,
-                s * engine.getRenderWidth(),
-                s * engine.getRenderHeight(),
-                Matrix.Identity(),
-                scene.getViewMatrix(),
-                scene.getProjectionMatrix(),
-                screenPosition
-            );
-
-            let cameraPosition: Vector3 = this.buccaneer.camera.position;
-            let ray = screenPosition.subtractInPlace(cameraPosition);
-            let f = cameraPosition.y / ray.y;
-            let positionOnSea = cameraPosition.subtract(ray.scale(f));
-
-            this.mousePickPosition = positionOnSea;
-
             if (Math.floor(this.mousePickPosition.x) == this.x && Math.floor(this.mousePickPosition.z) == this.z) {
                 mat2.getEffect().setVector3('pickedPoint', largeVector);
             } else {
                 mat2.getEffect().setVector3('pickedPoint', this.mousePickPosition);
             }
-
-
-
-            
-            
-            
-            
-            
-
-
-
-            //console.log("Screen pos: " + screenX + ":" + screenY + "    Render size: " + engine.getRenderWidth() + ":" + engine.getRenderHeight() + "    Scaled size: " + (s * engine.getRenderingCanvas().width) + ":" + (s * engine.getRenderingCanvas().height));
 
             mat2.getEffect().setVector3('boatStart', this.boatStart);
             mat2.getEffect().setFloat('sailingDist', this.sailingStrength > 0 ? this.sailingStrength + 0.5 : 1.5);
@@ -234,20 +199,6 @@ class Player extends Boat {
         `);
 
         this.movesMesh.material = mat2;
-
-
-
-
-
-
-        this.s1 = MeshBuilder.CreateIcoSphere("", {radius: 0.1}, scene);
-        this.s2 = MeshBuilder.CreateIcoSphere("", {radius: 0.1}, scene);
-        this.options = {
-            points: [Vector3.Zero(), Vector3.Zero()],
-            updatable: true
-            // instance: undefined
-        }
-        this.lines = MeshBuilder.CreateLines("lines", this.options, scene);
     }
 
     showLegalSquares() {
@@ -314,14 +265,13 @@ class Player extends Boat {
     update(time: number) {
         super.update(time);
 
-        let ts = performance.now();
-
         let scene = this.buccaneer.scene;
         let screenX = scene.pointerX;
         let screenY = scene.pointerY;
         let screenPosition = new Vector3(screenX, screenY, 0);
         let engine = scene.getEngine();
         let s = engine.getHardwareScalingLevel();
+        let cameraPosition: Vector3 = this.buccaneer.camera.position;
 
         Vector3.UnprojectToRef(
             screenPosition,
@@ -333,23 +283,8 @@ class Player extends Boat {
             screenPosition
         );
 
-        let cameraPosition: Vector3 = this.buccaneer.camera.position;
-        let ray = screenPosition.subtract(cameraPosition);
-        let f = cameraPosition.y / ray.y;
-        let positionOnSea = cameraPosition.subtract(ray.scale(f));
-
-        this.mousePickPosition = positionOnSea;
-
-        let cwBounds = this.cw.getBoundingInfo().boundingBox;
-        let cwMatrix = this.cw.computeWorldMatrix(true);
-        // cwMatrix = cwMatrix.scale(this.mesh.scaling.x);
-        // cwMatrix = cwMatrix.scale(this.cw.scaling.x);
-        let cwPositionWorld = Vector3.TransformCoordinates(this.cw.position, cwMatrix);
-        this.s1.position = Vector3.TransformCoordinates(cwBounds.minimum, cwMatrix);
-        this.s2.position = Vector3.TransformCoordinates(cwBounds.maximum, cwMatrix);
-        // s2.position = cwBounds.minimum.add(cwPositionWorld);
-
-        let cwInverse = cwMatrix.clone().invert();
+        let cwMatrix = this.cw.getWorldMatrix();
+        let cwInverse = cwMatrix.invert();
         
         let camInCwFrame = Vector3.TransformCoordinates(cameraPosition, cwInverse);
         let screenInCwFrame = Vector3.TransformCoordinates(screenPosition, cwInverse);
@@ -359,18 +294,26 @@ class Player extends Boat {
         let positionOnBoatPlane = camInCwFrame.subtract(rayInCwFrame.scale(f2));
 
         let intersect = false;
-        if (positionOnBoatPlane.x > cwBounds.minimum.x && positionOnBoatPlane.x < cwBounds.maximum.x && positionOnBoatPlane.z > cwBounds.minimum.z && positionOnBoatPlane.z < cwBounds.maximum.z)
+        let minCw = this.cwBounds.minimum;
+        let maxCw = this.cwBounds.maximum;
+        if (positionOnBoatPlane.x > minCw.x && positionOnBoatPlane.x < maxCw.x && positionOnBoatPlane.z > minCw.z && positionOnBoatPlane.z < maxCw.z) {
             intersect = true;
+        }
+        let minCcw = this.ccwBounds.minimum;
+        let maxCcw = this.ccwBounds.maximum;
+        if (positionOnBoatPlane.x > minCcw.x && positionOnBoatPlane.x < maxCcw.x && positionOnBoatPlane.z > minCcw.z && positionOnBoatPlane.z < maxCcw.z) {
+            intersect = true;
+        }
 
-        // console.log(intersect);
+        console.log(intersect);
 
-        console.log(performance.now() - ts);
-
-        
-        this.options.points[0].copyFrom(Vector3.TransformCoordinates(cameraPosition, cwInverse));
-        this.options.points[1].copyFrom(Vector3.TransformCoordinates(this.mousePickPosition, cwInverse));
-        (<any>this.options).instance = this.lines;
-        this.lines = MeshBuilder.CreateLines("lines", this.options); //No scene parameter when using
+        if (!intersect) {
+            let ray = screenPosition.subtract(cameraPosition);
+            let f = cameraPosition.y / ray.y;
+            this.mousePickPosition = cameraPosition.subtract(ray.scale(f));
+        } else {
+            this.mousePickPosition.set(10000, 0, 10000);
+        }
     }
 }
 
