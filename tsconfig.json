@@ -8,10 +8,14 @@
       "sourceMap": true,
       "baseUrl": ".",
       "preserveConstEnums":true,
+      "esModuleInterop": true,
       "lib": [
           "dom",
           "es6"
       ],
-      "rootDir": "."
-    }
+      "rootDir": ".",
+    },
+    "include": [
+      "src"
+    ]
   }

@@ -5,8 +5,8 @@ import { Color3, Mesh, Scene, StandardMaterial, TransformNode, Vector3 } from '@
 import { SoundEngine } from './soundengine';
 import { Buccaneer } from '.';
 import { CustomMaterial } from '@babylonjs/materials';
-import { MotionAnimator } from './motionanimator';
-import * as $ from "jquery";
+import { BoatMotionController } from './boatmotioncontroller';
+import $ from "jquery";
 
 let scene: Scene;
 let settings: any;
@@ -14,21 +14,24 @@ let settings: any;
 let matRed = null;
 let matWhite = null;
 
+class GridPosition {
+    x: number;
+    z: number;
+
+    constructor(x: number, z: number) {
+        this.x = x;
+        this.z = z;
+    }
+}
+
 class Boat {
-    readonly buccaneer : Buccaneer;
+    readonly buccaneer: Buccaneer;
 
     sailingStrength: number;
     x: number;
     z: number;
     boatIndex: number;
-    originalLocation: Vector3;
-    targetLocation: Vector3;
-    animateStartTime: number;
-    moveAnimateStartTime: number;
-    direction: number;
-    originalAngle: number;
-    CoT: TransformNode;
-    angle: number;
+    direction: number = 0;
     time: number;
     splashes: Mesh[];
     offset: number;
@@ -39,9 +42,12 @@ class Boat {
     turnStartDir: number;
     activated: boolean = false;
 
-    motionAnimator: MotionAnimator = new MotionAnimator();
+    baseTransform: TransformNode; // Position + rotation
+    seaMotionTransform: TransformNode;
 
-    legalMoves: number[][];
+    motionController: BoatMotionController = new BoatMotionController(this);
+
+    legalMoves: GridPosition[];
 
     boatStart: Vector3 = new Vector3(0, 0, 0);
 
@@ -54,13 +60,7 @@ class Boat {
         this.sailingStrength = Math.floor(Math.random() * 12) + 6;
         this.x = x;
         this.z = z;
-        this.originalLocation = Vector3.Zero();
-        this.targetLocation = new BABYLON.Vector3((x + 0.5) * settings.gridTileSize, 0, (z + 0.5) * settings.gridTileSize);
-        this.animateStartTime = 0;
-        this.moveAnimateStartTime = 0;
         this.legalMoves = [];
-
-        this.motionAnimator.setTrajectory(new Vector3(x + 0.5, 0, z + 0.5), 0, new Vector3(x + 0.5, 0, z + 0.5));
 
         if (matRed == null) {
             matRed = new BABYLON.StandardMaterial("red", scene);
@@ -86,8 +86,10 @@ class Boat {
 
         buccaneer.water.addToRenderList(mesh);
 
-        let CoT = new BABYLON.TransformNode("Boat" + port.portName + " transform");
-        mesh.setParent(CoT);
+        this.baseTransform = new BABYLON.TransformNode("Boat" + port.portName + " transform");
+        this.seaMotionTransform = new BABYLON.TransformNode("Boat" + port.portName + " sea motion transform");
+        this.seaMotionTransform.setParent(this.baseTransform);
+        mesh.setParent(this.seaMotionTransform);
 
         if (x <= -12)
             this.direction = 0;
@@ -98,12 +100,8 @@ class Boat {
         else
             this.direction = 2;
 
-        this.direction += Math.floor(Math.random() * 3 - 1);
-        this.originalAngle = BABYLON.Tools.ToRadians(45 * this.direction);
-
-        this.CoT = CoT;
-
-        
+        this.motionController.setLocation(x + 0.5, z + 0.5);
+        this.motionController.updateDirection();
 
         this.splashes = [];
         for (let i = 0; i < 3; i++) {
@@ -113,8 +111,8 @@ class Boat {
 
             splash.material = Utils.getSplashMaterial(scene);
 
-            splash.position.x = CoT.position.x;
-            splash.position.z = CoT.position.z;
+            splash.position.x = this.baseTransform.position.x;
+            splash.position.z = this.baseTransform.position.z;
 
             this.splashes.push(splash);
         }
@@ -161,6 +159,18 @@ class Boat {
         }
     }
 
+    rotateCW() {
+        this.buccaneer.soundEngine.boatRotate();
+        this.direction--; // TODO check dir
+        this.motionController.updateDirection();
+    }
+
+    rotateCCW() {
+        this.buccaneer.soundEngine.boatRotate();
+        this.direction++;
+        this.motionController.updateDirection();
+    }
+
     /**
      * Calculates possible moves given the terrian and current location. This does not guarantee that the move is not cheating.
      */
@@ -196,13 +206,13 @@ class Boat {
                     if (!Utils.isSquareAllowed(x, z))
                         break;
 
-                    this.legalMoves.push([x, z]);
+                    this.legalMoves.push(new GridPosition(x, z));
                 }
             }
-            this.legalMoves.push([this.x, this.z]);
+            this.legalMoves.push(new GridPosition(this.x, this.z));
         } else { // Shipwrecked
             for (let dx = -2; dx < 3; dx++) {
-                for (let dz = -2; dz < 3; dz ++) {
+                for (let dz = -2; dz < 3; dz++) {
                     x = this.x + dx;
                     z = this.z + dz;
 
@@ -210,7 +220,7 @@ class Boat {
                         continue;
                     }
 
-                    this.legalMoves.push([x, z]);
+                    this.legalMoves.push(new GridPosition(x, z));
                 }
             }
         }
@@ -230,7 +240,7 @@ class Boat {
         this.turnStartDir = this.direction;
 
         this.activated = true;
-        
+
         this.mesh.isPickable = true;
         this.calculateLegalMoves();
 
@@ -241,38 +251,22 @@ class Boat {
         this.x = Math.floor(x);
         this.z = Math.floor(z);
 
-        this.originalLocation.copyFrom(this.CoT.position);
-        this.moveAnimateStartTime = this.time;
-        this.targetLocation.x = this.x + 0.5;
-        this.targetLocation.z = this.z + 0.5;
-
-        this.motionAnimator.setTrajectory(this.originalLocation, 0, this.targetLocation);
+        this.motionController.setDestination(this.x + 0.5, this.z + 0.5);
 
         this.updateTurnButton();
     }
 
     update(time: number) {
         this.time = time;
-        let dilatedTime = time + this.offset * 348;
 
-        let rotationAnimationProgress = (time - this.animateStartTime) * 4;
-        this.angle = Utils.cosineInterpolate(this.originalAngle, BABYLON.Tools.ToRadians(45 * this.direction), rotationAnimationProgress);
-        if (rotationAnimationProgress >= 1)
-            this.originalAngle = this.angle;
-
-        let moveAnimationProgress = (time - this.moveAnimateStartTime);
-        // if (moveAnimationProgress < 1)
-        //     Utils.cosineInterpolateV3D(this.originalLocation, this.targetLocation, moveAnimationProgress, this.CoT.position);
-        // // else if (moveAnimationProgress >= 1)
-        // // this.CoT.position = this.originalLocation = this.targetLocation;
-
-        this.CoT.position = this.motionAnimator.getVectorPosition(moveAnimationProgress);
+        this.motionController.update(time);
 
         // Do random wave motion:
+        let dilatedTime = time + this.offset * 348;
         let angleDeltaX = Math.sin(dilatedTime * 0.1) * 0.05;
         let angleDeltaY = Math.sin(dilatedTime * 0.67) * 0.05;
         let angleDeltaZ = Math.sin(dilatedTime * 0.315) * 0.05;
-        this.CoT.setDirection(BABYLON.Axis.Y, angleDeltaX + this.angle, angleDeltaY + Math.PI / 2, angleDeltaZ);
+        this.seaMotionTransform.setDirection(BABYLON.Axis.Z, angleDeltaX, angleDeltaY, angleDeltaZ);
 
         // Do splashes:
         for (let i = 0; i < 3; i++) {
@@ -281,8 +275,8 @@ class Boat {
             splash.scaling.x = splash.scaling.z = 0 + (t % 24) / 12;
             splash.material.alpha = 1 - (t % 24) / 24;
 
-            splash.position.x = this.CoT.position.x;
-            splash.position.z = this.CoT.position.z;
+            splash.position.x = this.baseTransform.position.x;
+            splash.position.z = this.baseTransform.position.z;
 
             if (t % 24 == 0)
                 splash.rotate(BABYLON.Axis.Y, Math.random() * Math.PI * 2, BABYLON.Space.WORLD);
@@ -292,4 +286,5 @@ class Boat {
 
 export {
     Boat,
+    GridPosition
 }

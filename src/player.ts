@@ -1,8 +1,7 @@
 import { ActionManager, BoundingBox, Color3, ExecuteCodeAction, Matrix, Mesh, MeshBuilder, Scene, StandardMaterial, Texture, Vector3, VertexData } from "@babylonjs/core";
 import { CustomMaterial } from "@babylonjs/materials";
 import { Buccaneer } from ".";
-import { Boat } from "./boat";
-import { MotionAnimator } from "./motionanimator";
+import { Boat, GridPosition } from "./boat";
 import { Port } from "./port";
 import { SoundEngine } from "./soundengine";
 
@@ -69,12 +68,7 @@ class Player extends Boat {
                 trigger: ActionManager.OnLeftPickTrigger
             },
                 () => {
-                    this.buccaneer.soundEngine.boatRotate();
-
-                    this.direction -= 1;
-                    this.originalAngle = this.angle;
-                    this.animateStartTime = this.time;
-
+                    this.rotateCW();
                     this.updateTurnButton();
                 }
             )
@@ -111,12 +105,7 @@ class Player extends Boat {
                 trigger: ActionManager.OnLeftPickTrigger
             },
                 () => {
-                    this.buccaneer.soundEngine.boatRotate();
-
-                    this.direction += 1;
-                    this.originalAngle = this.angle;
-                    this.animateStartTime = this.time;
-
+                    this.rotateCCW();
                     this.updateTurnButton();
                 }
             )
@@ -136,12 +125,27 @@ class Player extends Boat {
                 trigger: ActionManager.OnPickTrigger
             },
                 (e) => {
-                    if (Math.floor(this.mousePickPosition.x) == this.x && Math.floor(this.mousePickPosition.z) == this.z) {
+                    let mouseObj = this.getUnderMouse(e.pointerX, e.pointerY);
+                    if (!(mouseObj instanceof GridPosition)) {
+                        return;
+                    }
+
+                    if (Math.floor(mouseObj.x) == this.x && Math.floor(mouseObj.z) == this.z) {
                         return; // Disable picking the square the boat is currently in.
                     }
 
-                    this.moveToSquare(this.mousePickPosition.x, this.mousePickPosition.z);
+                    let legalClick = false;
+                    for (let s of this.legalMoves) {
+                        if (s.x == mouseObj.x && s.z == mouseObj.z) {
+                            legalClick = true;
+                            break;
+                        }
+                    }
+                    if (!legalClick) {
+                        return;
+                    }
 
+                    this.moveToSquare(mouseObj.x, mouseObj.z);
                     this.updateTurnButton();
                 }
             )
@@ -150,7 +154,7 @@ class Player extends Boat {
         this.movesMesh.isPickable = true;
         this.movesMesh.alphaIndex = 600;
 
-        let largeVector = new Vector3(10000, 0, 10000); // TODO dis kinda ugly
+        let nanVector = new Vector3(NaN); // TODO dis kinda ugly
 
 
 
@@ -158,7 +162,7 @@ class Player extends Boat {
         mat2.needAlphaBlending = () => { return true };
         mat2.onBindObservable.add(() => {
             if (Math.floor(this.mousePickPosition.x) == this.x && Math.floor(this.mousePickPosition.z) == this.z) {
-                mat2.getEffect().setVector3('pickedPoint', largeVector);
+                mat2.getEffect().setVector3('pickedPoint', nanVector);
             } else {
                 mat2.getEffect().setVector3('pickedPoint', this.mousePickPosition);
             }
@@ -207,7 +211,7 @@ class Player extends Boat {
         var normals = [];
 
         for (let move of this.legalMoves) {
-            this.createSquareMesh(move[0], move[1], positions, indices);
+            this.createSquareMesh(move.x, move.z, positions, indices);
         }
 
         VertexData.ComputeNormals(positions, indices, normals);
@@ -262,12 +266,13 @@ class Player extends Boat {
         this.turnStartTime = performance.now();
     }
 
-    update(time: number) {
-        super.update(time);
-
+    getUnderMouse(screenX?: number, screenY?: number): Mesh|GridPosition {
         let scene = this.buccaneer.scene;
-        let screenX = scene.pointerX;
-        let screenY = scene.pointerY;
+        if (screenX === undefined)
+            screenX = scene.pointerX;
+        if (screenY === undefined)
+            screenY = scene.pointerY;
+
         let screenPosition = new Vector3(screenX, screenY, 0);
         let engine = scene.getEngine();
         let s = engine.getHardwareScalingLevel();
@@ -285,34 +290,49 @@ class Player extends Boat {
 
         let cwMatrix = this.cw.getWorldMatrix();
         let cwInverse = cwMatrix.invert();
-        
+
         let camInCwFrame = Vector3.TransformCoordinates(cameraPosition, cwInverse);
         let screenInCwFrame = Vector3.TransformCoordinates(screenPosition, cwInverse);
         let rayInCwFrame = screenInCwFrame.subtract(camInCwFrame);
 
+        if (Math.abs(rayInCwFrame.y) < 1E-6) { // Guard against parallel ray to zero plane => div by zero
+            return null;
+        }
+
         let f2 = camInCwFrame.y / rayInCwFrame.y;
         let positionOnBoatPlane = camInCwFrame.subtract(rayInCwFrame.scale(f2));
 
-        let intersect = false;
         let minCw = this.cwBounds.minimum;
         let maxCw = this.cwBounds.maximum;
         if (positionOnBoatPlane.x > minCw.x && positionOnBoatPlane.x < maxCw.x && positionOnBoatPlane.z > minCw.z && positionOnBoatPlane.z < maxCw.z) {
-            intersect = true;
+            return this.cw;
         }
         let minCcw = this.ccwBounds.minimum;
         let maxCcw = this.ccwBounds.maximum;
         if (positionOnBoatPlane.x > minCcw.x && positionOnBoatPlane.x < maxCcw.x && positionOnBoatPlane.z > minCcw.z && positionOnBoatPlane.z < maxCcw.z) {
-            intersect = true;
+            return this.ccw;
         }
 
-        console.log(intersect);
+        let ray = screenPosition.subtract(cameraPosition);
+        if (Math.abs(ray.y) < 1E-6) { // Guard against parallel ray to zero plane => div by zero
+            return null;
+        }
+        let f = cameraPosition.y / ray.y;
+        let gridPosition = cameraPosition.subtract(ray.scale(f));
+        return new GridPosition(Math.floor(gridPosition.x), Math.floor(gridPosition.z)); 
+    }
 
-        if (!intersect) {
-            let ray = screenPosition.subtract(cameraPosition);
-            let f = cameraPosition.y / ray.y;
-            this.mousePickPosition = cameraPosition.subtract(ray.scale(f));
+    update(time: number) {
+        super.update(time);
+
+        let mouseObj: Mesh|GridPosition = this.getUnderMouse();
+        if (mouseObj instanceof GridPosition) {
+            this.mousePickPosition.x = mouseObj.x;
+            this.mousePickPosition.z = mouseObj.z;
         } else {
-            this.mousePickPosition.set(10000, 0, 10000);
+            this.mousePickPosition.x = NaN;
+            this.mousePickPosition.z = NaN;
+
         }
     }
 }

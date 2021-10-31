@@ -27,12 +27,6 @@ class AI extends Boat {
 
     activate() {
         super.activate();
-        
-        // TODO don't render move
-        // for (let m of this.legalMoves) {
-        //     s.setEnabled(false);
-        // }
-
         this.makeMove();
     }
 
@@ -50,26 +44,21 @@ class AI extends Boat {
 
             if (!moveDone) {
                 let move = this.legalMoves[Math.floor(Math.random() * this.legalMoves.length)];
-                this.moveToSquare(move[0], move[1]);
+                this.moveToSquare(move.x, move.z);
                 moveDone = true;
 
                 setTimeout(task, 1000);
             } else {
                 if (!rotateDone) {
                     if (rotates > 0) {
-                        this.direction += 1;
                         rotates -= 1;
-                        this.buccaneer.soundEngine.boatRotate();
+                        this.rotateCCW();
                     } else if (rotates < 0) {
-                        this.direction -= 1;
                         rotates += 1;
-                        this.buccaneer.soundEngine.boatRotate();
+                        this.rotateCCW();
                     } else {
                         rotateDone = true;
                     }
-                    this.originalAngle = this.angle;
-                    this.animateStartTime = this.time;
-
                     setTimeout(task, 200);
                 }
             }

@@ -14,7 +14,7 @@ import { Player } from "./player";
 import { Terrain } from "./terrain";
 import { BaseCameraPointersInput } from '@babylonjs/core/Cameras/Inputs/BaseCameraPointersInput';
 
-import * as $ from "jquery";
+import $ from "jquery";
 
 let hudVisible = true;
 $('#settings').on("click",
@@ -197,7 +197,7 @@ const buccaneer = new Buccaneer(scene);
 let selectedBoat = null;
 let camera: ArcRotateCamera = null;
 let boatMesh = null;
-let boats = [];
+let boats: Boat[] = [];
 let chestLid;
 let cardAnimation;
 
@@ -260,8 +260,8 @@ function renderMinimap() {
     minimapCtx.fillStyle = "#FF0000";
 
     for (let boat of boats) {
-        let boatX = boat.CoT.position.x;
-        let boatY = boat.CoT.position.z;
+        let boatX = boat.baseTransform.position.x;
+        let boatY = boat.baseTransform.position.z;
 
         boatX = 28.5 / 2 - boatX;
         boatY += 28.5 / 2;
@@ -270,7 +270,7 @@ function renderMinimap() {
 
         minimapCtx.save();
         minimapCtx.translate(boatX * ratio, boatY * ratio);
-        minimapCtx.rotate(boat.CoT.rotation.y + Math.PI);
+        minimapCtx.rotate(boat.baseTransform.rotation.y + Math.PI); // TODO fix
 
         minimapCtx.beginPath();
         let w = 5;
@@ -410,8 +410,8 @@ const updateGame = function () {
         }
     }
 
-    let chestAngle = cosineInterpolate(boatAtPirateIsland ? 0 : -1.9, boatAtPirateIsland ? -1.9 : 0, chestAnimationProgress);
-    chestLid.setDirection(Axis.Z, 0.0, 0.0, chestAngle);
+    // let chestAngle = cosineInterpolate(boatAtPirateIsland ? 0 : -1.9, boatAtPirateIsland ? -1.9 : 0, chestAnimationProgress);
+    // chestLid.setDirection(Axis.Z, 0.0, 0.0, chestAngle); // TODO
 }
 
 const createScene = function () {
@@ -522,14 +522,6 @@ const createScene = function () {
             $("#popup").fadeIn();
         });
 
-        scene.registerBeforeRender(function () {
-            updateGame();
-        });
-
-        scene.onPointerMove = function () {
-            // TODO
-        };
-
         let playerPort = ports[randomInt(7)];
         boats.push(new Player(playerPort.portLocation.x, playerPort.portLocation.z, playerPort, buccaneer));
 
@@ -562,7 +554,7 @@ const createScene = function () {
 
         buccaneer.nextTurn();
 
-        scene.executeWhenReady(function () {
+        scene.executeWhenReady(() => {
             engine.hideLoadingUI();
         });
     });
@@ -570,10 +562,14 @@ const createScene = function () {
 
 createScene();
 
-engine.runRenderLoop(function () {
+scene.registerBeforeRender(() => {
+    updateGame();
+});
+
+engine.runRenderLoop(() => {
     scene.render();
 });
 
-window.addEventListener("resize", function () {
+window.addEventListener("resize", () => {
     engine.resize();
 });
