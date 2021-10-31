@@ -1,27 +1,49 @@
-// import * as BABYLON from 'babylonjs';
-// import { Material, Mesh, StandardMaterial, Texture } from 'babylonjs';
-// import 'babylonjs-materials';
-// import { GLTFLoaderAnimationStartMode } from 'babylonjs-loaders';
-// import 'babylonjs-inspector';
-// import { GridMaterial, WaterMaterial, CustomMaterial } from 'babylonjs-materials'
-import { createPointerLock } from "./pointerLock.js"
 import { cosineInterpolate, cosineInterpolateV3D, isMobileDevice, randomInt, showAxis } from './utils';
 import { Boat } from './boat';
 import { Port, ports } from './port';
 import { SoundEngine } from './soundengine';
 import { AssetManager } from './assets';
-// import { SimpleMaterial } from 'babylonjs-materials/simple/simpleMaterial';
-// import { PBRMaterial } from 'babylonjs/index';
-// import { GLTFFileLoader } from 'babylonjs-loaders/index';
-
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import { GridMaterial, WaterMaterial } from "@babylonjs/materials";
 import { GLTFLoaderAnimationStartMode, GLTFFileLoader } from "@babylonjs/loaders/glTF";
-import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Texture, ParticleSystem, SceneLoader, Axis, PBRMaterial, Camera } from "@babylonjs/core";
+import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Texture, ParticleSystem, SceneLoader, Axis, PBRMaterial, Camera, StandardMaterial, ICameraInput, Matrix, ArcRotateCameraPointersInput } from "@babylonjs/core";
 import * as BABYLON from "@babylonjs/core";
 import { AI } from "./ai";
 import { Player } from "./player";
+import { Terrain } from "./terrain";
+import { BaseCameraPointersInput } from '@babylonjs/core/Cameras/Inputs/BaseCameraPointersInput';
+
+import * as $ from "jquery";
+
+let hudVisible = true;
+$('#settings').on("click",
+    () => {
+        let hud = $("#hudbottom");
+        if (hudVisible) {
+            hud.css("transform", "translate(0, 150%)");
+            $("#settings").removeClass("fa-caret-square-down");
+            $("#settings").addClass("fa-caret-square-up");
+        } else {
+            hud.css("transform", "translate(0, 0)");
+            $("#settings").removeClass("fa-caret-square-up");
+            $("#settings").addClass("fa-caret-square-down");
+        }
+        hudVisible = !hudVisible;
+    }
+);
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+        navigator.serviceWorker.register('service-worker.js').then(function (registration) {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, function (err) {
+            console.log('ServiceWorker registration failed: ', err);
+        });
+    });
+}
+
+$("#btnClosePopup").on("click", () => $("#popup").fadeOut());
 
 const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("renderCanvas"); // Get the canvas element
 canvas.onselectstart = function () { return false; }
@@ -54,7 +76,7 @@ class Buccaneer {
     camera: Camera;
     readonly settings;
 
-    water : WaterMaterial;
+    water: WaterMaterial;
 
     constructor(scene: Scene) {
         this.scene = scene;
@@ -88,9 +110,76 @@ export {
     Buccaneer
 }
 
+class CustomCameraInput implements ICameraInput<ArcRotateCamera> {
+    camera: ArcRotateCamera;
+
+    clickStart: Vector3;
+    mousePressed: boolean = false;
+
+    //this function must return the class name of the camera, it could be used for serializing your scene
+    getClassName(): string {
+        return "CustomCameraInput";
+    }
+
+    //this function must return the simple name that will be injected in the input manager as short hand
+    //for example "mouse" will turn into camera.inputs.attached.mouse
+    getSimpleName(): string {
+        return "mouse";
+    }
+
+    //this function must activate your input, event if your input does not need a DOM element
+    attachControl(noPreventDefault?: boolean) {
+        canvas.addEventListener('pointerdown', (event) => {
+            // event.
+            this.clickStart = screenXYToSeaPosition(event.x, event.y);
+            console.log("You pressed: " + this.clickStart);
+
+            this.mousePressed = true;
+
+            event.preventDefault();
+            // event.stopPropagation();
+
+        }, false);
+
+        // canvas.addEventListener('dragstart', (event) => {
+        // this.mousePressed = false;
+        // }, false);
+
+        canvas.addEventListener('pointerup', (event) => {
+            this.mousePressed = false;
+
+            event.preventDefault();
+        }, false);
+
+        canvas.addEventListener('pointermove', (event) => {
+            if (!this.mousePressed)
+                return;
 
 
-const engine = new Engine(canvas, true, {}, true); // Generate the BABYLON 3D engine
+            // event.
+            let newPos = screenXYToSeaPosition(event.x, event.y);
+            console.log("You moved: " + newPos);
+
+            event.preventDefault();
+
+        }, false);
+
+        console.log("Added event listener");
+    }
+
+    //detach control must deactivate your input and release all pointers, closures or event listeners
+    detachControl() {
+
+    }
+
+    //this optional function will get called for each rendered frame, if you want to synchronize your input to rendering,
+    //no need to use requestAnimationFrame. It's a good place for applying calculations if you have to
+    checkInputs(): void {
+        // console.log("Checking inputs");
+    }
+}
+
+const engine = new Engine(canvas, true, {}, true);
 engine.displayLoadingUI();
 const scene = new Scene(engine);
 const buccaneer = new Buccaneer(scene);
@@ -106,7 +195,7 @@ const buccaneer = new Buccaneer(scene);
 // });
 
 let selectedBoat = null;
-let camera = null;
+let camera: ArcRotateCamera = null;
 let boatMesh = null;
 let boats = [];
 let chestLid;
@@ -135,6 +224,26 @@ for (let i = 0; i < 3000; i++) {
     cardDeck[cardIndex + 1] = c1;
 }
 
+function screenXYToSeaPosition(screenX: number, screenY: number) {
+    let screenPosition = new Vector3(screenX, screenY, 0);
+    let s = engine.getHardwareScalingLevel();
+
+    Vector3.UnprojectToRef(
+        screenPosition,
+        s * engine.getRenderWidth(),
+        s * engine.getRenderHeight(),
+        Matrix.Identity(),
+        scene.getViewMatrix(),
+        scene.getProjectionMatrix(),
+        screenPosition
+    );
+
+    let cameraPosition: Vector3 = camera.position;
+    let ray = screenPosition.subtractInPlace(cameraPosition);
+    let f = cameraPosition.y / ray.y;
+    return cameraPosition.subtract(ray.scaleInPlace(f));
+}
+
 function drawCard() {
     let card = cardDeck[0];
     cardDeck.shift();
@@ -142,12 +251,13 @@ function drawCard() {
     return card;
 }
 
+let minimapCanvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("minimap");
+minimapCanvas.width = 285;
+minimapCanvas.height = 285;
+let minimapCtx = minimapCanvas.getContext("2d");
 function renderMinimap() {
-    let minimapCanvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("minimap");
-    minimapCanvas.width = 285;
-    minimapCanvas.height = 285;
-    let ctx = minimapCanvas.getContext("2d");
-    ctx.fillStyle = "#FF0000";
+    minimapCtx.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+    minimapCtx.fillStyle = "#FF0000";
 
     for (let boat of boats) {
         let boatX = boat.CoT.position.x;
@@ -158,29 +268,29 @@ function renderMinimap() {
 
         let ratio = minimapCanvas.width / 28.5;
 
-        ctx.save();
-        ctx.translate(boatX * ratio, boatY * ratio);
-        ctx.rotate(boat.CoT.rotation.y + Math.PI);
+        minimapCtx.save();
+        minimapCtx.translate(boatX * ratio, boatY * ratio);
+        minimapCtx.rotate(boat.CoT.rotation.y + Math.PI);
 
-        ctx.beginPath();
+        minimapCtx.beginPath();
         let w = 5;
         let h = 7;
-        ctx.moveTo(-w, h);
-        ctx.lineTo(0, -h);
-        ctx.lineTo(w, h);
-        ctx.closePath();
+        minimapCtx.moveTo(-w, h);
+        minimapCtx.lineTo(0, -h);
+        minimapCtx.lineTo(w, h);
+        minimapCtx.closePath();
 
-        ctx.lineWidth = 5;
+        minimapCtx.lineWidth = 5;
         if (boat.activated)
-            ctx.strokeStyle = '#AAA';
+            minimapCtx.strokeStyle = '#C33';
         else
-            ctx.strokeStyle = '#000000';
-        ctx.stroke();
+            minimapCtx.strokeStyle = '#000';
+        minimapCtx.stroke();
 
-        ctx.fillStyle = boat.port.portColor;
-        ctx.fill();
+        minimapCtx.fillStyle = boat.port.portColor;
+        minimapCtx.fill();
 
-        ctx.restore();
+        minimapCtx.restore();
     }
 }
 
@@ -188,8 +298,8 @@ function updateTurn(currentPort, newPort) {
     if (currentPort.boat.x >= -3 && currentPort.boat.z >= -3 && currentPort.boat.x <= 2 && currentPort.boat.z <= 2) {
         drawnCard = drawCard();
         let cardMesh: Mesh = <Mesh>scene.getMeshByName("Face");
-        let cardMaterial: PBRMaterial = <PBRMaterial>cardMesh.material;
-        let albedoTexture: Texture = <Texture>cardMaterial.albedoTexture;
+        let cardMaterial: StandardMaterial = <StandardMaterial>cardMesh.material;
+        let albedoTexture: Texture = <Texture>cardMaterial.diffuseTexture;
         albedoTexture.uOffset = (drawnCard % 8) * (1 / 8);
         albedoTexture.vOffset = Math.floor(drawnCard / 8) * 0.19034;
 
@@ -207,12 +317,13 @@ function updateTurn(currentPort, newPort) {
 }
 
 let drawnCard;
-let lastFPSUpdate = Date.now();
+let lastFPSUpdate = performance.now();
+let fpsText = $("#fps");
 const updateGame = function () {
 
-    if (Date.now() - lastFPSUpdate > 1000) {
-        $("#fps").html(engine.getFps().toFixed() + "");
-        lastFPSUpdate = Date.now();
+    if (performance.now() - lastFPSUpdate > 1000) {
+        fpsText.text(engine.getFps().toFixed() + "");
+        lastFPSUpdate = performance.now();
     }
 
     time = performance.now() * 0.001;
@@ -231,11 +342,23 @@ const updateGame = function () {
         }
     }
 
-    if (camera.beta > 1.4)
+    if (camera.beta > 1.4) {
         camera.beta = 1.4;
+    }
 
-    camera.target.y = 0;
+    let cameraToTarget = camera.target.subtract(camera.position);
+    let f = camera.target.y / cameraToTarget.y;
+    camera.target.subtractInPlace(cameraToTarget.scale(f));
+    camera.position.subtractInPlace(cameraToTarget.scale(f));
 
+
+    // camera.target.y = 0;
+
+    (<ArcRotateCameraPointersInput>camera.inputs.attached.pointers).panningSensibility = 1500 * 1 / camera.radius;
+    camera.angularSensibilityX = camera.angularSensibilityY = 300;
+    (<ArcRotateCameraPointersInput>camera.inputs.attached.pointers).useNaturalPinchZoom = true;
+    // console.log(camera.inputs.attached.pointers);
+    // camera.zoomOnFactor = 1.0;
 
     if (selectedBoat !== null) {
         selectedBoat.rotate(new BABYLON.Vector3(0, 1, 0), 0.02, BABYLON.Space.WORLD);
@@ -255,7 +378,7 @@ const updateGame = function () {
             createdParticleSystem = false;
         }
     }
-    let chestAnimationProgress = (time - chestAnimationStartTime) / 40;
+    let chestAnimationProgress = (time - chestAnimationStartTime);
     if (chestAnimationProgress >= 1) {
         chestAnimationProgress = 1;
     }
@@ -309,12 +432,14 @@ const createScene = function () {
 
     camera = new ArcRotateCamera("camera", -3 * Math.PI / 4, Math.PI / 3, 50, new BABYLON.Vector3(0, 0, 0), scene);
     camera.lowerRadiusLimit = 5;
-    camera.upperRadiusLimit = 50;
+    camera.upperRadiusLimit = 100;
+    console.log(camera.inputs);
+    // camera.inputs.clear();
+    // camera.inputs.add(new CustomCameraInput());
     camera.attachControl(canvas, true);
     camera.inertia = 0.0;
     camera.panningInertia = 0.0;
-    camera.inputs.attached.pointers.panningSensibility = 100;
-    camera.inputs.attached.pointers.angularSensibility = 10;
+    (<any>camera.inputs.attached.pointers).angularSensibility = 1;
     camera.wheelPrecision = 1;
     buccaneer.camera = camera;
 
@@ -338,7 +463,7 @@ const createScene = function () {
     skybox.material = skyboxMaterial;
 
     scene.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("assets/environment.dds", scene);
-    scene.environmentIntensity = 0.5;
+    scene.environmentIntensity = 0.3;
 
     scene.actionManager = new BABYLON.ActionManager(scene);
     scene.actionManager.registerAction(
@@ -359,7 +484,7 @@ const createScene = function () {
     );
 
 
-    $("#debug").click(function () { scene.debugLayer.show({ handleResize: true, overlay: true }) });
+    $("#debug").on("click", () => { scene.debugLayer.show({ handleResize: true, overlay: true }) });
 
     // const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
     const ambientLight = new BABYLON.HemisphericLight("HemiLight", new BABYLON.Vector3(0, 1, 0), scene);
@@ -376,14 +501,12 @@ const createScene = function () {
     ]).then(function () {
         buccaneer.assetManager.load(scene);
 
-        boatMesh = scene.getMeshByName("Boat");
-        // boatMesh.setEnabled(false);
+        let terrain = new Terrain();
+        terrain.loadTerrain(buccaneer);
+        buccaneer.water.addToRenderList(skybox);
 
-        var sea = scene.getMeshByName("Sea");
-        var castle = scene.getMeshByName("Castle");
-        var edgeIslands = scene.getMeshByName("Grass");
-        let rivers = scene.getMeshByName("Rivers");
-        let frame = scene.getMeshByName("Frame");
+        boatMesh = scene.getMeshByName("Boat");
+
         let portMeshes = [];
         for (let i = 0; i < 8; i++) {
             portMeshes[i] = scene.getMeshByName("Dock" + i);
@@ -392,83 +515,12 @@ const createScene = function () {
         for (let i = 0; i < 8; i++) {
             safes[i] = scene.getMeshByName("Safe" + i);
         }
-        let gold = scene.getMeshByName("Gold");
-        let diamond = scene.getMeshByName("Diamond");
-        let ruby = scene.getMeshByName("Ruby");
         chestLid = scene.getNodeByID("ChestLid");
 
         scene.getAnimationGroupByName("ChanceReveal").onAnimationEndObservable.add(() => {
             $("#chancecard").attr("src", "assets/cards/Chance " + (drawnCard + 1) + ".png");
             $("#popup").fadeIn();
         });
-
-        var groundTexture = new BABYLON.Texture("assets/sand.jpg", scene);
-        groundTexture.vScale = groundTexture.uScale = 4.0;
-        var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
-        groundMaterial.diffuseTexture = groundTexture;
-        // groundMaterial.diffuseColor = new BABYLON.Color3(69 / 100, 100 / 100, 50 / 100);
-        groundMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-        var ground = sea.clone("Ground", null);
-        ground.position.y = -0.19;
-        ground.material = groundMaterial;
-
-        let gridMaterial = new GridMaterial("grid", scene);
-        var grid = sea.clone("Grid", null);
-        grid.isPickable = false;
-
-        grid.position.y = 0.001;
-        gridMaterial.lineColor = new BABYLON.Color3(1, 1, 1);
-        gridMaterial.majorUnitFrequency = 1;
-        gridMaterial.gridRatio = buccaneer.settings.gridTileSize;
-        gridMaterial.opacity = 0.2;
-        grid.material = gridMaterial;
-
-        let water = new WaterMaterial("water", scene, new BABYLON.Vector2(buccaneer.settings.reflectionResolution, buccaneer.settings.reflectionResolution));
-        water.backFaceCulling = true;
-        water.bumpTexture = new BABYLON.Texture("assets/waterbump.png", scene);
-        water.windForce = -5;
-        water.waveHeight = 0.0;
-        water.bumpHeight = 0.05;
-        water.waveLength = 0.2;
-        water.colorBlendFactor = 0.5;
-        water.waterColor = new BABYLON.Color3(0.1, 0.5, 0.8);
-        buccaneer.water = water;
-
-        for (let mesh of scene.meshes) {
-            mesh.isPickable = false;
-        }
-
-        // Water reflections:
-        water.addToRenderList(skybox);
-        water.addToRenderList(ground);
-        let terrainParent = scene.getNodeByName("TerrainParent");
-        for (let mesh of terrainParent.getChildren(undefined, false)) {
-            if (mesh instanceof BABYLON.Mesh || mesh instanceof BABYLON.InstancedMesh)
-                water.addToRenderList(mesh);
-            // console.log(mesh);
-        }
-
-        // sea.material = water;
-        sea.isPickable = false;
-
-        let waterDiffuseMaterial = new BABYLON.StandardMaterial("", scene);
-        waterDiffuseMaterial.diffuseColor = new BABYLON.Color3(0.1, 0.4, 0.8);
-        waterDiffuseMaterial.specularColor = new BABYLON.Color3(0.8, 0.8, 0.8);
-        waterDiffuseMaterial.alpha = 0.8;
-
-        if (buccaneer.settings.reflections) {
-            sea.material = water;
-        } else {
-            sea.material = waterDiffuseMaterial;
-            // sea.material.needAlphaTesting = true;
-            sea.alphaIndex = 500;
-        }
-
-        // let meshes = [];
-        // for (let m of scene.meshes) {
-        // meshes.push(m);
-        // }
-        // BABYLON.Mesh.MergeMeshes(meshes, true, true, undefined, false, true);
 
         scene.registerBeforeRender(function () {
             updateGame();
@@ -486,79 +538,15 @@ const createScene = function () {
             let port = ports[i];
             if (port.boat != null) continue;
             let portLocation = port.portLocation;
-            let boat : Boat;
+            let boat: Boat;
             boat = new AI(portLocation.x, portLocation.z, port, buccaneer);
             boats.push(boat);
-            
+
         }
 
         for (let port of ports) {
             port.init(buccaneer);
         }
-
-        let material = new BABYLON.StandardMaterial("", scene);
-        let grassTexture = new BABYLON.Texture("assets/grasscolors.png", scene);
-        // material.diffuseTexture = grassTexture;
-        material.diffuseColor = new BABYLON.Color3(69 / 100, 100 / 100, 50 / 100);
-        material.specularColor = new BABYLON.Color3(0, 0, 0);
-        edgeIslands.material = material;
-        // edgeIslands.material.specularColor = new BABYLON.Color3(0, 0, 0);
-
-
-        material = new BABYLON.StandardMaterial("", scene);
-        material.diffuseColor = new BABYLON.Color3(1, 0.8, 0.6);
-        material.specularColor = new BABYLON.Color3(0, 0, 0);
-        castle.material = material;
-
-        material = new BABYLON.StandardMaterial("", scene);
-        material.diffuseColor = new BABYLON.Color3(1, 0.9, 0.7);
-        material.specularColor = new BABYLON.Color3(0, 0, 0);
-        // sand.material = material;
-
-        material = new BABYLON.StandardMaterial("", scene);
-        material.diffuseColor = new BABYLON.Color3(0.1, 0.6, 0.8);
-        material.specularColor = new BABYLON.Color3(0, 0, 0);
-        rivers.material = material;
-
-        if (buccaneer.settings.reflections) {
-            rivers.material = water;
-        } else {
-            rivers.material = waterDiffuseMaterial;
-        }
-
-        material = new BABYLON.StandardMaterial("", scene);
-        material.diffuseColor = new BABYLON.Color3(0.4, 0.4, 0.4);
-        material.specularColor = new BABYLON.Color3(0, 0, 0);
-        // edgeIslands.setEnabled(false);
-        frame.material = material;
-        // frame.setEnabled(false);
-
-        material = new BABYLON.StandardMaterial("", scene);
-        material.diffuseColor = new BABYLON.Color3(1.0, 0.3, 0.2);
-        material.specularColor = new BABYLON.Color3(0, 0, 0);
-        // diamond.material = ruby.material = gold.material = material;
-
-        material = new BABYLON.StandardMaterial("", scene);
-        material.diffuseColor = new BABYLON.Color3(1.0, 1, 1);
-        material.specularColor = new BABYLON.Color3(.8, .8, .8);
-        material.alpha = 0.5;
-        diamond.material = material;
-
-        material = new BABYLON.StandardMaterial("", scene);
-        material.diffuseColor = new BABYLON.Color3(1.0, 1, 1);
-        material.specularColor = new BABYLON.Color3(.8, .8, .8);
-        material.alpha = 0.0;
-        scene.getMeshByName("ChestEmitPlane").material = material;
-
-        let anchor = scene.getMeshByName("Anchor");
-        water.addToRenderList(anchor);
-        let anchorMaterial = new BABYLON.StandardMaterial("", scene);
-        anchorMaterial.diffuseTexture = new BABYLON.Texture("assets/Anchor_Plain.png", scene);
-        anchorMaterial.diffuseTexture.hasAlpha = true;
-        anchorMaterial.useAlphaFromDiffuseTexture = true;
-        anchorMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-        anchor.material = anchorMaterial;
-        anchor.alphaIndex = 100;
 
         boatMesh.parent.dispose();
 

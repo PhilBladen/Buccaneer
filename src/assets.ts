@@ -76,7 +76,7 @@ class AssetManager {
         
 
         
-        let inst = this.ruby.createInstance("");
+        let inst = this.ruby.createInstance("Ruby instance");
         return inst;
         // return this.ruby.createInstance("Instance");
     }
@@ -91,7 +91,7 @@ class AssetManager {
         
 
         
-        let inst = this.diamond.createInstance("");
+        let inst = this.diamond.createInstance("Diamond instance");
         return inst;
         // return this.ruby.createInstance("Instance");
     }
@@ -103,11 +103,11 @@ class AssetManager {
         //     child.setEnabled(true);
         // }
         // return inst;
-        return this.gold.createInstance("Instance");
+        return this.gold.createInstance("Gold instance");
     }
 
     getBarrelInstance() {
-        let inst = this.barrel.clone();
+        let inst = this.barrel.clone("Barrel clone");
         inst.setEnabled(true);
         for (let child of inst.getChildren()) {
             child.setEnabled(true);
@@ -116,7 +116,7 @@ class AssetManager {
     }
 
     getPearlInstance() {
-        return this.pearl.createInstance("");
+        return this.pearl.createInstance("Peal instance");
     }
 }
 

@@ -6,6 +6,7 @@ import { SoundEngine } from './soundengine';
 import { Buccaneer } from '.';
 import { CustomMaterial } from '@babylonjs/materials';
 import { MotionAnimator } from './motionanimator';
+import * as $ from "jquery";
 
 let scene: Scene;
 let settings: any;
@@ -53,7 +54,8 @@ class Boat {
         this.sailingStrength = Math.floor(Math.random() * 12) + 6;
         this.x = x;
         this.z = z;
-        this.originalLocation = this.targetLocation = new BABYLON.Vector3((x + 0.5) * settings.gridTileSize, 0, (z + 0.5) * settings.gridTileSize);
+        this.originalLocation = Vector3.Zero();
+        this.targetLocation = new BABYLON.Vector3((x + 0.5) * settings.gridTileSize, 0, (z + 0.5) * settings.gridTileSize);
         this.animateStartTime = 0;
         this.moveAnimateStartTime = 0;
         this.legalMoves = [];
@@ -235,11 +237,25 @@ class Boat {
         this.updateTurnButton();
     }
 
+    moveToSquare(x: number, z: number) {
+        this.x = Math.floor(x);
+        this.z = Math.floor(z);
+
+        this.originalLocation.copyFrom(this.CoT.position);
+        this.moveAnimateStartTime = this.time;
+        this.targetLocation.x = this.x + 0.5;
+        this.targetLocation.z = this.z + 0.5;
+
+        this.motionAnimator.setTrajectory(this.originalLocation, 0, this.targetLocation);
+
+        this.updateTurnButton();
+    }
+
     update(time: number) {
         this.time = time;
         let dilatedTime = time + this.offset * 348;
 
-        let rotationAnimationProgress = (time - this.animateStartTime);
+        let rotationAnimationProgress = (time - this.animateStartTime) * 4;
         this.angle = Utils.cosineInterpolate(this.originalAngle, BABYLON.Tools.ToRadians(45 * this.direction), rotationAnimationProgress);
         if (rotationAnimationProgress >= 1)
             this.originalAngle = this.angle;
@@ -271,11 +287,6 @@ class Boat {
             if (t % 24 == 0)
                 splash.rotate(BABYLON.Axis.Y, Math.random() * Math.PI * 2, BABYLON.Space.WORLD);
         }
-
-
-
-
-
     }
 }
 

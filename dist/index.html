@@ -12,7 +12,7 @@
     <link rel="manifest" href="manifest.webmanifest">
 
     <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
 
 </head>
 
@@ -89,10 +89,10 @@
                             <div class="row" style="flex: 1; justify-content: center; align-items: center;">
                                 <div style="position: absolute;" class="row">
                                     <div class="treasure container">
-                                        <img src="assets/Gem.jpg">
+                                        <img src="assets/icon-barrel.png">
                                     </div>
                                     <div class="treasure container" style="margin-left: 10px;">
-                                        <img src="assets/Gem.jpg">
+                                        <img src="assets/icon-gold.png">
                                     </div>
                                 </div>
                                 <img src="assets/BoatIcon.png" alt="" class="boat">
@@ -101,12 +101,12 @@
                             <!-- Pirate count + fighting strength -->
                             <div class="row" style="flex: 1; margin: 0px 0 0 0">
                                 <div class="row" style="flex: 1; justify-content: center; align-items: center;">
-                                    <img src="assets/PirateIcon.png" alt="" class="icon" style="padding: 0px;">
+                                    <img src="assets/PirateIcon.png" alt="" class="buccaneer icon" style="padding: 0px;">
                                     <div class="cardcount">14</div>
                                 </div>
 
                                 <div class="row" style="flex: 1; justify-content: center; align-items: center">
-                                    <img src="assets/FightingIcon.png" alt="" class="icon">
+                                    <img src="assets/FightingIcon.png" alt="" class="buccaneer icon">
                                     <div class="cardcount">8</div>
                                 </div>
                             </div>
@@ -115,10 +115,10 @@
                         <!-- Rules + card button UI -->
                         <div class="container" style="flex: 0 1 auto; flex-direction: column; ">
                             <div class="container btnrules" style="flex: 1 1; justify-content: center; align-items: center; ">
-                                <img src="assets/RulesIcon.png " alt=" " class="icon">
+                                <img src="assets/RulesIcon.png " alt=" " class="buccaneer icon">
                             </div>
                             <div class="container btnrules" style="flex: 1 1; justify-content: center; align-items: center; margin-top: 3px; ">
-                                <img src="assets/CardIcon.png " alt=" " class="icon">
+                                <img src="assets/CardIcon.png " alt=" " class="buccaneer icon">
                                 <div class="cardcount">6</div>
                             </div>
                         </div>
@@ -156,42 +156,9 @@
             <img id="chancecard" src="assets/cards/Chance 1.png" alt="" style="flex: 1 1 0; min-height: 000px; max-height: 500px; object-fit: contain; display: block;">
             <!-- </div> -->
             <!-- <div style="background-color: darkred; width: 100%; flex: 1 1 0;"></div> -->
-            <div id="btnClosePopup" class="btn" style="flex: 0 1;" style="" onclick="javascript: closePopup();">CLOSE</div>
+            <div id="btnClosePopup" class="btn" style="flex: 0 1;">CLOSE</div>
         </div>
     </div>
-
-    <script>
-        let hudVisible = true;
-        $('#settings').click(
-            function() {
-                let hud = $("#hudbottom");
-                if (hudVisible) {
-                    hud.css("transform", "translate(0, 150%)");
-                    $("#settings").removeClass("fa-caret-square-down");
-                    $("#settings").addClass("fa-caret-square-up");
-                } else {
-                    hud.css("transform", "translate(0, 0)");
-                    $("#settings").removeClass("fa-caret-square-up");
-                    $("#settings").addClass("fa-caret-square-down");
-                }
-                hudVisible = !hudVisible;
-            }
-        );
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('service-worker.js').then(function(registration) {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                }, function(err) {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            });
-        }
-
-        function closePopup() {
-            $("#popup").fadeOut();
-        }
-    </script>
 
     <script src="main.js "></script>
 </body>

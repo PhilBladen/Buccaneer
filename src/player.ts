@@ -130,15 +130,7 @@ class Player extends Boat {
                 trigger: ActionManager.OnPickTrigger
             },
                 (e) => {
-                    this.x = Math.floor(this.mousePickPosition.x);
-                    this.z = Math.floor(this.mousePickPosition.z);
-
-                    this.originalLocation = this.CoT.position.clone();
-                    this.moveAnimateStartTime = this.time;
-                    this.targetLocation.x = this.x + 0.5;
-                    this.targetLocation.z = this.z + 0.5;
-
-                    this.motionAnimator.setTrajectory(this.originalLocation, 0, this.targetLocation);
+                    this.moveToSquare(this.mousePickPosition.x, this.mousePickPosition.z);
 
                     this.updateTurnButton();
                 }
@@ -146,7 +138,6 @@ class Player extends Boat {
         );
 
         this.movesMesh.isPickable = true;
-        this.movesMesh.enablePointerMoveEvents = true;
         this.movesMesh.alphaIndex = 600;
 
         var mat2 = new CustomMaterial('s', scene);
@@ -203,9 +194,9 @@ class Player extends Boat {
 
         float t2 = t;// * 0.05;
 
-        vec4 c = vec4(vec3(0), 0.15);
+        vec4 c = vec4(vec3(0), 0.25);
         if (dist > sailingDist)
-            c = vec4(vec3(1, 0, 0), 0.15);
+            c = vec4(vec3(1, 0, 0), 0.25);
 
         if ((x == floor(pickedPoint.x)) && (z == floor(pickedPoint.z)))
             c.a = 0.5;

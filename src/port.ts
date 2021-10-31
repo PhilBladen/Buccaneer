@@ -116,7 +116,7 @@ class Port {
                 default:
                     // Sad
             }
-            let parent = new BABYLON.TransformNode("", scene);
+            let parent = new BABYLON.TransformNode("Treasure", scene);
 
 
 

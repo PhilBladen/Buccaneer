@@ -50,12 +50,7 @@ class AI extends Boat {
 
             if (!moveDone) {
                 let move = this.legalMoves[Math.floor(Math.random() * this.legalMoves.length)];
-                this.x = move[0];
-                this.z = move[1];
-                this.originalLocation = this.CoT.position.clone();
-                this.moveAnimateStartTime = this.time;
-                this.targetLocation.x = (this.x + 0.5);
-                this.targetLocation.z = (this.z + 0.5);
+                this.moveToSquare(move[0], move[1]);
                 moveDone = true;
 
                 setTimeout(task, 1000);
