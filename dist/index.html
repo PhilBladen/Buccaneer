@@ -76,17 +76,16 @@
 
             <!-- City HUD -->
             <div class="container" style="flex: 1 1;">
-                <div id="hudleft" class="column hudleft clickable" style="flex: 0 1 200px; background-color: #6A9023;">
+                <div id="hudleft" class="column hudleft clickable" style="flex: 0 1 auto; background-color: #6A9023;">
 
-                    <div class="city" style="flex: 1 1 auto;">BOMBAY</div>
+                    <div id="cityname" class="city" style="flex: 1 1 auto;">BOMBAY</div>
 
-                    <div class="container" style="flex: 1 1 auto; flex-direction: row;">
+                    <!-- Boat + pirate count UI -->
+                    <div class="grid testgrid" style="flex: 1 1 auto; flex-direction: row;">
 
-                        <!-- Boat + pirate count UI -->
-                        <div class="container" style="flex: 1 1; flex-direction: column;">
-
-                            <!-- Boat -->
-                            <div class="row" style="flex: 1; justify-content: center; align-items: center;">
+                        <!-- Boat -->
+                        <div class="boatcell container">
+                            <div class="row" style="justify-content: center; align-items: center; grid-column: 1 / span 2; min-width: fit-content;">
                                 <div style="position: absolute;" class="row">
                                     <div class="treasure container">
                                         <img src="assets/icon-barrel.png">
@@ -97,41 +96,48 @@
                                 </div>
                                 <img src="assets/BoatIcon.png" alt="" class="boat">
                             </div>
+                        </div>
 
-                            <!-- Pirate count + fighting strength -->
-                            <div class="row" style="flex: 1; margin: 0px 0 0 0">
-                                <div class="row" style="flex: 1; justify-content: center; align-items: center;">
-                                    <img src="assets/PirateIcon.png" alt="" class="buccaneer icon" style="padding: 0px;">
-                                    <div class="cardcount">14</div>
-                                </div>
 
-                                <div class="row" style="flex: 1; justify-content: center; align-items: center">
-                                    <img src="assets/FightingIcon.png" alt="" class="buccaneer icon">
-                                    <div class="cardcount">8</div>
-                                </div>
+                        <!-- Pirate count + fighting strength -->
+                        <div class="column dummycell cellbtn" style="align-items: stretch; padding-top: 0; padding-bottom: 0;">
+                            <div class="row" style="flex: 1; align-items: center; padding-left: 0px;">
+                                <img src="assets/PirateIcon.png" alt="" class="buccaneer icon" style="height: 48px">
+                                <div style="flex: 1"></div>
+                                <div id="sailingstrength" class="cardcount">14</div>
+                            </div>
+
+                            <div class="row" style="flex: 1 1; align-items: center; padding-left: 0px;">
+                                <img src="assets/FightingIcon.png" alt="" class="buccaneer icon" style="height: 48px">
+                                <div style="flex: 1"></div>
+                                <div id="fightingstrength" class="cardcount">8</div>
                             </div>
                         </div>
 
                         <!-- Rules + card button UI -->
-                        <div class="container" style="flex: 0 1 auto; flex-direction: column; ">
-                            <div class="container btnrules" style="flex: 1 1; justify-content: center; align-items: center; ">
-                                <img src="assets/RulesIcon.png " alt=" " class="buccaneer icon">
-                            </div>
-                            <div class="container btnrules" style="flex: 1 1; justify-content: center; align-items: center; margin-top: 3px; ">
-                                <img src="assets/CardIcon.png " alt=" " class="buccaneer icon">
-                                <div class="cardcount">6</div>
-                            </div>
+                        <div id="btnrules" class="dummycell container cellbtn " style="justify-content: center; align-items: center; ">
+                            <img src="assets/RulesIcon.png " alt=" " class="buccaneer icon ">
                         </div>
-
+                        <div class="dummycell container cellbtn " style="justify-content: center; align-items: center; ">
+                            <img src="assets/CamHomeIcon.png " alt=" " class="buccaneer icon ">
+                        </div>
+                        <div class="dummycell container cellbtn " style="justify-content: center; align-items: center; ">
+                            <img src="assets/CamLockBoatIcon.png " alt=" " class="buccaneer icon ">
+                        </div>
+                        <div class="dummycell container cellbtn " style="justify-content: center; align-items: center; ">
+                            <img src="assets/CardIcon.png " alt=" " class="buccaneer icon ">
+                            <div style="flex: 1"></div>
+                            <div id="chancecardcount" class="cardcount ">6</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Action buttons -->
-            <div id="actionbtnwrapper" class="container">
-                <div id="actionbtnwrapper2" class="row">
-                    <div id="buttons" class="row">
-                        <div id="actionbtnturn" class="actionbtn " style="flex: 0 1; white-space: nowrap;">END TURN</div>
+            <div id="actionbtnwrapper" class="container ">
+                <div id="actionbtnwrapper2" class="row ">
+                    <div id="buttons" class="row ">
+                        <div id="actionbtnturn" class="actionbtn " style="flex: 0 1; white-space: nowrap; ">END TURN</div>
                         <div id="actionbtnattacktrade" class="actionbtn disabled " style="flex: 0 1 ">ATTACK!</div>
                         <!-- <div style="flex: 1 1; max-width: 50px; min-width: 20px; "></div> -->
                         <!-- <div class="actionbtn disabled " style="flex: 0 1 ">TRADE</div> -->
@@ -140,25 +146,59 @@
             </div>
 
             <!-- Minimap -->
-            <div id="minimapwrapper" class="row" style="flex: 1 1; height: 300px; justify-content: flex-end; align-items: flex-end;">
-                <div id="hudright" class="" style="background-color: darkred; max-width: fit-content; max-height: fit-content; ">
-                    <canvas id="minimap" class="clickable minimap" style="position: absolute;"></canvas>
-                    <img class="minimap" src="assets/MiniBoard_NoBorder.png " alt=" " style="  ">
+            <div id="minimapwrapper" class="row " style="flex: 1 1; height: 300px; justify-content: flex-end; align-items: flex-end; ">
+                <div id="hudright" class=" " style="background-color: darkred; max-width: fit-content; max-height: fit-content; ">
+                    <canvas id="minimap" class="clickable minimap " style="position: absolute; "></canvas>
+                    <img class="minimap" src="assets/MiniBoard_NoBorder.png " alt=" " style=" ">
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="popup" class="container" style="display:none; position: fixed; left: 0; right: 0; top: 0; bottom: 0; flex-direction: column; overflow: auto; background-color: rgba(0, 0, 0, 0.3);">
-        <div class="popup container clickable" style="flex: 1 1 auto; align-items: center; padding: 20px; flex-direction: column; justify-content: center;">
-            <!-- <div style=""> -->
-            <!-- <div style="flex: 1 1 0"></div> -->
-            <img id="chancecard" src="assets/cards/Chance 1.png" alt="" style="flex: 1 1 0; min-height: 000px; max-height: 500px; object-fit: contain; display: block;">
+    <div id="popup" class="container" style="display:none; position: fixed; left: 0; right: 0; top: 0; bottom: 0; flex-direction: column; overflow: auto; background-color: rgba(0, 0, 0, 0.5); ">
+        <div class="popup container clickable" style="flex: 1 1 auto; align-items: center; padding: 20px; flex-direction: column; justify-content: center; ">
+            <!-- <div style=" "> -->
+            <!-- <div style="flex: 1 1 0 "></div> -->
+            <img id="chancecard" src="assets/cards/Chance 1.png " alt=" " style="flex: 1 1 0; min-height: 000px; max-height: 500px; object-fit: contain; display: block; ">
             <!-- </div> -->
-            <!-- <div style="background-color: darkred; width: 100%; flex: 1 1 0;"></div> -->
-            <div id="btnClosePopup" class="btn" style="flex: 0 1;">CLOSE</div>
+            <!-- <div style="background-color: darkred; width: 100%; flex: 1 1 0; "></div> -->
+            <div id="btnClosePopup" class="btn " style="flex: 0 1; ">CLOSE</div>
         </div>
     </div>
+
+    <div id="rules" class="row" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; pointer-events: all;">
+        <div class="" style="font-family: pirate; font-size: 1.5em; max-width: 1500px; text-align: justify; padding: 30px; overflow: auto; background-color: blanchedalmond;">
+            <p style="text-align: center; font-weight: bold; font-size: larger;">RULES</p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam vel mattis felis. Etiam consequat nisi ut est posuere, id laoreet odio pulvinar. Nam id interdum ante, vel hendrerit nulla. Fusce sit amet dolor in neque rhoncus ullamcorper in ultrices metus.
+            In maximus consectetur nulla quis finibus. Fusce ullamcorper purus suscipit ante ultrices pellentesque. Proin et tempor mauris. Suspendisse nec venenatis turpis. Ut laoreet sit amet enim ac tincidunt. Maecenas ornare consectetur odio, a blandit
+            tortor dignissim vitae. Morbi eu nibh cursus, accumsan mi eget, porttitor odio. Praesent et leo ut odio sagittis iaculis non et ex. Nam eleifend consequat ligula et porta. Donec semper ullamcorper mi tincidunt luctus. Quisque ultrices ante
+            nec urna elementum vestibulum. Quisque ut lectus magna. Donec lacinia, nulla quis scelerisque consequat, sem tellus euismod nunc, eu molestie nisl ante a sem. Mauris vehicula lectus nec porta interdum. Integer sollicitudin condimentum turpis
+            sit amet fermentum. Sed a nisl purus. Proin ut augue at quam lacinia suscipit nec nec augue. Sed tempor vulputate lorem, gravida sagittis nibh egestas vitae. Pellentesque vitae lacus augue. Aliquam iaculis consequat vestibulum. Duis fringilla
+            malesuada felis, eu dapibus nisl aliquam eu. Maecenas ipsum ligula, congue sed rutrum placerat, rhoncus et ante. Suspendisse tempus lacus sit amet velit tristique tincidunt. In fringilla vestibulum augue, at tincidunt ex molestie ac. Ut pretium
+            nibh id nulla vehicula, vel sodales quam molestie. Vestibulum vitae sapien risus. Nulla facilisi. Praesent rhoncus, enim quis mattis hendrerit, nulla neque sollicitudin ante, ut scelerisque mauris arcu at dolor. Nunc sagittis ultricies arcu
+            et sollicitudin. Aliquam eleifend justo ac dui viverra tincidunt. Morbi vel molestie sapien, ac sollicitudin ipsum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. In aliquam eros eget gravida tincidunt.
+            Praesent vulputate metus vel velit convallis blandit. Nam sed nisl id lorem lacinia ullamcorper at quis est. Nam faucibus hendrerit dolor. In libero neque, molestie consectetur convallis ut, blandit id mauris. Aenean ultrices mauris non dapibus
+            mattis. Nullam venenatis accumsan vulputate. Curabitur eu interdum justo, non interdum nunc. Donec porttitor euismod eros, ut fringilla ligula varius in. Proin eu mauris luctus, semper dolor a, pharetra ex. Vestibulum vel augue rhoncus, volutpat
+            lorem non, fermentum tortor. Sed eget sem nec diam commodo auctor vitae sit amet lectus. Aliquam erat volutpat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Cras tempus tellus quam, at commodo
+            libero malesuada sed. Fusce ac aliquet arcu. Proin luctus massa nec mi commodo, ac bibendum purus venenatis. Vivamus lobortis lorem eu ligula commodo hendrerit. Nulla consequat tempus ullamcorper. Nulla et augue finibus elit pulvinar ornare.
+            Phasellus suscipit sapien est, id tempor ipsum tempor eget. Mauris sit amet tincidunt orci. Donec pretium nisi ut eros ultrices dapibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Lorem ipsum
+            dolor sit amet, consectetur adipiscing elit. Etiam vel mattis felis. Etiam consequat nisi ut est posuere, id laoreet odio pulvinar. Nam id interdum ante, vel hendrerit nulla. Fusce sit amet dolor in neque rhoncus ullamcorper in ultrices metus.
+            In maximus consectetur nulla quis finibus. Fusce ullamcorper purus suscipit ante ultrices pellentesque. Proin et tempor mauris. Suspendisse nec venenatis turpis. Ut laoreet sit amet enim ac tincidunt. Maecenas ornare consectetur odio, a blandit
+            tortor dignissim vitae. Morbi eu nibh cursus, accumsan mi eget, porttitor odio. Praesent et leo ut odio sagittis iaculis non et ex. Nam eleifend consequat ligula et porta. Donec semper ullamcorper mi tincidunt luctus. Quisque ultrices ante
+            nec urna elementum vestibulum. Quisque ut lectus magna. Donec lacinia, nulla quis scelerisque consequat, sem tellus euismod nunc, eu molestie nisl ante a sem. Mauris vehicula lectus nec porta interdum. Integer sollicitudin condimentum turpis
+            sit amet fermentum. Sed a nisl purus. Proin ut augue at quam lacinia suscipit nec nec augue. Sed tempor vulputate lorem, gravida sagittis nibh egestas vitae. Pellentesque vitae lacus augue. Aliquam iaculis consequat vestibulum. Duis fringilla
+            malesuada felis, eu dapibus nisl aliquam eu. Maecenas ipsum ligula, congue sed rutrum placerat, rhoncus et ante. Suspendisse tempus lacus sit amet velit tristique tincidunt. In fringilla vestibulum augue, at tincidunt ex molestie ac. Ut pretium
+            nibh id nulla vehicula, vel sodales quam molestie. Vestibulum vitae sapien risus. Nulla facilisi. Praesent rhoncus, enim quis mattis hendrerit, nulla neque sollicitudin ante, ut scelerisque mauris arcu at dolor. Nunc sagittis ultricies arcu
+            et sollicitudin. Aliquam eleifend justo ac dui viverra tincidunt. Morbi vel molestie sapien, ac sollicitudin ipsum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. In aliquam eros eget gravida tincidunt.
+            Praesent vulputate metus vel velit convallis blandit. Nam sed nisl id lorem lacinia ullamcorper at quis est. Nam faucibus hendrerit dolor. In libero neque, molestie consectetur convallis ut, blandit id mauris. Aenean ultrices mauris non dapibus
+            mattis. Nullam venenatis accumsan vulputate. Curabitur eu interdum justo, non interdum nunc. Donec porttitor euismod eros, ut fringilla ligula varius in. Proin eu mauris luctus, semper dolor a, pharetra ex. Vestibulum vel augue rhoncus, volutpat
+            lorem non, fermentum tortor. Sed eget sem nec diam commodo auctor vitae sit amet lectus. Aliquam erat volutpat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Cras tempus tellus quam, at commodo
+            libero malesuada sed. Fusce ac aliquet arcu. Proin luctus massa nec mi commodo, ac bibendum purus venenatis. Vivamus lobortis lorem eu ligula commodo hendrerit. Nulla consequat tempus ullamcorper. Nulla et augue finibus elit pulvinar ornare.
+            Phasellus suscipit sapien est, id tempor ipsum tempor eget. Mauris sit amet tincidunt orci. Donec pretium nisi ut eros ultrices dapibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+        </div>
+    </div>
+
+    <div id="loadingcover" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none; overflow: hidden; background-color: black;"></div>
 
     <script src="main.js "></script>
 </body>

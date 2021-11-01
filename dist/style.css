@@ -26,6 +26,7 @@ body {
 
 img {
     min-height: 0;
+    pointer-events: none;
 }
 
 #renderCanvas {
@@ -82,6 +83,50 @@ img {
 .container {
     display: flex;
     /* or inline-flex */
+}
+
+.grid {
+    display: grid;
+}
+
+.testgrid {
+    grid-template-columns: repeat(4, auto);
+    grid-template-rows: repeat(2, auto);
+    grid-auto-rows: minmax(min-content, max-content);
+    grid-auto-columns: minmax(min-content, max-content);
+    grid-auto-flow: row;
+    /* justify-items: center; */
+    /* align-items: center; */
+    padding: 10px;
+    grid-gap: 13px;
+}
+
+.boatcell {
+    grid-column: 1 / span 3;
+    /* justify-items: center; */
+    /* align-items: center; */
+}
+
+.outline-2px {
+    box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.5);
+}
+
+.dummycell {
+    /* justify-items: center; */
+    /* width: 100px; */
+    /* height: 100px */
+}
+
+.cellbtn {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    box-shadow: 0px 0px 0px 3px rgba(0, 0, 0, 0.3);
+    padding: 5px;
+    cursor: pointer;
+}
+
+.cellbtn:hover {
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
 .row {
@@ -155,8 +200,9 @@ img {
 }
 
 .boat {
-    width: 300px;
-    height: 107px;
+    /* width: 300px; */
+    /* height: 107px; */
+    width: 100%;
     min-height: 0px;
     min-width: 0px;
 }
@@ -198,11 +244,13 @@ img {
 }
 
 .btnrules {
-    outline: solid rgba(1, 1, 1, 0.2) 3px;
+    /* outline: solid rgba(1, 1, 1, 0.2) 3px; */
     background-color: rgba(255, 255, 255, 0.3);
-    border-radius: 10px;
-    padding: 10px;
-    margin: 10px;
+    border-radius: 5px;
+    width: 70px;
+    height: 70px;
+    /* padding: 10px; */
+    /* margin: 10px; */
 }
 
 .btnrules:hover img {

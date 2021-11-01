@@ -181,6 +181,7 @@ class CustomCameraInput implements ICameraInput<ArcRotateCamera> {
 
 const engine = new Engine(canvas, true, {}, true);
 engine.displayLoadingUI();
+$("#loadingcover").fadeOut();
 const scene = new Scene(engine);
 const buccaneer = new Buccaneer(scene);
 // engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
@@ -424,6 +425,14 @@ const createScene = function () {
             buccaneer.nextTurn();
         },
         mouseover: () => { buccaneer.soundEngine.buttonHover() }
+    });
+
+    $("#rules").on("click", () => {
+        $("#rules").fadeOut();
+    });
+    
+    $('#btnrules').on("click", () => {
+        $("#rules").fadeIn();
     });
 
     SceneLoader.OnPluginActivatedObservable.addOnce(loader => {

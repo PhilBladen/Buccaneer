@@ -6,6 +6,7 @@ import { Port } from "./port";
 import { SoundEngine } from "./soundengine";
 
 import $ from "jquery";
+import { randomInt } from "./utils";
 
 class Player extends Boat {
     cw: Mesh = null;
@@ -24,6 +25,8 @@ class Player extends Boat {
 
         let mesh = this.mesh;
         let scene = this.buccaneer.scene;
+
+        this.initialisePlayerUI();
 
         let cw: Mesh;
         let ccw: Mesh;
@@ -208,6 +211,14 @@ class Player extends Boat {
 
         this.updateRightActionButton();
         this.updateLeftActionButton();
+    }
+
+    initialisePlayerUI() {
+        $("#cityname").html(this.port.portName.toUpperCase());
+        $("#hudleft").css("background-color", this.port.portColor);
+        $("#fightingstrength").html(randomInt(this.sailingStrength) + "");
+        $("#sailingstrength").html(this.sailingStrength + "");
+        $("#chancecardcount").html("" + randomInt(6));
     }
 
     moveToSquare(x: number, z: number) {
