@@ -228,8 +228,12 @@ class BoatMotionController {
         return journeyVector.scaleInPlace(this.getLinearPosition(t)).addInPlace(this.startPosition);
     }
 
-    isComplete(t: Number): boolean {
+    _isComplete(t: Number): boolean {
         return t >= this.points[3].time;
+    }
+
+    isMoving(): boolean {
+        return this.animationRunning || this.rotationAnimation.animationRunning;
     }
 
     update(time: number) {
@@ -239,7 +243,7 @@ class BoatMotionController {
         if (this.animationRunning) {
             let animationTime = (time - this.trajectoryStartTime);
             this.boat.baseTransform.position = this.getVectorPosition(animationTime);
-            if (this.isComplete(animationTime)) {
+            if (this._isComplete(animationTime)) {
                 this.animationRunning = false;
             }
         }

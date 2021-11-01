@@ -149,25 +149,15 @@ class Boat {
         return true;
     }
 
-    updateTurnButton() {
-        if (!this.hasMovedSinceTurnStart()) {
-            if (!$("#actionbtnturn").hasClass("disabled")) {
-                $("#actionbtnturn").addClass("disabled");
-            }
-        } else {
-            $("#actionbtnturn").removeClass("disabled");
-        }
-    }
-
     rotateCW() {
         this.buccaneer.soundEngine.boatRotate();
-        this.direction--; // TODO check dir
+        this.direction++;
         this.motionController.updateDirection();
     }
 
     rotateCCW() {
         this.buccaneer.soundEngine.boatRotate();
-        this.direction++;
+        this.direction--;
         this.motionController.updateDirection();
     }
 
@@ -226,7 +216,9 @@ class Boat {
         }
     }
 
-
+    isMoving() : boolean {
+        return this.motionController.isMoving();
+    }
 
     deactivate() {
         this.activated = false;
@@ -241,10 +233,8 @@ class Boat {
 
         this.activated = true;
 
-        this.mesh.isPickable = true;
+        // this.mesh.isPickable = true;
         this.calculateLegalMoves();
-
-        this.updateTurnButton();
     }
 
     moveToSquare(x: number, z: number) {
@@ -252,8 +242,6 @@ class Boat {
         this.z = Math.floor(z);
 
         this.motionController.setDestination(this.x + 0.5, this.z + 0.5);
-
-        this.updateTurnButton();
     }
 
     update(time: number) {

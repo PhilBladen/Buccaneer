@@ -48,19 +48,25 @@ class AssetManager {
         // material.spec = new Color3(1, 1, 1);
         // material.specularPower = 0.1;
         // material.useSpecularOverAlpha = true;
-        material.specularIntensity = 0.5;
-        material.albedoColor = new Color3(1, 0, 0);//new Color3(0.5, 0, 0);
-        // material.emissiveColor = new Color3(0.5, 0.5, 0.5);//new Color3(0.1, 0, 0);
-        // material.alpha = 0.5;
-        // material.backFaceCulling = true;
+        // material.specularIntensity = 0.5;
+        material.albedoColor = new Color3(0.1, 0, 0);//new Color3(0.5, 0, 0);
+        material.emissiveColor = new Color3(0.1, 0, 0);
+        material.backFaceCulling = true;
+        // material.alpha = 0.9;
+        material.metallic = 0.0;
+        material.roughness = 0; 
         material.indexOfRefraction = 2.4;
-        // this.ruby.material = material;
+        // material.transparencyMode = PBRMaterial.MATERIAL_ALPHATESTANDBLEND;
+        // material.refractionTexture = scene.environmentTexture;
+        // material.subSurface.isRefractionEnabled = true;
+        this.ruby.material = material;
 
         this.diamond = this.ruby.clone("Diamond");
-        this.diamond.material = (<PBRMaterial> this.diamond.material).clone("");
+        this.diamond.material = material.clone("");
         (<PBRMaterial>this.diamond.material).albedoColor = new Color3(1, 1, 1);
-        (<PBRMaterial>this.diamond.material).alpha = 0.7;
-        (<PBRMaterial>this.diamond.material).indexOfRefraction = 2.4;
+        (<PBRMaterial>this.diamond.material).emissiveColor = new Color3(0.1, 0.1, 0.1);
+        (<PBRMaterial>this.diamond.material).alpha = 0.9;
+        // (<PBRMaterial>this.diamond.material).indexOfRefraction = 2.4;
         (<PBRMaterial>this.diamond.material).transparencyMode = PBRMaterial.MATERIAL_ALPHABLEND;
 
         container.setEnabled(false);

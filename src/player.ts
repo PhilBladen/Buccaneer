@@ -5,6 +5,8 @@ import { Boat, GridPosition } from "./boat";
 import { Port } from "./port";
 import { SoundEngine } from "./soundengine";
 
+import $ from "jquery";
+
 class Player extends Boat {
     cw: Mesh = null;
     ccw: Mesh = null;
@@ -69,7 +71,7 @@ class Player extends Boat {
             },
                 () => {
                     this.rotateCW();
-                    this.updateTurnButton();
+                    this.updateLeftActionButton();
                 }
             )
         );
@@ -106,7 +108,7 @@ class Player extends Boat {
             },
                 () => {
                     this.rotateCCW();
-                    this.updateTurnButton();
+                    this.updateLeftActionButton();
                 }
             )
         );
@@ -146,7 +148,7 @@ class Player extends Boat {
                     }
 
                     this.moveToSquare(mouseObj.x, mouseObj.z);
-                    this.updateTurnButton();
+                    this.updateLeftActionButton();
                 }
             )
         );
@@ -203,6 +205,39 @@ class Player extends Boat {
         `);
 
         this.movesMesh.material = mat2;
+
+        this.updateRightActionButton();
+        this.updateLeftActionButton();
+    }
+
+    moveToSquare(x: number, z: number) {
+        super.moveToSquare(x, z);
+
+        this.updateRightActionButton();
+        this.updateLeftActionButton();
+    }
+
+    updateRightActionButton() {
+        // TODO optimize calls
+        let tradeBtn = $("#actionbtnattacktrade");
+        if (this.isInPort()) {
+            tradeBtn.html("TRADE");
+            tradeBtn.removeClass("disabled");
+        } else {
+            if (!tradeBtn.hasClass("disabled"))
+                tradeBtn.addClass("disabled");
+            tradeBtn.html("ATTACK");
+        }
+    }
+
+    updateLeftActionButton() {
+        if (!this.hasMovedSinceTurnStart()) {
+            if (!$("#actionbtnturn").hasClass("disabled")) {
+                $("#actionbtnturn").addClass("disabled");
+            }
+        } else {
+            $("#actionbtnturn").removeClass("disabled");
+        }
     }
 
     showLegalSquares() {
@@ -251,6 +286,8 @@ class Player extends Boat {
         this.movesMesh.isPickable = true;
 
         this.turnStartTime = performance.now();
+
+        this.updateLeftActionButton();
     }
 
     deactivate() {

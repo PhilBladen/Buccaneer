@@ -563,6 +563,8 @@ const createScene = function () {
 createScene();
 
 scene.registerBeforeRender(() => {
+    if (scene.getViewMatrix() === undefined)
+        return;
     updateGame();
 });
 

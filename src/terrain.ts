@@ -382,11 +382,11 @@ class Terrain {
         frame.material = material;
         // frame.setEnabled(false);
 
-        material = new StandardMaterial("Diamond", scene);
-        material.diffuseColor = new Color3(1.0, 1, 1);
-        material.specularColor = new Color3(.8, .8, .8);
-        material.alpha = 0.5;
-        diamond.material = material;
+        // material = new StandardMaterial("Diamond", scene);
+        // material.diffuseColor = new Color3(1.0, 1, 1);
+        // material.specularColor = new Color3(.8, .8, .8);
+        // material.alpha = 0.5;
+        // diamond.material = material;
 
         material = new StandardMaterial("", scene);
         material.diffuseColor = new Color3(1.0, 1, 1);

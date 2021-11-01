@@ -3,9 +3,17 @@ import { Buccaneer } from ".";
 import { Boat } from "./boat";
 import { Port } from "./port";
 import { SoundEngine } from "./soundengine";
+import { randomInt } from "./utils";
+
+enum AIState {
+    NONE = 0,
+    MOVING,
+    ROTATING,
+}
 
 class AI extends Boat {
     buccaneer: Buccaneer;
+    state: AIState = AIState.NONE;
 
     constructor(x: number, z: number, port: Port, buccaneer: Buccaneer) {
         super(x, z, port, buccaneer);
@@ -31,39 +39,51 @@ class AI extends Boat {
     }
 
     makeMove() {
-        // return;// TODO remove
+        let numRotates = randomInt(8) - 4;
+        console.log("Rotates: " + numRotates);
+        let move = this.legalMoves[Math.floor(Math.random() * this.legalMoves.length)];
+        if (move.x == this.x && move.z == this.z && numRotates == 0) {
+            numRotates++;
+        }
 
-        let rotateDone = false;
-        let moveDone = false;
-        let rotates = Math.floor(Math.random() * 8 - 4);
         let task = () => {
-            if (rotateDone) {
-                this.buccaneer.nextTurn();
-                return;
-            }
-
-            if (!moveDone) {
-                let move = this.legalMoves[Math.floor(Math.random() * this.legalMoves.length)];
-                this.moveToSquare(move.x, move.z);
-                moveDone = true;
-
-                setTimeout(task, 1000);
-            } else {
-                if (!rotateDone) {
-                    if (rotates > 0) {
-                        rotates -= 1;
-                        this.rotateCCW();
-                    } else if (rotates < 0) {
-                        rotates += 1;
-                        this.rotateCCW();
+            switch (this.state) {
+                case AIState.NONE:
+                    if (move.x != this.x || move.z != this.z) {
+                        this.moveToSquare(move.x, move.z);
+                        this.state = AIState.MOVING;
                     } else {
-                        rotateDone = true;
+                        this.state = AIState.ROTATING;
                     }
-                    setTimeout(task, 200);
-                }
+                    break;
+                case AIState.MOVING:
+                    if (!this.isMoving()) {
+                        this.state = AIState.ROTATING;
+                    }
+                    break;
+                case AIState.ROTATING:
+                    if (this.isMoving()) {
+                        break;
+                    }
+                    if (numRotates > 0) {
+                        numRotates -= 1;
+                        this.rotateCW();
+                        console.log("CW");
+                    } else if (numRotates < 0) {
+                        numRotates += 1;
+                        this.rotateCCW();
+                        console.log("CCW");
+                    } else {
+                        this.buccaneer.nextTurn();
+                        this.state = AIState.NONE;
+                    }
+                    break;
+                default:
+                    break;
             }
-        };
-        // setTimeout(task, 500);
+            if (this.state != AIState.NONE)
+                setTimeout(task, 200);
+        }
         task();
     }
 }
