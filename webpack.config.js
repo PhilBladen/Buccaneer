@@ -5,12 +5,23 @@ const smp = new SpeedMeasurePlugin();
 
 module.exports = smp.wrap({
     mode: 'development',
+    target: 'web',
     devtool: "inline-source-map",
     entry: "./src/index.ts",
+    // optimization: {
+    //     // usedExports: true,
+    //     splitChunks: {
+    //         chunks: 'all',
+    //     },
+    // },
     devServer: {
         port: 8081,
         static: path.resolve(__dirname, "dist"),
     },
+    // output: {
+    //     path: path.resolve(__dirname, 'dist'),
+    //     filename: '[name].[contenthash].js',
+    // },
     module: {
         rules: [{
                 test: /\.s[ac]ss$/i,

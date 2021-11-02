@@ -8,93 +8,6 @@ class Terrain {
     }
 
     mergeMeshes(newMeshName: string, meshes: Mesh[]|InstancedMesh[], scene: Scene) {
-        // var arrayPos = [];
-        // var arrayNormal = [];
-        // var arrayUv = [];
-        // var arrayUv2 = [];
-        // var arrayColor = [];
-        // var arrayMatricesIndices = [];
-        // var arrayMatricesWeights = [];
-        // var arrayIndice = [];
-        // var savedPosition = [];
-        // var savedNormal = [];
-        // var newMesh = new Mesh(newMeshName, scene);
-        // var UVKind = true;
-        // var UV2Kind = true;
-        // var ColorKind = true;
-        // var MatricesIndicesKind = true;
-        // var MatricesWeightsKind = true;
-
-        // for (var i = 0; i != 1; i++) { // TODO arrayObj.length
-        //     if (!arrayObj[i].isVerticesDataPresent(VertexBuffer.UVKind)) UVKind = false;
-        //     if (!arrayObj[i].isVerticesDataPresent(VertexBuffer.UV2Kind)) UV2Kind = false;
-        //     if (!arrayObj[i].isVerticesDataPresent(VertexBuffer.ColorKind)) ColorKind = false;
-        //     if (!arrayObj[i].isVerticesDataPresent(VertexBuffer.MatricesIndicesKind)) MatricesIndicesKind = false;
-        //     if (!arrayObj[i].isVerticesDataPresent(VertexBuffer.MatricesWeightsKind)) MatricesWeightsKind = false;
-        // }
-
-
-        // for (i = 0; i != 1; i++) { // TODO arrayObj.length
-        //     var ite = 0;
-        //     var iter = 0;
-        //     arrayPos[i] = arrayObj[i].getVerticesData(VertexBuffer.PositionKind);
-        //     if (arrayPos[i] == null) continue;// TODO remove
-        //     arrayNormal[i] = arrayObj[i].getVerticesData(VertexBuffer.NormalKind);
-        //     if (UVKind) arrayUv = arrayUv.concat(arrayObj[i].getVerticesData(VertexBuffer.UVKind));
-        //     if (UV2Kind) arrayUv2 = arrayUv2.concat(arrayObj[i].getVerticesData(VertexBuffer.UV2Kind));
-        //     if (ColorKind) arrayColor = arrayColor.concat(arrayObj[i].getVerticesData(VertexBuffer.ColorKind));
-        //     if (MatricesIndicesKind) arrayMatricesIndices = arrayMatricesIndices.concat(arrayObj[i].getVerticesData(VertexBuffer.MatricesIndicesKind));
-        //     if (MatricesWeightsKind) arrayMatricesWeights = arrayMatricesWeights.concat(arrayObj[i].getVerticesData(VertexBuffer.MatricesWeightsKind));
-
-        //     console.log("Pos in: " + arrayPos[i]);//(VertexBuffer.UVKind));
-
-        //     var maxValue = savedPosition.length / 3;
-
-        //     arrayObj[i].computeWorldMatrix(true);
-        //     var worldMatrix = arrayObj[i].getWorldMatrix();
-
-        //     // for (var ite = 0; ite != arrayPos[i].length; ite += 1) {
-        //     //     savedPosition.push(arrayPos[i][ite]);
-        //     // }
-
-        //     for (var ite = 0; ite != arrayPos[i].length; ite += 3) {
-        //         var vertex = Vector3.TransformCoordinates(new Vector3(arrayPos[i][ite], arrayPos[i][ite + 1], arrayPos[i][ite + 2]), worldMatrix);
-        //         savedPosition.push(vertex.x);
-        //         savedPosition.push(vertex.y);
-        //         savedPosition.push(vertex.z);
-        //     }
-
-        //     for (var iter = 0; iter != arrayNormal[i].length; iter += 3) {
-        //         var vertex = Vector3.TransformNormal(new Vector3(arrayNormal[i][iter], arrayNormal[i][iter + 1], arrayNormal[i][iter + 2]), worldMatrix);
-        //         savedNormal.push(vertex.x);
-        //         savedNormal.push(vertex.y);
-        //         savedNormal.push(vertex.z);
-        //     }
-
-        //     // savedPosition = savedPosition.concat(arrayPos[i]);
-        //     // savedNormal = savedNormal.concat(arrayNormal[i]);
-
-        //     var tmp = arrayObj[i].getIndices();
-        //     for (let it = 0; it != tmp.length; it++) {
-        //         // arrayIndice.push(tmp[it] + maxValue);
-        //     }
-        //     arrayIndice = arrayIndice.concat(tmp);
-
-        //     arrayObj[i].dispose(false);
-        // }
-
-        // VertexData.ComputeNormals(savedPosition, arrayIndice, savedNormal);
-
-        // newMesh.setVerticesData(VertexBuffer.PositionKind, savedPosition, false);
-        // newMesh.setVerticesData(VertexBuffer.NormalKind, savedNormal, false);
-        // if (arrayUv.length > 0) newMesh.setVerticesData(VertexBuffer.UVKind, arrayUv, false);
-        // // if (arrayUv2.length > 0) newMesh.setVerticesData(VertexBuffer.UV2Kind, arrayUv, false);
-        // // if (arrayColor.length > 0) newMesh.setVerticesData(VertexBuffer.ColorKind, arrayUv, false);
-        // // if (arrayMatricesIndices.length > 0) newMesh.setVerticesData(VertexBuffer.MatricesIndicesKind, arrayUv, false);
-        // // if (arrayMatricesWeights.length > 0) newMesh.setVerticesData(VertexBuffer.MatricesWeightsKind, arrayUv, false);
-
-        // newMesh.setIndices(arrayObj[0].getIndices());
-
         let newMesh = new Mesh(newMeshName, scene);
 
         let vertexData = new VertexData();
@@ -115,54 +28,23 @@ class Terrain {
             }
         }
 
-        let indexOffset = 0;
-        for (let mesh of instancedMeshes) {
-            let worldMatrix = mesh.getWorldMatrix();
-
-            let meshPositions = mesh.getVerticesData(VertexBuffer.PositionKind);
-            let meshIndices = mesh.getIndices();
-            let meshNormals = mesh.getVerticesData(VertexBuffer.NormalKind);
-            let meshUVs = mesh.getVerticesData(VertexBuffer.UVKind);
-            
-            for (let f of meshIndices) {
-                indices.push(f + indexOffset);
-            }
-
-            if (meshUVs != null) {
-                for (let uv of meshUVs) {
-                    uvs.push(uv);
-                }
-            } else {
-                for (let i = 0; i < meshPositions.length / 3; i += 1) {
-                    uvs.push(0);
-                    uvs.push(0);
-                }
-            }
-    
-            for (let ite = 0; ite != meshPositions.length; ite += 3) {
-                let vertex = Vector3.TransformCoordinates(new Vector3(meshPositions[ite], meshPositions[ite + 1], meshPositions[ite + 2]), worldMatrix);
-                positions.push(vertex.x);
-                positions.push(vertex.y);
-                positions.push(vertex.z);
-            }
-
-            indexOffset = positions.length / 3;
-            
-            for (let ite = 0; ite != meshNormals.length; ite += 3) {
-                let v = new Vector3(meshNormals[ite], meshNormals[ite + 1], meshNormals[ite + 2]);
-                let vertex = Vector3.TransformNormal(v, worldMatrix);
-                vertex.normalize();
-                normals.push(vertex.x);
-                normals.push(vertex.y);
-                normals.push(vertex.z);
-            }
+        let orderedMeshes = [];
+        for (let instancedMesh of instancedMeshes) {
+            orderedMeshes.push(instancedMesh);
+        }
+        for (let pureMesh of pureMeshes) {
+            orderedMeshes.push(pureMesh);
         }
 
-        for (let mesh of pureMeshes) {
-
+        let indexOffset = 0;
+        for (let mesh of orderedMeshes) {
             let worldMatrix = mesh.getWorldMatrix();
 
             let meshPositions = mesh.getVerticesData(VertexBuffer.PositionKind);
+            if (meshPositions == null) {// TODO investigate
+                continue;
+            }
+
             let meshIndices = mesh.getIndices();
             let meshNormals = mesh.getVerticesData(VertexBuffer.NormalKind);
             let meshUVs = mesh.getVerticesData(VertexBuffer.UVKind);
@@ -213,24 +95,6 @@ class Terrain {
         vertexData.indices = indices;
         vertexData.normals = normals;
         vertexData.uvs = uvs;
-
-        // vertexData.positions = arrayObj[0].getVerticesData(VertexBuffer.PositionKind);
-        // vertexData.indices = arrayObj[0].getIndices();
-        // vertexData.normals = arrayObj[0].getVerticesData(VertexBuffer.NormalKind);
-        // vertexData.uvs = arrayObj[0].getVerticesData(VertexBuffer.UVKind);
-
-        //VertexData.ComputeNormals(vertexData.positions, vertexData.indices, vertexData.normals);
-
-        // for (var ite = 0; ite != vertexData.positions.length; ite += 3) {
-        //     var vertex = Vector3.TransformCoordinates(new Vector3(vertexData.positions[ite], vertexData.positions[ite + 1], vertexData.positions[ite + 2]), worldMatrix);
-        //     // savedPosition.push(vertex.x);
-        //     // savedPosition.push(vertex.y);
-        //     // savedPosition.push(vertex.z);
-        //     vertexData.positions[ite] = vertex.x;
-        //     vertexData.positions[ite + 1] = vertex.y;
-        //     vertexData.positions[ite + 2] = vertex.z;
-        // }
-
         vertexData.applyToMesh(newMesh);
 
         return newMesh;
@@ -252,7 +116,7 @@ class Terrain {
         let terrainMaterial = new PBRMaterial("Terrain material", scene);
         terrainMaterial.metallic = 0.0;
         terrainMaterial.albedoTexture = terrainTexture;
-        terrainMaterial.backFaceCulling = false;
+        terrainMaterial.backFaceCulling = true;
 
         // let terrainMaterial = new StandardMaterial("Terrain material", scene);
         // terrainMaterial.diffuseTexture = terrainTexture;
@@ -317,6 +181,12 @@ class Terrain {
         let terrainMesh = this.mergeMeshes("Terrain", terrainMeshes, scene);
         terrainMesh.isPickable = false;
         terrainMesh.material = terrainMaterial;
+        // terrainMaterial.freeze();
+        // scene.onAfterRenderObservable.add(() => {
+            // scene.onAfterRenderObservable.clear();
+            // terrainMaterial.freeze();
+            // console.log("Frozen");
+        // });
         water.addToRenderList(terrainMesh);
 
         // for (let mesh of terrainMeshes) {

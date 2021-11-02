@@ -270,7 +270,18 @@ img {
 }
 
 .card {
-    flex: 0 1 200px;
+    position: absolute;
+    display: block;
+    width: auto;
+    height: auto;
+    /* height: 200px; */
+    /* width: auto; */
+    /* margin-left: -50px; */
+    /* flex: 0 1 auto; */
+    /* object-fit: contain; */
+    /* width: auto; */
+    /* height: auto; */
+    /* aspect-ratio: 1/2.5; */
     /* max-height: 300px; */
     /* min-height: 300px; */
     /* min-width: 20%; */
@@ -278,11 +289,28 @@ img {
     /* width: 10; */
     /* height: 100px; */
     /* background-color: hotpink; */
-    margin-left: -50px;
+    /* margin-left: -50px; */
     transition: transform ease-in-out 0.1s;
     pointer-events: all;
     /* transform: translate(0, -50px); */
     /* border */
+    /* width: 100%; */
+    box-shadow: 0 10px 16px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%) !important;
+    border-radius: 10%/7%;
+    overflow: hidden;
+}
+
+.cardimg {
+    flex: 1 1 35px;
+    overflow: visible;
+    max-width: 100px;
+    min-width: 35px;
+    height: 200px;
+}
+
+#cs:last-child {
+    /* max-width: 131px; */
+    /* max-width: 131px; */
 }
 
 .card img {
@@ -291,38 +319,6 @@ img {
     border-radius: 10%/7%;
     overflow: hidden;
     /* object-fit: cover; */
-}
-
-.card:nth-child(1) {
-    transform: rotate(-10deg) translate(0, 15px);
-}
-
-.card:nth-child(2) {
-    transform: rotate(0deg);
-}
-
-.card:nth-child(3) {
-    transform: rotate(10deg) translate(0, 15px);
-}
-
-.card:nth-child(4) {
-    transform: rotate(20deg) translate(-5px, 60px);
-}
-
-.card:nth-child(1):hover {
-    transform: translate(0, -30px) rotate(-10deg);
-}
-
-.card:nth-child(2):hover {
-    transform: translate(0, -45px) rotate(0deg);
-}
-
-.card:nth-child(3):hover {
-    transform: translate(0, -30px) rotate(10deg);
-}
-
-.card:nth-child(4):hover {
-    transform: translate(0, 0px) rotate(20deg);
 }
 
 #hudtop {
@@ -361,11 +357,12 @@ img {
 
 #hudbottom {
     justify-content: center;
+    margin-bottom: 20px;
 }
 
 #actionbtnwrapper {
     flex: 2 1;
-    height: 300px;
+    /* height: 300px; */
 }
 
 #actionbtnwrapper2 {
@@ -414,11 +411,13 @@ img {
         font-size: large;
         border-radius: 5px;
         outline-width: 3px;
-        /* text-align: center; */
+    }
+    .cardimg {
+        height: 100px;
     }
 }
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (max-width: 850px) {
     #buttons {
         flex-direction: column;
         align-items: stretch;
@@ -428,7 +427,7 @@ img {
     }
 }
 
-@media only screen and (max-width: 650px) {
+@media only screen and (max-width: 700px) {
     #actionbtnwrapper2 {
         justify-content: flex-end;
         margin-right: 10px;
@@ -442,6 +441,65 @@ img {
     }
 }
 
+@media only screen and (max-width: 500px) {
+    #actionbtnwrapper2 {
+        justify-content: flex-end;
+        margin-right: 10px;
+    }
+    #minimapwrapper {
+        display: none;
+    }
+    #buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .actionbtn {
+        font-size: medium;
+        text-align: center;
+        outline-width: 3px;
+        margin: 3px 0px 0 3px;
+        padding: 0 3px;
+    }
+    #hudleft {
+        margin-left: 10px;
+        outline-width: 3px;
+    }
+    #hudright {
+        outline-width: 3px;
+    }
+    #hudbottom {
+        margin-bottom: 10px;
+    }
+    .buccaneer.icon {
+        max-height: 32px;
+    }
+    .cardcount {
+        font-size: large;
+    }
+    .treasure {
+        width: 25px;
+        height: 25px;
+        border-radius: 5px;
+        margin-top: -25px;
+    }
+    .treasure img {
+        width: 22px;
+        height: 22px;
+    }
+    .boat {
+        width: 150px;
+        height: 54px;
+    }
+    .city {
+        font-size: x-large;
+    }
+    .btn {
+        font-size: medium;
+        border-radius: 5px;
+        outline-width: 3px;
+    }
+}
+
 
 /* @media only screen and (max-width: 1200px) {
     .actionbtn {
@@ -452,3 +510,22 @@ img {
         height: 150px;
     }
 } */
+
+
+/*============================ TRADE ============================*/
+
+.tradebtn {
+    border-radius: 10px;
+    font-family: pirate;
+    font-size: x-large;
+    font-weight: bolder;
+    padding: 20px;
+    margin: 20px;
+}
+
+
+/*============================ VIEW CONTROLS ============================*/
+
+.cameralocktoggleon {
+    box-shadow: 0px 0px 0px 4px white;
+}

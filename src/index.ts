@@ -12,8 +12,6 @@ import * as BABYLON from "@babylonjs/core";
 import { AI } from "./ai";
 import { Player } from "./player";
 import { Terrain } from "./terrain";
-import { BaseCameraPointersInput } from '@babylonjs/core/Cameras/Inputs/BaseCameraPointersInput';
-
 import $ from "jquery";
 
 let hudVisible = true;
@@ -42,8 +40,6 @@ if ('serviceWorker' in navigator) {
         });
     });
 }
-
-$("#btnClosePopup").on("click", () => $("#popup").fadeOut());
 
 const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("renderCanvas"); // Get the canvas element
 canvas.onselectstart = function () { return false; }
@@ -212,6 +208,12 @@ let createdParticleSystem = false;
 
 let currentTurnPortIndex = 7;
 
+let drawnCard;
+let lastFPSUpdate = performance.now();
+let fpsText = $("#fps");
+
+let isCameraLockedToPlayerBoat = false;
+
 let cardDeck = [];
 for (let cardIndex = 0; cardIndex < 30; cardIndex++) {
     cardDeck.push(cardIndex);
@@ -317,9 +319,6 @@ function updateTurn(currentPort, newPort) {
     }, 1000);
 }
 
-let drawnCard;
-let lastFPSUpdate = performance.now();
-let fpsText = $("#fps");
 const updateGame = function () {
 
     if (performance.now() - lastFPSUpdate > 1000) {
@@ -343,14 +342,20 @@ const updateGame = function () {
         }
     }
 
+    // Manage camera:
     if (camera.beta > 1.4) {
         camera.beta = 1.4;
     }
-
     let cameraToTarget = camera.target.subtract(camera.position);
     let f = camera.target.y / cameraToTarget.y;
     camera.target.subtractInPlace(cameraToTarget.scale(f));
     camera.position.subtractInPlace(cameraToTarget.scale(f));
+    if (isCameraLockedToPlayerBoat) {
+        camera.target.copyFrom(boats[0].baseTransform.position);
+        camera.beta = 1;
+        camera.alpha = -Math.PI / 2 - boats[0].baseTransform.rotation.y;
+        camera.radius = 15;
+    }
 
 
     // camera.target.y = 0;
@@ -416,8 +421,7 @@ const updateGame = function () {
 }
 
 const createScene = function () {
-
-
+    $("#btnClosePopup").on("click", () => $("#popup").fadeOut());
     $("#actionbtnturn").on({
         click: () => {
             $("#actionbtnturn").addClass("disabled");
@@ -433,6 +437,67 @@ const createScene = function () {
     
     $('#btnrules').on("click", () => {
         $("#rules").fadeIn();
+    });
+
+    $("#btnhome").on("pointerdown", () => {
+        let p = boats[0].port;
+        let pl = p.portLocation;
+        camera.target.copyFrom(pl);
+        camera.target.x += 0.5;
+        camera.target.z += 0.5;
+        if (pl.x <= -12) {
+            camera.alpha = Math.PI;
+        } else if (pl.x >= 12) {
+            camera.alpha = 0;
+        } else if (pl.z <= -12) {
+            camera.alpha = -Math.PI / 2;
+        } else if (pl.z >= 12) {
+            camera.alpha = Math.PI / 2;
+        }
+        camera.beta = 1;
+        camera.radius = 15;
+
+        let button = $("#btncameralockboat");
+        if (button.hasClass("cameralocktoggleon")) {
+            button.removeClass("cameralocktoggleon");
+            isCameraLockedToPlayerBoat = false;
+        }
+    });
+    
+    $("#btncameralockboat").on("pointerdown", () => {
+        let button = $("#btncameralockboat");
+        if (button.hasClass("cameralocktoggleon")) {
+            button.removeClass("cameralocktoggleon");
+            isCameraLockedToPlayerBoat = false;
+        } else {
+            button.addClass("cameralocktoggleon");
+            isCameraLockedToPlayerBoat = true;
+        }
+    });
+
+    let btnChanceCards = $("#btnchancecards");
+    let btnPirateCards = $("#btnpiratecards");
+    btnChanceCards.on("pointerdown", () => {
+        if (btnChanceCards.hasClass("cameralocktoggleon")) {
+            btnChanceCards.removeClass("cameralocktoggleon");
+        } else {
+            btnChanceCards.addClass("cameralocktoggleon");
+        }
+
+        if (btnPirateCards.hasClass("cameralocktoggleon")) {
+            btnPirateCards.removeClass("cameralocktoggleon");
+        }
+    });
+    btnPirateCards.on("pointerdown", () => {
+        if (btnPirateCards.hasClass("cameralocktoggleon")) {
+            btnPirateCards.removeClass("cameralocktoggleon");
+        } else {
+            btnPirateCards.addClass("cameralocktoggleon");
+        }
+
+        if (btnChanceCards.hasClass("cameralocktoggleon")) {
+            btnChanceCards.removeClass("cameralocktoggleon");
+        }
     });
 
     SceneLoader.OnPluginActivatedObservable.addOnce(loader => {

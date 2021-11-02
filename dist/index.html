@@ -12,14 +12,77 @@
     <link rel="manifest" href="manifest.webmanifest">
 
     <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+    <script>
+        function isOverflown(element) {
+            return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
+        }
+
+        let numCards = 7;
+        setInterval(() => {
+            let c = $("#c1");
+            let cards = $("#cs");
+
+            // if (isOverflown(cards[0])) {
+            // console.log("Overflowing");
+
+            let element = cards[0];
+            let aspect = 600 / 394;
+            let defaultCardWidth = 200 / aspect;
+            let scaleFactor = Math.min(1, element.clientWidth / (defaultCardWidth * (1 + 0.25 * (numCards - 1))));
+            let cw = scaleFactor * defaultCardWidth;
+            var elements = document.querySelectorAll('.card');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.width = cw + "px";
+            }
+
+            elements = document.querySelectorAll('.cardimg');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.minWidth = (cw * 0.25) + "px";
+                // elements[i].style.height = (cw * aspect) + "px";
+            }
+
+            // console.log((element.clientWidth / element.scrollWidth) * (200 / aspect));
+            // }
+
+
+
+            if (numCards < 52) {
+                numCards++;
+                cards.append(c.clone(true, true));
+            }
+        }, 100);
+
+        window.onresize = () => {
+            let c = $("#c1");
+            let cards = $("#cs");
+
+            // if (isOverflown(cards[0])) {
+            console.log("Overflowing");
+
+            let element = cards[0];
+            let aspect = 600 / 394;
+            let defaultCardWidth = 200 / aspect;
+            let scaleFactor = Math.min(1, element.clientWidth / (defaultCardWidth * (1 + 0.25 * (numCards - 1))));
+            let cw = scaleFactor * defaultCardWidth;
+            var elements = document.querySelectorAll('.card');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.width = cw + "px";
+            }
+
+            elements = document.querySelectorAll('.cardimg');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.minWidth = (cw * 0.25) + "px";
+            }
+        }
+    </script>
 </head>
 
 <body>
     <canvas id="renderCanvas" class="" touch-action="none"></canvas>
 
-    <!-- <div class=" " style="position: fixed; width: 100%; left: 0; bottom: 0; pointer-events: none; ">
+    <!-- <div id="cards" class=" " style="position: fixed; width: 100%; left: 0; bottom: 0; pointer-events: none; ">
         <div id="cards " class="container " style="max-width: 50%; height: 300px; margin-left: auto; margin-right: auto; bottom: 0; flex-direction: row; justify-content: space-evenly; ">
             <div class="container cards " style="flex-direction: row; ">
                 <div class="card ">
@@ -72,11 +135,11 @@
         </div>
 
         <!-- Bottom HUD -->
-        <div id="hudbottom" class="container" style="flex: 0 0 auto; flex-direction: row; align-items: flex-end; margin-bottom: 20px; transition: transform ease-in-out 0.3s;">
+        <div id="hudbottom" class="container" style="flex: 0 0 auto; flex-direction: row; align-items: flex-end; transition: transform ease-in-out 0.3s;">
 
             <!-- City HUD -->
             <div class="container" style="flex: 1 1;">
-                <div id="hudleft" class="column hudleft clickable" style="flex: 0 1 auto; background-color: #6A9023;">
+                <div id="hudleft" class="column hudleft clickable" style="z-index: 1; flex: 0 1 auto; background-color: #6A9023;">
 
                     <div id="cityname" class="city" style="flex: 1 1 auto;">BOMBAY</div>
 
@@ -100,7 +163,7 @@
 
 
                         <!-- Pirate count + fighting strength -->
-                        <div class="column dummycell cellbtn" style="align-items: stretch; padding-top: 0; padding-bottom: 0;">
+                        <div id="btnpiratecards" class="column dummycell cellbtn" style="align-items: stretch; padding-top: 0; padding-bottom: 0;">
                             <div class="row" style="flex: 1; align-items: center; padding-left: 0px;">
                                 <img src="assets/PirateIcon.png" alt="" class="buccaneer icon" style="height: 48px">
                                 <div style="flex: 1"></div>
@@ -115,17 +178,17 @@
                         </div>
 
                         <!-- Rules + card button UI -->
-                        <div id="btnrules" class="dummycell container cellbtn " style="justify-content: center; align-items: center; ">
-                            <img src="assets/RulesIcon.png " alt=" " class="buccaneer icon ">
+                        <div id="btnrules" class="dummycell container cellbtn" style="justify-content: center; align-items: center; ">
+                            <img src="assets/RulesIcon.png" alt=" " class="buccaneer icon ">
                         </div>
-                        <div class="dummycell container cellbtn " style="justify-content: center; align-items: center; ">
-                            <img src="assets/CamHomeIcon.png " alt=" " class="buccaneer icon ">
+                        <div id="btnhome" class="dummycell container cellbtn" style="justify-content: center; align-items: center; ">
+                            <img src="assets/CamHomeIcon.png" alt=" " class="buccaneer icon ">
                         </div>
-                        <div class="dummycell container cellbtn " style="justify-content: center; align-items: center; ">
-                            <img src="assets/CamLockBoatIcon.png " alt=" " class="buccaneer icon ">
+                        <div id="btncameralockboat" class="dummycell container cellbtn" style="justify-content: center; align-items: center; ">
+                            <img src="assets/CamLockBoatIcon.png" alt=" " class="buccaneer icon ">
                         </div>
-                        <div class="dummycell container cellbtn " style="justify-content: center; align-items: center; ">
-                            <img src="assets/CardIcon.png " alt=" " class="buccaneer icon ">
+                        <div id="btnchancecards" class="dummycell container cellbtn" style="justify-content: center; align-items: center; ">
+                            <img src="assets/CardIcon.png" alt=" " class="buccaneer icon ">
                             <div style="flex: 1"></div>
                             <div id="chancecardcount" class="cardcount ">6</div>
                         </div>
@@ -134,8 +197,43 @@
             </div>
 
             <!-- Action buttons -->
-            <div id="actionbtnwrapper" class="container ">
-                <div id="actionbtnwrapper2" class="row ">
+            <div id="actionbtnwrapper" class="column" style=" ">
+                <div class="row">
+                    <!-- <div></div> -->
+                    <!-- <div class="dbg3" style="flex: 1 1"></div> -->
+                    <div id="cs" class="" style="display: inline-flex; flex-wrap: nowrap; flex: 1 0 auto; overflow:visible; width: 0; pointer-events: all; height: 200px; justify-content: center; overflow: hidden; align-items: flex-end;">
+                        <div id="c1" class="cardimg"><img class="card" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
+                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Black 3 NoWear.png " alt=" "></div>
+                        <!-- <div style="width: 150px;"></div> -->
+                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 1 NoWear.png " alt=" "></div>
+                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
+                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
+                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
+                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
+                        <!-- <div style="flex: 0 0 80px;"></div> -->
+
+                        <!-- <img class="card" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "> -->
+                        <!-- </div> -->
+                        <!-- 
+                        <img class="card" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" ">
+                        <img class="card" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" ">
+                        <img class="card" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "> -->
+                        <!-- </div> -->
+                        <!-- <div class="card ">
+                            <img src="assets/pirates/Pirate Red 3 NoWear.png " alt=" ">
+                        </div>
+                        <div class="card ">
+                            <img src="assets/pirates/Pirate Red 3 NoWear.png " alt=" ">
+                        </div>
+                        <div class="card ">
+                            <img src="assets/pirates/Pirate Red 3 NoWear.png " alt=" ">
+                        </div> -->
+                    </div>
+                    <!-- <div class="dbg3" style="flex: 1 1"></div> -->
+                </div>
+
+
+                <div id="actionbtnwrapper2" class="row" style="z-index: 1; flex: 0 0 auto">
                     <div id="buttons" class="row ">
                         <div id="actionbtnturn" class="actionbtn " style="flex: 0 1; white-space: nowrap; ">END TURN</div>
                         <div id="actionbtnattacktrade" class="actionbtn disabled " style="flex: 0 1 ">ATTACK!</div>
@@ -146,7 +244,7 @@
             </div>
 
             <!-- Minimap -->
-            <div id="minimapwrapper" class="row " style="flex: 1 1; height: 300px; justify-content: flex-end; align-items: flex-end; ">
+            <div id="minimapwrapper" class="row " style="z-index: 1; flex: 1 1; /*height: 300px;*/ justify-content: flex-end; align-items: flex-end; ">
                 <div id="hudright" class=" " style="background-color: darkred; max-width: fit-content; max-height: fit-content; ">
                     <canvas id="minimap" class="clickable minimap " style="position: absolute; "></canvas>
                     <img class="minimap" src="assets/MiniBoard_NoBorder.png " alt=" " style=" ">
@@ -198,7 +296,23 @@
         </div>
     </div>
 
-    <div id="loadingcover" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none; overflow: hidden; background-color: black;"></div>
+    <div class="container" style="display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; justify-content: center; align-items: center;">
+        <div class="row" style="width: calc(100vw - 100px); height: calc(100vh - 100px); ">
+            <div class="dbg1" style="flex: 1 1"></div>
+
+            <div class="dbg2 column" style="flex: 0 1 100px; justify-content: center;">
+                <div class="dbg4 tradebtn"><i class="fa fa-arrow-left" style="padding-left: 5px;"></i></div>
+                <div class="dbg4 tradebtn"><i class="fa fa-arrow-right" style="padding-left: 5px;"></i></div>
+            </div>
+
+            <div class="dbg3" style="flex: 1 1"></div>
+
+        </div>
+    </div>
+
+
+
+    <div id="loadingcover" style="z-index: 100; position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none; overflow: hidden; background-color: black;"></div>
 
     <script src="main.js "></script>
 </body>
