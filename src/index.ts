@@ -13,6 +13,7 @@ import { AI } from "./ai";
 import { Player } from "./player";
 import { Terrain } from "./terrain";
 import $ from "jquery";
+import { initialiseHUD } from './hud';
 
 let hudVisible = true;
 $('#settings').on("click",
@@ -69,10 +70,32 @@ class Buccaneer {
     readonly scene: Scene;
     readonly soundEngine: SoundEngine;
     readonly assetManager: AssetManager;
-    camera: Camera;
+    camera: ArcRotateCamera = null;
     readonly settings;
 
     water: WaterMaterial;
+
+    selectedBoat = null;
+    boatMesh = null;
+    boats: Boat[] = [];
+    chestLid;
+    cardAnimation;
+
+    time = 0;
+
+    boatIndex = 0;
+
+    wasBoatAtPirateIsland = false;
+    chestAnimationStartTime = 0;
+    createdParticleSystem = false;
+
+    currentTurnPortIndex = 7;
+
+    drawnCard;
+    lastFPSUpdate = performance.now();
+    fpsText = $("#fps");
+
+    isCameraLockedToPlayerBoat = false;
 
     constructor(scene: Scene) {
         this.scene = scene;
@@ -86,17 +109,17 @@ class Buccaneer {
     }
 
     nextTurn() {
-        let currentTurnPort = ports[currentTurnPortIndex % 8];
+        let currentTurnPort = ports[buccaneer.currentTurnPortIndex % 8];
         while (currentTurnPort.boat == null) { // First turn only TODO
-            currentTurnPort = ports[++currentTurnPortIndex % 8];
+            currentTurnPort = ports[++buccaneer.currentTurnPortIndex % 8];
         }
 
-        currentTurnPortIndex++;
-        currentTurnPortIndex %= 8; // TODO deal with only real players
+        buccaneer.currentTurnPortIndex++;
+        buccaneer.currentTurnPortIndex %= 8; // TODO deal with only real players
 
-        let newTurnPort = ports[currentTurnPortIndex % 8];
+        let newTurnPort = ports[buccaneer.currentTurnPortIndex % 8];
         while (newTurnPort.boat == null) {
-            newTurnPort = ports[++currentTurnPortIndex % 8];
+            newTurnPort = ports[++buccaneer.currentTurnPortIndex % 8];
         }
         updateTurn(currentTurnPort, newTurnPort);
     }
@@ -191,29 +214,6 @@ const buccaneer = new Buccaneer(scene);
 //     Engine.audioEngine.setGlobalVolume(0);
 // });
 
-let selectedBoat = null;
-let camera: ArcRotateCamera = null;
-let boatMesh = null;
-let boats: Boat[] = [];
-let chestLid;
-let cardAnimation;
-
-let time = 0;
-
-let boatIndex = 0;
-
-let wasBoatAtPirateIsland = false;
-let chestAnimationStartTime = 0;
-let createdParticleSystem = false;
-
-let currentTurnPortIndex = 7;
-
-let drawnCard;
-let lastFPSUpdate = performance.now();
-let fpsText = $("#fps");
-
-let isCameraLockedToPlayerBoat = false;
-
 let cardDeck = [];
 for (let cardIndex = 0; cardIndex < 30; cardIndex++) {
     cardDeck.push(cardIndex);
@@ -241,7 +241,7 @@ function screenXYToSeaPosition(screenX: number, screenY: number) {
         screenPosition
     );
 
-    let cameraPosition: Vector3 = camera.position;
+    let cameraPosition: Vector3 = buccaneer.camera.position;
     let ray = screenPosition.subtractInPlace(cameraPosition);
     let f = cameraPosition.y / ray.y;
     return cameraPosition.subtract(ray.scaleInPlace(f));
@@ -262,7 +262,7 @@ function renderMinimap() {
     minimapCtx.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
     minimapCtx.fillStyle = "#FF0000";
 
-    for (let boat of boats) {
+    for (let boat of buccaneer.boats) {
         let boatX = boat.baseTransform.position.x;
         let boatY = boat.baseTransform.position.z;
 
@@ -299,12 +299,12 @@ function renderMinimap() {
 
 function updateTurn(currentPort, newPort) {
     if (currentPort.boat.x >= -3 && currentPort.boat.z >= -3 && currentPort.boat.x <= 2 && currentPort.boat.z <= 2) {
-        drawnCard = drawCard();
+        buccaneer.drawnCard = drawCard();
         let cardMesh: Mesh = <Mesh>scene.getMeshByName("Face");
         let cardMaterial: StandardMaterial = <StandardMaterial>cardMesh.material;
         let albedoTexture: Texture = <Texture>cardMaterial.diffuseTexture;
-        albedoTexture.uOffset = (drawnCard % 8) * (1 / 8);
-        albedoTexture.vOffset = Math.floor(drawnCard / 8) * 0.19034;
+        albedoTexture.uOffset = (buccaneer.drawnCard % 8) * (1 / 8);
+        albedoTexture.vOffset = Math.floor(buccaneer.drawnCard / 8) * 0.19034;
 
         scene.getAnimationGroupByName("ChanceReveal").play();
     }
@@ -321,21 +321,21 @@ function updateTurn(currentPort, newPort) {
 
 const updateGame = function () {
 
-    if (performance.now() - lastFPSUpdate > 1000) {
-        fpsText.text(engine.getFps().toFixed() + "");
-        lastFPSUpdate = performance.now();
+    if (performance.now() - buccaneer.lastFPSUpdate > 1000) {
+        buccaneer.fpsText.text(engine.getFps().toFixed() + "");
+        buccaneer.lastFPSUpdate = performance.now();
     }
 
-    time = performance.now() * 0.001;
+    buccaneer.time = performance.now() * 0.001;
 
     renderMinimap();
 
     buccaneer.soundEngine.doAmbientSounds();
 
     let boatAtPirateIsland = false;
-    for (let boat of boats) {
+    for (let boat of buccaneer.boats) {
         // console.log(boat);
-        boat.update(time);
+        boat.update(buccaneer.time);
 
         if (boat.x >= -3 && boat.z >= -3 && boat.x <= 2 && boat.z <= 2) {
             boatAtPirateIsland = true;
@@ -343,6 +343,7 @@ const updateGame = function () {
     }
 
     // Manage camera:
+    let camera = buccaneer.camera;
     if (camera.beta > 1.4) {
         camera.beta = 1.4;
     }
@@ -350,10 +351,10 @@ const updateGame = function () {
     let f = camera.target.y / cameraToTarget.y;
     camera.target.subtractInPlace(cameraToTarget.scale(f));
     camera.position.subtractInPlace(cameraToTarget.scale(f));
-    if (isCameraLockedToPlayerBoat) {
-        camera.target.copyFrom(boats[0].baseTransform.position);
+    if (buccaneer.isCameraLockedToPlayerBoat) {
+        camera.target.copyFrom(buccaneer.boats[0].baseTransform.position);
         camera.beta = 1;
-        camera.alpha = -Math.PI / 2 - boats[0].baseTransform.rotation.y;
+        camera.alpha = -Math.PI / 2 - buccaneer.boats[0].baseTransform.rotation.y;
         camera.radius = 15;
     }
 
@@ -366,13 +367,9 @@ const updateGame = function () {
     // console.log(camera.inputs.attached.pointers);
     // camera.zoomOnFactor = 1.0;
 
-    if (selectedBoat !== null) {
-        selectedBoat.rotate(new BABYLON.Vector3(0, 1, 0), 0.02, BABYLON.Space.WORLD);
-    }
-
-    if (wasBoatAtPirateIsland != boatAtPirateIsland) {
-        wasBoatAtPirateIsland = boatAtPirateIsland;
-        chestAnimationStartTime = time;
+    if (buccaneer.wasBoatAtPirateIsland != boatAtPirateIsland) {
+        buccaneer.wasBoatAtPirateIsland = boatAtPirateIsland;
+        buccaneer.chestAnimationStartTime = buccaneer.time;
 
         if (boatAtPirateIsland) {
             buccaneer.soundEngine.chestOpen();
@@ -381,17 +378,17 @@ const updateGame = function () {
         } else {
             buccaneer.soundEngine.chestClose();
 
-            createdParticleSystem = false;
+            buccaneer.createdParticleSystem = false;
         }
     }
-    let chestAnimationProgress = (time - chestAnimationStartTime);
+    let chestAnimationProgress = (buccaneer.time - buccaneer.chestAnimationStartTime);
     if (chestAnimationProgress >= 1) {
         chestAnimationProgress = 1;
     }
 
     if (boatAtPirateIsland && chestAnimationProgress > 0.0) {
-        if (!createdParticleSystem) {
-            createdParticleSystem = true;
+        if (!buccaneer.createdParticleSystem) {
+            buccaneer.createdParticleSystem = true;
 
             const particleSystem = new ParticleSystem("particles", 200, scene);
 
@@ -421,89 +418,13 @@ const updateGame = function () {
 }
 
 const createScene = function () {
-    $("#btnClosePopup").on("click", () => $("#popup").fadeOut());
-    $("#actionbtnturn").on({
-        click: () => {
-            $("#actionbtnturn").addClass("disabled");
-            buccaneer.soundEngine.buttonClick();
-            buccaneer.nextTurn();
-        },
-        mouseover: () => { buccaneer.soundEngine.buttonHover() }
-    });
-
-    $("#rules").on("click", () => {
-        $("#rules").fadeOut();
-    });
-    
-    $('#btnrules').on("click", () => {
-        $("#rules").fadeIn();
-    });
-
-    $("#btnhome").on("pointerdown", () => {
-        let p = boats[0].port;
-        let pl = p.portLocation;
-        camera.target.copyFrom(pl);
-        camera.target.x += 0.5;
-        camera.target.z += 0.5;
-        if (pl.x <= -12) {
-            camera.alpha = Math.PI;
-        } else if (pl.x >= 12) {
-            camera.alpha = 0;
-        } else if (pl.z <= -12) {
-            camera.alpha = -Math.PI / 2;
-        } else if (pl.z >= 12) {
-            camera.alpha = Math.PI / 2;
-        }
-        camera.beta = 1;
-        camera.radius = 15;
-
-        let button = $("#btncameralockboat");
-        if (button.hasClass("cameralocktoggleon")) {
-            button.removeClass("cameralocktoggleon");
-            isCameraLockedToPlayerBoat = false;
-        }
-    });
-    
-    $("#btncameralockboat").on("pointerdown", () => {
-        let button = $("#btncameralockboat");
-        if (button.hasClass("cameralocktoggleon")) {
-            button.removeClass("cameralocktoggleon");
-            isCameraLockedToPlayerBoat = false;
-        } else {
-            button.addClass("cameralocktoggleon");
-            isCameraLockedToPlayerBoat = true;
-        }
-    });
-
-    let btnChanceCards = $("#btnchancecards");
-    let btnPirateCards = $("#btnpiratecards");
-    btnChanceCards.on("pointerdown", () => {
-        if (btnChanceCards.hasClass("cameralocktoggleon")) {
-            btnChanceCards.removeClass("cameralocktoggleon");
-        } else {
-            btnChanceCards.addClass("cameralocktoggleon");
-        }
-
-        if (btnPirateCards.hasClass("cameralocktoggleon")) {
-            btnPirateCards.removeClass("cameralocktoggleon");
-        }
-    });
-    btnPirateCards.on("pointerdown", () => {
-        if (btnPirateCards.hasClass("cameralocktoggleon")) {
-            btnPirateCards.removeClass("cameralocktoggleon");
-        } else {
-            btnPirateCards.addClass("cameralocktoggleon");
-        }
-
-        if (btnChanceCards.hasClass("cameralocktoggleon")) {
-            btnChanceCards.removeClass("cameralocktoggleon");
-        }
-    });
+    initialiseHUD(buccaneer);
 
     SceneLoader.OnPluginActivatedObservable.addOnce(loader => {
         (<GLTFFileLoader>loader).animationStartMode = GLTFLoaderAnimationStartMode.NONE;
     });
 
+    let camera = buccaneer.camera;
     camera = new ArcRotateCamera("camera", -3 * Math.PI / 4, Math.PI / 3, 50, new BABYLON.Vector3(0, 0, 0), scene);
     camera.lowerRadiusLimit = 5;
     camera.upperRadiusLimit = 100;
@@ -579,7 +500,7 @@ const createScene = function () {
         terrain.loadTerrain(buccaneer);
         buccaneer.water.addToRenderList(skybox);
 
-        boatMesh = scene.getMeshByName("Boat");
+        buccaneer.boatMesh = scene.getMeshByName("Boat");
 
         let portMeshes = [];
         for (let i = 0; i < 8; i++) {
@@ -589,15 +510,15 @@ const createScene = function () {
         for (let i = 0; i < 8; i++) {
             safes[i] = scene.getMeshByName("Safe" + i);
         }
-        chestLid = scene.getNodeByID("ChestLid");
+        buccaneer.chestLid = scene.getNodeByID("ChestLid");
 
         scene.getAnimationGroupByName("ChanceReveal").onAnimationEndObservable.add(() => {
-            $("#chancecard").attr("src", "assets/cards/Chance " + (drawnCard + 1) + ".png");
+            $("#chancecard").attr("src", "assets/cards/Chance " + (buccaneer.drawnCard + 1) + ".png");
             $("#popup").fadeIn();
         });
 
         let playerPort = ports[randomInt(7)];
-        boats.push(new Player(playerPort.portLocation.x, playerPort.portLocation.z, playerPort, buccaneer));
+        buccaneer.boats.push(new Player(playerPort.portLocation.x, playerPort.portLocation.z, playerPort, buccaneer));
 
         let numPlayers = 1;//randomInt(5) + 2;
         for (let i = 0; i < numPlayers; i++) {
@@ -606,7 +527,7 @@ const createScene = function () {
             let portLocation = port.portLocation;
             let boat: Boat;
             boat = new AI(portLocation.x, portLocation.z, port, buccaneer);
-            boats.push(boat);
+            buccaneer.boats.push(boat);
 
         }
 
@@ -614,7 +535,7 @@ const createScene = function () {
             port.init(buccaneer);
         }
 
-        boatMesh.parent.dispose();
+        buccaneer.boatMesh.parent.dispose();
 
         buccaneer.soundEngine.init(scene);
 

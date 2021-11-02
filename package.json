@@ -14,6 +14,7 @@
     "@babylonjs/inspector": "^4.2.0",
     "@babylonjs/materials": "^4.2.0",
     "@types/jquery": "^3.5.8",
+    "@types/resize-observer-browser": "^0.1.6",
     "jquery": "^3.6.0",
     "speed-measure-webpack-plugin": "^1.5.0",
     "ts-loader": "^9.2.6",

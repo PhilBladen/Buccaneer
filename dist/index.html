@@ -13,63 +13,6 @@
 
     <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-    <script>
-        function isOverflown(element) {
-            return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
-        }
-
-        function layoutCards() {
-            // return;
-            let c = $("#c1");
-            let cards = $("#cs");
-
-            // if (isOverflown(cards[0])) {
-            // console.log("Overflowing");
-
-            let element = cards[0];
-            let aspect = 600 / 394;
-            let defaultCardWidth = 200 / aspect;
-            let scaleFactor = Math.min(1, (element.clientWidth) / (defaultCardWidth * (1 + 0.25 * (numCards - 1 + 1))));
-            let cw = scaleFactor * defaultCardWidth;
-            let elements = document.querySelectorAll('.card');
-            for (var i = 0; i < elements.length; i++) {
-                elements[i].style.width = cw + "px";
-                elements[i].style.marginLeft = (-0.375 * cw) + "px";
-            }
-            console.log(cw);
-            // element.style.paddingRight = cw * 0.75 + "px";
-
-            elements = document.querySelectorAll('.cardimg');
-            for (var i = 0; i < elements.length; i++) {
-                elements[i].style.minWidth = (cw * 0.25) + "px";
-                elements[i].style.maxWidth = (cw * 0.25) + "px";
-
-                // elements[i].style.height = (cw * aspect) + "px";
-            }
-
-            // cards.css('transform', 'scale(' + scaleFactor + ')');
-        }
-
-        let numCards = 7;
-        setInterval(() => {
-            let cards = $("#cs");
-            let c = $("#c1");
-            if (numCards < 15) {
-                numCards++;
-                cards.append(c.clone(true, true));
-                layoutCards();
-            }
-        }, 100);
-
-        window.onresize = () => {
-            layoutCards();
-        }
-
-        window.onload = () => {
-            layoutCards();
-        }
-    </script>
 </head>
 
 <body>
@@ -192,18 +135,27 @@
             <!-- Action buttons -->
             <div id="actionbtnwrapper" class="column" style="">
                 <!-- <div class="row"> -->
-                <!-- <div></div> -->
                 <!-- <div class="dbg3" style="flex: 1 1 200px"></div> -->
 
-                <div id="cs" class="" style="flex: 1 1 200px; display: inline-flex; flex-wrap: nowrap; overflow:visible; pointer-events: all; justify-content: center; align-items: flex-end;">
-                    <div class="cardimg"><img class="card noshadow" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
-                    <div class="cardimg"><img class="card" src="assets/pirates/Pirate Black 3 NoWear.png " alt=" "></div>
-                    <!-- <div style="width: 150px;"></div> -->
-                    <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 1 NoWear.png " alt=" "></div>
-                    <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
-                    <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
-                    <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
-                    <div id="c1" class="cardimg"><img class="card" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
+                <div class="row">
+                    <div id="cs" class="cardviewer row" style="display: none;">
+                        <div class="cardimg"><img class="card noshadow" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
+                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Black 3 NoWear.png " alt=" "></div>
+                        <!-- <div style="width: 150px;"></div> -->
+                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 1 NoWear.png " alt=" "></div>
+                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
+                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
+                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
+                        <div id="c1" class="cardimg"><img class="card" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
+                    </div>
+                    <div id="chancecardviewer" class="cardviewer row" style="display: none;">
+                        <div class="cardimg2"><img class="card2 noshadow" src="assets/cards/Chance 12.png" alt=" "></div>
+                        <div class="cardimg2"><img class="card2" src="assets/cards/Chance 24.png" alt=" "></div>
+                        <div class="cardimg2"><img class="card2" src="assets/cards/Chance 2.png" alt=" "></div>
+                        <div class="cardimg2"><img class="card2" src="assets/cards/Chance 30.png" alt=" "></div>
+                        <div class="cardimg2"><img class="card2" src="assets/cards/Chance 22.png" alt=" "></div>
+                        <div class="cardimg2"><img class="card2" src="assets/cards/Chance 15.png" alt=" "></div>
+                    </div>
                 </div>
 
 
@@ -240,263 +192,28 @@
     </div>
 
     <div id="rules" class="row" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; pointer-events: all;">
-        <div class="" style="font-family: pirate; font-size: 1.5em; max-width: 1500px; text-align: justify; padding: 30px; overflow: auto; background-color: blanchedalmond;">
-            <!-- <p style="text-align: center; font-weight: bold; font-size: larger;">RULES</p> -->
-            <div>
-                <!-- <h2>Instruction Sheet for the Game</h2> -->
-                <!-- <h1>BUCCANEER</h1> -->
-                <h1 style="text-align: center; ">BUCCANEER</h1>
-
-                <h2>A Game for 2 to 8 Players</h2>
-
-                <p>Kindly read the Instructions and Laws very carefully before playing.</p>
-
-                <div>
-                    <h2>THE OBJECT OF THE GAME</h2>
-
-                    <p>The idea of the game is to collect Treasure and return it to the HOME PORT consisting of a space marked "Docks", and a "Safety Zone".</p>
-
-                    <p>The winner of the game is the first player to collect Treasure to the value of 20 points, and land it safely in their Home Port.</p>
-
-                    <p>
-                        The Treasure values are as follows: <br> &nbsp&nbsp&nbsp&nbsp Diamonds &nbsp&nbsp&nbsp&nbsp Five Points <br> &nbsp&nbsp&nbsp&nbsp Rubies &nbsp&nbsp&nbsp&nbsp Five Points <br> &nbsp&nbsp&nbsp&nbsp Gold &nbsp&nbsp&nbsp&nbsp Four
-                        Points <br> &nbsp&nbsp&nbsp&nbsp Pearls &nbsp&nbsp&nbsp&nbsp Three Points <br> &nbsp&nbsp&nbsp&nbsp Rum &nbsp&nbsp&nbsp&nbsp Two Points
-                    </p>
-
-                    <p>
-                        A player may obtain Treasure by the following methods:<br> &nbsp&nbsp&nbsp&nbsp i. &nbsp&nbsp&nbsp Sailing to the coast of TREASURE ISLAND, and turning up Chance Cards which may give them Treasure or Crew. (See Rule 9.)<br> &nbsp&nbsp&nbsp&nbsp
-                        ii. &nbsp&nbsp Sailing to other Ports, and TRADING Crew Cards, Treasure, and Chance Cards value for value. (See Rule 10.)<br> &nbsp&nbsp&nbsp&nbsp iii. &nbsp By ATTACKING other ships at sea, whereupon the winner (with the greater
-                        FIGHTING STRENGTH) shall receive Treasure or Crew. (See Rule 12.)<br> &nbsp&nbsp&nbsp&nbsp iv. &nbsp&nbsp Claiming any Treasure washed overboard to FLAT ISLAND, free to any player who lands upon its coast. (See Rule 15.)
-                    </p>
-
-                </div>
-
-
-                <div>
-                    <h2>THE SETUP</h2>
-
-                    <p>
-                        1. The fundamental playing pieces of the game are:<br> &nbsp&nbsp&nbsp&nbsp i. &nbsp&nbsp&nbsp SHIPS, one allocated to each Port.<br> &nbsp&nbsp&nbsp&nbsp ii. &nbsp&nbsp CREW CARDS, each Red or Black in colour and with a point
-                        value of 1 to 3. <br> &nbsp&nbsp&nbsp&nbsp iii. &nbsp CHANCE CARDS, which detail actions including the gain of Treasure or Crew.<br> &nbsp&nbsp&nbsp&nbsp iv. &nbsp&nbsp TREASURE, values as above.
-                    </p>
-
-                    <p>2. Up to eight Players may play, each choosing a Port to represent them. All Unoccupied Ports facilitate Trading.</p>
-
-                    <p>3. Within each Unoccupied Port, items are placed for sale by Trading including Crew Cards, Treasure, and Chance Cards with trading value (if deposited by a player). At the start of play each Unoccupied Port contains:<br> &nbsp&nbsp&nbsp&nbsp
-                        i. &nbsp&nbsp&nbsp Two Crew Cards, drawn at random.<br> &nbsp&nbsp&nbsp&nbsp ii. &nbsp&nbsp Treasure, making up the "point value" of each Unoccupied Port to 8. For this purpose the highest value Treasure is used.
-                    </p>
-
-                    <p>4. Within each Port occupied by a player, no items are placed at the start of play. </p>
-
-                    <p>5. Each player is dealt six Crew Cards into their hand. The remainder of the pack is placed on Pirate Island. </p>
-
-                    <p>
-                        6. From their hand the player can ascertain the following:<br> &nbsp&nbsp&nbsp&nbsp (a) SAILING STRENGTH, which is the total value of the Crew held in the hand.<br> &nbsp&nbsp&nbsp&nbsp (b) FIGHTING STRENGTH, which is the DIFFERENCE
-                        between the totals of the Black Cards and the totals of the Red Cards held in the hand.<br> For convenience these values are automatically calculated and presented to the player.
-                    </p>
-
-                </div>
-
-                <div>
-                    <h2>THE PLAY</h2>
-
-                    <p>The first player sails their boat from their Harbour in any of the directions indicated, and is entitled to move their boat in a straight line, ant number of squares, up to but not exceeding their Sailing Strength.</p>
-
-                    <p>AT THE END OF EACH TURN THE PLAYER MUST POINT THEIR BOAT IN THE DIRECTION IN WHICH THEY INTEND TO PROCEED ON THE NEXT TURN.</p>
-
-                    <p>The turn is ended with the pressing of "End Turn" at which point the ship's position or direction cannot be modified until the next turn.</p>
-
-                    <p>Play continues in a clockwise fashion such that the second player moves their ship, and so on.</p>
-
-                    <p>If a player oes not wish to move any number of sqaures, but just desires to change their direction, this constitutes a turn.</p>
-
-                    <p>Ships can only sail in a forward direction.</p>
-
-                    <p>For further particulars, see the Laws of the Game.</p>
-
-                </div>
-
-                <div>
-                    <h2>THE LAWS OF THE GAME</h2>
-
-                    <p>(In accordance with the 1958 Regulations)</p>
-
-                    <div>
-                        <h3>1. HOME PORTS AND SHIPS</h3>
-
-                        Each player chooses a different Home Port and a corresponding ship of the same colour as the small discks under the name of the Port. A ship is in Port only when it is on that square marked Harbour.
-                    </div>
-
-                    <div>
-                        <h3>2. TREASURE</h3>
-
-                        All treasure consists of six pieces of each of the following:<br> &nbsp&nbsp&nbsp&nbsp Diamonds .. value 5 &nbsp&nbsp&nbsp&nbsp Rubies .. value 5<br> &nbsp&nbsp&nbsp&nbsp Gold .. value 4 &nbsp&nbsp&nbsp&nbsp Pearls .. value 3<br>                        &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp Rum .. value 2<br>
-                    </div>
-
-                    <div>
-                        <h3>3. DEALER</h3>
-
-                        In accordance with a physical game, the player who initiates the game will be considered the Dealer.
-                    </div>
-
-                    <div>
-                        <h3>4. CHANCE CARDS</h3>
-
-                        The Chance Cards are shuffled and placed face down on Treasure Island.
-                    </div>
-
-                    <div>
-                        <h3>5. CREW CARDS</h3>
-
-                        The Crew Cards are shuffled and 2 cards are places face up in the spaces marked "Crew and Treasure for Sale" at any Unoccupied Ports, beginning with the first of such Ports to the left of the Dealer. The cards are re-shuffled and 6 cards dealt to each
-                        player placeing the remainder of the pack face downwards on Pirate Island. <br><br> The loss of Crew Cards as the result of an attack or by any Chance Cards (excepting Nos. 2 and 22) is from a player's hand
-                        to the exclusion of any Crew Cards which may be at their Home Port.
-                    </div>
-
-                    <div>
-                        <h3>6. TREASURE AND CREW FOR SALE AT PORTS</h3>
-
-                        The Crew Cards at the Unoccupied Ports are for sale and before play begins the treasure is taken from Treasure Island and is added to the crew for sale to make a combined total value of 8 at each of such ports. The highest value treasure is used.
-                    </div>
-
-                    <div>
-                        <h3>7. PLAY</h3>
-
-                        The Dealer moves first, and they and each successive player to their left has the choice of either:<br> &nbsp&nbsp&nbsp&nbsp (a) Sailing for Treasure Island to take a chance. (See Rule 9.)<br> &nbsp&nbsp&nbsp&nbsp (b) Sailing into
-                        any port to trade. (See Rule 10.)<br> &nbsp&nbsp&nbsp&nbsp (c) Sailing to attack an Opponent. (See Rule 12.)<br><br> Note: At any turn to play either before sailing or subsequently when their ship is in their Home Port, the player
-                        may leave crew for sale.
-                    </div>
-
-                    <div>
-                        <h3>8. SAILING</h3>
-
-                        Each player has the option of entering or leaving a port by any one of the three directions indicated upon their turn (either perpendicular to the coast or on either adjacent diagonal). <br><br> Each move of a ship is made along
-                        one straight line only, which is either along a column of squares or diagonally. <br><br> The number of squares moved may be any number, but should not exceed at any time the sailing strength of a player's hand, which is the total
-                        value of all the Crew Cards of both colours in their hand. A move exceeding the sailing strength may be liable for penalty. (See Rule 16.)<br><br> In moving their ship the player must, at the END OF THE MOVE, place their ship to
-                        point in the direction they may wish to go at their next turn of play. <br><br> A player's ship shall be moved at each turn to play, except when in the player's Home Port. <br><br> Turning a ship to point in a different direction
-                        on the square it is already on constitutes a move except in any Port. <br><br> At no time shall more than two ships be on one square, excepting at the initiation of an attack, but two or more ships may be together in any Port.<br><br>                        A ship may be sailed through a square on which is an Opponent's ship, but shall stop on that square if the latter declares attack. (See Rule 12.)<br><br> Up until a player has delared the end of their move, they may choose to revise
-                        their move provided their final position is legal, except when attacked whilst sailing past an Opponent.<br><br>
-                    </div>
-
-                    <div>
-                        <h3>9. VISITING TREASURE ISLAND</h3>
-
-                        Immediately after a player's ship stops on any square directly adjacent to the coast of Treasure Island, the player takes a Chance Card which is disclosed to all players, obeys its instructions, and returns it to the base of the pile unless it is a card
-                        which has to be kept for further use.<br><br> A Chance Card shall be obeyed as completely as possible.<br><br> A ship alreadty visiting Treasure Island may continue to take a further Chance Card at each
-                        turn of play by remaining on the squares adjacent to the Island, as for example, by turning on the same square, or by moving along the coast of Treasure Island. <br><br> A SHIP MAY AT NO TIME CARRY MORE THAN TWO PIECES OF TREASURE.<br><br>                        Any treasure however acquired outside a ship's Home Port is placed on board a player's ship and may be landed only at any Port or Ports entered by a player's ship.<br><br> When a ship attacks another ship on the coast of Treasure
-                        Island, the attack is settled under Rule 12, after which the player whose ship moved to the attack takes a Chance Card.
-                    </div>
-
-                    <div>
-                        <h3>9B. CHANCE CARD MINUTIAE</h3>
-
-                        Should a Chance Card require a ship to be moved to a square already occupied by another ship (No. 1, No. 3, No. 4), then the ship shall be placed in the nearest free square. <br><br> After a ship is moved by a Chance Card (No.
-                        1, No. 3, No. 4), the player may point their ship in the direction in which they may wish to go in the next turn to play. <br><br> A player drawing Chance Card No. 1 by which their ship is blown five leagues from the coast of Treasure
-                        Island, shall have their ship moved, irrespective of any other ship along its path and in accordance with the above, to the fifth square from the Island in a direction at right angles to the coast and irrespective of the direction
-                        in whih their ship was originally pointing. If the player's ship is on a square at any corner of Treasure Island, the five leagues (squares) are counted diagonally from that corner of the island).<br><br> A player drawing Chance
-                        Card No. 7 cannot obey if their ship is equidistant from two other ships and hence will not be obliged to do so. <br><br> Chance Cards No. 2 and No. 22, each apply to al Crew Cards in a player's possession, i.e. those in hand and
-                        any at their Home Port, the cards, in the case of No. 2 (handed to the Opponent) and in the case of No. 22 (returned to Pirate Island) being selected from their hand and/or the home port at the player's discretion.
-                    </div>
-
-                    <div>
-                        <h3>10. TRADING AT OTHER PORTS</h3>
-
-                        A ship sailing into any port may trade by exchanging at the player's turn to play (i.e. either on sailing into, or on sailing out of the port) value for value, any Crew Cards from their hand and/or any treasure on boar their ship amd/or any Chance Cards
-                        such as Pieces of Eight, Doubloon, etc., which they hold, with any of the foregoing (or any combination of them) in the Docks of that port.
-                    </div>
-
-                    <div>
-                        <h3>11. HOME PORT</h3>
-
-                        Any crew, treasure or value Chance Cards (such as Pieces of Eight, Doubloon, Kidd's Chart or Long John Silver) which may have been left at a Home Port, may be freely taken up by hthe Home Port player at their turn to play, provided their ship is in its
-                        Home Port at the time. When their ship is in its Home Port, a player may transfer treasure or crew from their Ship to their Docks or vice-versa.
-                    </div>
-
-                    <div>
-                        <h3>12. ATTACKING AN OPPONENT'S SHIP</h3>
-
-                        A ship is immune from attack in any Port.<br><br> To attack an opponent's ship a player shall sail their own ship onto the square on which is the opponent's ship, and shall place their own ship alongside their opponent's ship,
-                        but may point their own ship in either direction. <br><br> The player then declares "attack", upon which the two players concerned temporarily view each other's Crew Cards, thus finding out their opponent's fighting strength.<br><br>                        The FIGHTING STRENGTH is derermined by totalling the value of one colour of crew and deducting from it the total value of the other colour of crew, if any; this will be automatically calculated.<br><br> A player may declare attack
-                        immediately if an opponent's ship attempts to pass through a square on which is their own ship, whereupon the ship attempting to pass shall stop alongside, and the attack be settled. <br><br> The player with the greater Fighting
-                        Strength wins the attack. <br><br> The winner shall demand and receive from the loser either: <br> &nbsp&nbsp&nbsp&nbsp (a) All treasure on board the losing ship: In accordance with Rule 17, should the winner already have treasure
-                        aboard, the surplus treasure, e.g. that of lowest value or otherwise at the winner's discretion, is returned to Treasure Island. <br> &nbsp&nbsp&nbsp&nbsp (b) Not more than two Crew Cards - colour and value at the loser's discretion.
-                        <br><br> Immediately after the attack has been settled, the loser shall make one free move in any direction, irrespective of the next turn to play, and shall not attack anyone in sich free move, which is not a "turn to play".<br><br>                        The loser's free move may be used, for example, either to visit Treasure Island, in which case a Chance Card is taken under Rule 9, or sail towardsa or into a Port or to a position enabling an attack to be made at a subsequent
-                        turn to play.<br><br> The winner, when moving at their next turn to play, shall move only in the direction their ship is pointing, as occasioned by having been alongside their opponent. <br><br> In the event of a drwawn Fight between
-                        two players of the same Fighting Strength, the ship attacked has a free move exactly as that provided for a loser.
-                    </div>
-
-                    <div>
-                        <h3>13. DERELICTS</h3>
-
-                        A derelict is a ship without a crew, and may drift one square per turn to play, in any direction.
-                    </div>
-
-                    <div>
-                        <h3>14. PIRATE ISLAND</h3>
-
-                        Whenever Crew Cards are taken from Pirate Island these are taken from the top of the pile, and whenever Crew Cards are returned to Pirate Island they are placed face down and beneath the pile. <br><br> Crew Cards are taken from
-                        Pirate Island only by drawing Chance Cards at Treasure Island; players cannot interact with Crew Cards by any other means including by sailing to Pirate Island.
-                    </div>
-
-                    <div>
-                        <h3>15. FLAT ISLAND</h3>
-
-                        Any crew or trasure on Flat Island is free to any ship already on, or on arrival on, any square adhacent to Flat Island, and any ship on a square adjacent to Flat Island may land or take off any crew there, in the player's turn to play.
-                    </div>
-
-                    <div>
-                        <h3>16. CHECKING AN OPPONENT'S SAILING MOVE</h3>
-
-                        Following a player's move, and before play by the next player, any opponent may dispute the player's move by checking their sailing strength. This shall be ascertained by inspection of the back of their Crew Cards, and if the move is thus proved to exceed
-                        the sailing strength, the challenged player shall lose alll their crew to Pirate Island.
-                    </div>
-
-                    <div>
-                        <h3>16B. PREVENTING JUDICIOUS DISPUTING</h3>
-
-                        If the challenger is proved wrong, then they lose either their best crew card or treasure to Flat Island, at the challenger's discretion.
-                    </div>
-
-                    <div>
-                        <h3>17. TREASURE ON BOARD</h3>
-
-                        No more than two treasures may be carried on a ship at the same time (see Rules 9 and 12).
-                    </div>
-
-                    <div>
-                        <h3>18. SAFETY ZONE</h3>
-
-                        Treasure deposited in the "Safety Zone" cannot be traded, but treasure can only be put into the "Safety Zone" in quantities of three treasures of a kind.<br><br> If, however, there are three treasures of a kind already in the "Safety
-                        Zone", another treasure of the same kind can be added to the other three.
-                    </div>
-
-                    <div>
-                        <h3>19. WINNER</h3>
-
-                        The game is won by the first player who with their ship in its HOME PORT has collected treasure at their "Docks and Safety Zone" to a total value of 20 points.
-                    </div>
-                </div>
-            </div>
+        <div id="rulescontent" style="font-family: pirate; font-size: 1.5em; max-width: 1500px; text-align: justify; padding: 30px; overflow: auto; background-color: blanchedalmond;">
         </div>
+    </div>
 
-        <div class="container" style="display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; justify-content: center; align-items: center;">
-            <div class="row" style="width: calc(100vw - 100px); height: calc(100vh - 100px); ">
-                <div class="dbg1" style="flex: 1 1"></div>
+    <div class="container" style="display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; justify-content: center; align-items: center;">
+        <div class="row" style="width: calc(100vw - 100px); height: calc(100vh - 100px); ">
+            <div class="dbg1" style="flex: 1 1"></div>
 
-                <div class="dbg2 column" style="flex: 0 1 100px; justify-content: center;">
-                    <div class="dbg4 tradebtn"><i class="fa fa-arrow-left" style="padding-left: 5px;"></i></div>
-                    <div class="dbg4 tradebtn"><i class="fa fa-arrow-right" style="padding-left: 5px;"></i></div>
-                </div>
-
-                <div class="dbg3" style="flex: 1 1"></div>
-
+            <div class="dbg2 column" style="flex: 0 1 100px; justify-content: center;">
+                <div class="dbg4 tradebtn"><i class="fa fa-arrow-left" style="padding-left: 5px;"></i></div>
+                <div class="dbg4 tradebtn"><i class="fa fa-arrow-right" style="padding-left: 5px;"></i></div>
             </div>
+
+            <div class="dbg3" style="flex: 1 1"></div>
+
         </div>
+    </div>
 
 
-        <!-- <div id="loadingcover" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none; overflow: hidden; background-color: black;"></div> -->
+    <div id="loadingcover" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none; overflow: hidden; background-color: black;"></div>
 
-        <!-- <script src="main.js "></script> -->
+    <script src="main.js "></script>
 </body>
 
 </html>

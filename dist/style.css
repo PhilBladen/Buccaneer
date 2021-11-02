@@ -29,6 +29,16 @@ img {
     pointer-events: none;
 }
 
+.cardviewer {
+    flex: 1 1 200px;
+    display: inline-flex;
+    flex-wrap: nowrap;
+    overflow: visible;
+    pointer-events: all;
+    justify-content: center;
+    align-items: flex-end;
+}
+
 #renderCanvas {
     width: 100%;
     height: 100%;
@@ -270,6 +280,7 @@ img {
 }
 
 .card {
+    /* position: absolute; */
     display: block;
     width: auto;
     height: auto;
@@ -300,16 +311,35 @@ img {
     overflow: hidden;
 }
 
+.card2 {
+    display: block;
+    width: auto;
+    height: auto;
+    border-radius: 10%/7%;
+}
+
+.cardimg2 {
+    /* position: absolute; */
+    flex: 0 1 35px;
+    overflow: visible;
+    /* max-width: 100px; */
+    min-width: 0px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
 .noshadow {
     box-shadow: none;
 }
 
 .cardimg {
     /* position: absolute; */
-    flex: 1 1 35px;
+    flex: 0 1 35px;
     overflow: visible;
-    max-width: 100px;
-    min-width: 35px;
+    /* max-width: 100px; */
+    min-width: 0px;
     height: 200px;
 }
 
