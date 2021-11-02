@@ -270,7 +270,6 @@ img {
 }
 
 .card {
-    position: absolute;
     display: block;
     width: auto;
     height: auto;
@@ -295,12 +294,18 @@ img {
     /* transform: translate(0, -50px); */
     /* border */
     /* width: 100%; */
-    box-shadow: 0 10px 16px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%) !important;
+    /* box-shadow: 0 10px 16px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%) !important; */
+    box-shadow: -2px 0 2px 0 rgba(0, 0, 0, 0.2);
     border-radius: 10%/7%;
     overflow: hidden;
 }
 
+.noshadow {
+    box-shadow: none;
+}
+
 .cardimg {
+    /* position: absolute; */
     flex: 1 1 35px;
     overflow: visible;
     max-width: 100px;
