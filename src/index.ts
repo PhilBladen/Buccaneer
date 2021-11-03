@@ -16,6 +16,8 @@ import $ from "jquery";
 import { initialiseHUD } from './HUD';
 import { chanceCardHandler } from './ChanceCard';
 
+declare let DISABLE_LOADING_SCREEN: boolean;
+
 let hudVisible = true;
 $('#settings').on("click",
     () => {
@@ -196,10 +198,14 @@ class CustomCameraInput implements ICameraInput<ArcRotateCamera> {
 }
 
 const engine = new Engine(canvas, true, {}, true);
-engine.displayLoadingUI();
-$("#loadingcover").fadeOut();
 const scene = new Scene(engine);
 const buccaneer = new Buccaneer(scene);
+$("#loadingcover").fadeOut();
+if (DISABLE_LOADING_SCREEN) {
+    SceneLoader.ShowLoadingScreen = false;
+} else {
+    engine.displayLoadingUI();
+}
 // engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
 
 // engine.enterFullscreen(); TODO add user option
@@ -549,7 +555,7 @@ const createScene = function () {
         buccaneer.nextTurn();
 
         scene.executeWhenReady(() => {
-            engine.hideLoadingUI();
+            // engine.hideLoadingUI();
         });
     });
 };

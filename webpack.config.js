@@ -1,5 +1,5 @@
 const path = require('path');
-
+const webpack = require('webpack');
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const smp = new SpeedMeasurePlugin();
 
@@ -61,4 +61,9 @@ module.exports = smp.wrap({
         //     // util: require.resolve("util/")
         // }
     },
+    plugins: [
+        new webpack.DefinePlugin({
+            DISABLE_LOADING_SCREEN: true
+        }),
+    ]
 });
