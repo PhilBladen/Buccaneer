@@ -1,18 +1,18 @@
 <div class="column tradingmasterspacing">
     <div class="row" style="overflow: hidden;">
-        <div id="tradingleftpane" class="uipane column" style="flex: 1 0; overflow: hidden; background-color: #6A9023; ">
+        <!-- LEFT PANE -->
+        <div id="tradingLHSpane" class="uipane column" style="flex: 1 0; overflow: hidden; background-color: #6A9023; ">
             <!-- Title row -->
             <div class="tradingtext tradingtexttopspacing">ITEMS IN HAND</div>
-
 
             <!-- Boat row -->
             <div class="container" style="justify-content: center;">
                 <div class="row" style="justify-content: center; align-items: center; min-width: fit-content;">
                     <div style="position: absolute;" class="row">
-                        <div id="tradinglefttreasure1" class="tradingtreasure tradingtreasureLHSspacing container">
+                        <div id="tradingLHStreasure1" class="tradingtreasure tradingtreasureLHSspacing container">
                             <img src="assets/icon-barrel.png">
                         </div>
-                        <div id="tradinglefttreasure2" class="tradingtreasure tradingtreasureLHSspacing container" style="margin-left: 10px;">
+                        <div id="tradingLHStreasure2" class="tradingtreasure tradingtreasureLHSspacing container" style="margin-left: 10px;">
                             <img src="assets/icon-gold.png">
                         </div>
                     </div>
@@ -20,9 +20,8 @@
                 </div>
             </div>
 
-
             <!-- Red Card Row -->
-            <div class="row uihorizontalscrollpanel" style="flex: 1 0; width: inherit">
+            <div id="tradingLHSredcrew" class="row uihorizontalscrollpanel" style="flex: 1 0; width: inherit">
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 1 NoWear.png " alt=" "></div>
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
@@ -37,7 +36,7 @@
             </div>
 
             <!-- Black Card Row -->
-            <div class="row uihorizontalscrollpanel" style="flex: 1 0; width: inherit">
+            <div id="tradingLHSblackcrew" class="row uihorizontalscrollpanel" style="flex: 1 0; width: inherit">
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 2 NoWear.png " alt=" "></div>
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 3 NoWear.png " alt=" "></div>
@@ -52,7 +51,7 @@
             </div>
 
             <!-- Chance Card Row -->
-            <div class="row uihorizontalscrollpanel" style="flex: 1 0; width: inherit;">
+            <div id="tradingLHSchance" class="row uihorizontalscrollpanel" style="flex: 1 0; width: inherit;">
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 21.png" alt=" "></div>
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 23.png" alt=" "></div>
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 24.png" alt=" "></div>
@@ -62,28 +61,22 @@
             </div>
 
             <!-- Value row -->
-            <div id="tradingleftvaluetext" class="tradingtext tradingtextbottomspacing">SELECTED VALUE: 10</div>
-
+            <div id="tradingLHSvaluetext" class="tradingtext tradingtextbottomspacing">SELECTED VALUE: 10</div>
         </div>
 
-
-
+        <!-- CENTRAL BUTTONS -->
         <div class="column" style="flex: 0 1; justify-content: center;">
-            <!-- <div class="dbg4 tradebtn"><i class="fa fa-arrow-left" style="padding-left: 5px;"></i></div> -->
-            <!-- <div class="dbg4 tradebtn"><i class="fa fa-arrow-right" style="padding-left: 5px;"></i></div> -->
-            <div class="tradingbuttonstyle tradingbuttoncenter" style="flex: 0 2"><i class="fa fa-arrow-right" style=""></i><br><i class="fa fa-arrow-left" style=""></i></div>
-            <div class="tradingbuttonstyle tradingbuttoncenter" style="flex: 0 2;"><i class="fa fa-times" style=""></i></div>
+            <div id="tradingbutton_switchcenter" class="tradingbuttonstyle tradingbuttoncenter" style="flex: 0 2"><i class="fa fa-arrow-right" style=""></i><br><i class="fa fa-arrow-left" style=""></i></div>
+            <div id="tradingbutton_quitcenter" class="tradingbuttonstyle tradingbuttoncenter" style="flex: 0 2;"><i class="fa fa-times" style=""></i></div>
         </div>
 
-
-
-
-
-        <div id="tradingrightpane" class="uipane column" style="flex: 1 0; overflow: hidden; background-color: #cc4346; ">
+        <!-- RIGHT PANE -->
+        <div id="tradingRHSpane" class="uipane column" style="flex: 1 0; overflow: hidden; background-color: #cc4346; ">
             <!-- Title row -->
-            <div id="tradingrighttitletext" class="tradingtext tradingtexttopspacing">PORT OF<br>MARSEILLES</div>
+            <div id="tradingRHStitletext" class="tradingtext tradingtexttopspacing">PORT OF<br>MARSEILLES</div>
+            
             <!-- Treasure Row: has a fixed height to match boat on LHS, and should be scaled as needed!!! -->
-            <div class="row uihorizontalscrollpanel" style="width: inherit; align-items: center;">
+            <div id="tradingRHStreasure" class="row uihorizontalscrollpanel" style="width: inherit; align-items: center;">
                 <div class="tradingtreasure tradingtreasureRHSspacing container"><img src="assets/icon-barrel.png" alt=" "></div>
                 <div class="tradingtreasure tradingtreasureRHSspacing container"><img src="assets/icon-barrel.png" alt=" "></div>
                 <div class="tradingtreasure tradingtreasureRHSspacing container"><img src="assets/icon-pearl.png" alt=" "></div>
@@ -97,7 +90,7 @@
             </div>
 
             <!-- Red Card Row -->
-            <div class="row uihorizontalscrollpanel" style="flex: 1 ; width: inherit">
+            <div id="tradingRHSredcrew" class="row uihorizontalscrollpanel" style="flex: 1 ; width: inherit">
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 1 NoWear.png " alt=" "></div>
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
@@ -112,7 +105,7 @@
             </div>
 
             <!-- Black Card Row -->
-            <div class="row uihorizontalscrollpanel" style="flex: 1; width: inherit">
+            <div id="tradingRHSblackcrew" class="row uihorizontalscrollpanel" style="flex: 1; width: inherit">
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 2 NoWear.png " alt=" "></div>
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 3 NoWear.png " alt=" "></div>
@@ -127,7 +120,7 @@
             </div>
 
             <!-- Chance Card Row -->
-            <div class="row uihorizontalscrollpanel" style="flex: 1; width: inherit">
+            <div id="tradingRHSchance" class="row uihorizontalscrollpanel" style="flex: 1; width: inherit">
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 21.png" alt=" "></div>
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 23.png" alt=" "></div>
                 <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 24.png" alt=" "></div>
@@ -137,15 +130,13 @@
             </div>
 
             <!-- Value row -->
-            <div id="tradingleftvaluetext" class="tradingtext tradingtextbottomspacing">SELECTED VALUE: 10</div>
-
+            <div id="tradingRHSvaluetext" class="tradingtext tradingtextbottomspacing">SELECTED VALUE: 10</div>
         </div>
-
     </div>
 
     <div class="row" style="flex: 0 0;">
-        <div class="tradingbuttonstyle tradingbuttonbottom" style="flex: 1; height: 50px; padding-top: 0px; padding-bottom: 0px; font-size: large;"><i class="fa fa-arrow-right" style=""></i><br><i class="fa fa-arrow-left" style=""></i></div>
-        <div class="tradingbuttonstyle tradingbuttonbottom" style="flex: 1;"><i class="fa fa-times" style=""></i></div>
+        <div id="tradingbutton_switchbottom" class="tradingbuttonstyle tradingbuttonbottom" style="flex: 1; height: 50px; padding-top: 0px; padding-bottom: 0px; font-size: large;"><i class="fa fa-arrow-right" style=""></i><br><i class="fa fa-arrow-left" style=""></i></div>
+        <div id="tradingbutton_quitbottom" class="tradingbuttonstyle tradingbuttonbottom" style="flex: 1;"><i class="fa fa-times" style=""></i></div>
         
     </div>
 </div>

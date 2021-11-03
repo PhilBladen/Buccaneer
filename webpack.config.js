@@ -63,7 +63,7 @@ module.exports = smp.wrap({
     },
     plugins: [
         new webpack.DefinePlugin({
-            DISABLE_LOADING_SCREEN: false
+            DISABLE_LOADING_SCREEN: true
         }),
     ]
 });

@@ -1,4 +1,5 @@
 {
     "tradingoverlay": "tradingUI.html",
+    "dockoverlay": "dockUI.html",
     "rulescontent": "rules.html"
 }
