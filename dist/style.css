@@ -401,6 +401,21 @@ img {
     background-color: rgba(0, 0, 0, 0.05);
 }
 
+.uihorizontalscrollpanel::-webkit-scrollbar {
+    width: 20px;
+}
+
+.uihorizontalscrollpanel::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.uihorizontalscrollpanel::-webkit-scrollbar-thumb {
+    background-color: #d6dee1;
+    border-radius: 20px;
+    border: 6px solid transparent;
+    background-clip: content-box;
+}
+
 .tradingtext {
     font-family: pirate;
     font-size: xx-large;
@@ -419,7 +434,6 @@ img {
     box-shadow: -2px 0 2px 0 rgba(0, 0, 0, 0.2);
     border-radius: 10%/7%;
     overflow: hidden;
-    
     pointer-events: none;
 }
 
