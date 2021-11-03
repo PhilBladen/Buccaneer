@@ -34,7 +34,7 @@ img {
     display: inline-flex;
     flex-wrap: nowrap;
     overflow: visible;
-    pointer-events: all;
+    /* pointer-events: all; */
     justify-content: center;
     align-items: flex-end;
 }
@@ -280,35 +280,13 @@ img {
 }
 
 .card {
-    /* position: absolute; */
     display: block;
     width: auto;
     height: auto;
-    /* height: 200px; */
-    /* width: auto; */
-    /* margin-left: -50px; */
-    /* flex: 0 1 auto; */
-    /* object-fit: contain; */
-    /* width: auto; */
-    /* height: auto; */
-    /* aspect-ratio: 1/2.5; */
-    /* max-height: 300px; */
-    /* min-height: 300px; */
-    /* min-width: 20%; */
-    /* margin: 0 20px; */
-    /* width: 10; */
-    /* height: 100px; */
-    /* background-color: hotpink; */
-    /* margin-left: -50px; */
-    transition: transform ease-in-out 0.1s;
-    pointer-events: all;
-    /* transform: translate(0, -50px); */
-    /* border */
-    /* width: 100%; */
-    /* box-shadow: 0 10px 16px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%) !important; */
     box-shadow: -2px 0 2px 0 rgba(0, 0, 0, 0.2);
     border-radius: 10%/7%;
     overflow: hidden;
+    pointer-events: none;
 }
 
 .card2 {
@@ -316,6 +294,7 @@ img {
     width: auto;
     height: auto;
     border-radius: 10%/7%;
+    pointer-events: none;
 }
 
 .cardimg2 {
@@ -328,6 +307,7 @@ img {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    /* pointer-events: all; */
 }
 
 .noshadow {
@@ -341,11 +321,7 @@ img {
     /* max-width: 100px; */
     min-width: 0px;
     height: 200px;
-}
-
-#cs:last-child {
-    /* max-width: 131px; */
-    /* max-width: 131px; */
+    /* pointer-events: all; */
 }
 
 .card img {

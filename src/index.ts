@@ -1,19 +1,20 @@
-import { cosineInterpolate, cosineInterpolateV3D, isMobileDevice, randomInt, showAxis } from './utils';
-import { Boat } from './boat';
-import { Port, ports } from './port';
-import { SoundEngine } from './soundengine';
-import { AssetManager } from './assets';
+import { cosineInterpolate, cosineInterpolateV3D, isMobileDevice, randomInt, showAxis } from './Utils';
+import { Boat } from './Boat';
+import { Port, ports } from './Port';
+import { SoundEngine } from './SoundEngine';
+import { AssetManager } from './Assets';
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import { GridMaterial, WaterMaterial } from "@babylonjs/materials";
 import { GLTFLoaderAnimationStartMode, GLTFFileLoader } from "@babylonjs/loaders/glTF";
 import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Texture, ParticleSystem, SceneLoader, Axis, PBRMaterial, Camera, StandardMaterial, ICameraInput, Matrix, ArcRotateCameraPointersInput } from "@babylonjs/core";
 import * as BABYLON from "@babylonjs/core";
-import { AI } from "./ai";
-import { Player } from "./player";
-import { Terrain } from "./terrain";
+import { AI } from "./AI";
+import { Player } from "./Player";
+import { Terrain } from "./Terrain";
 import $ from "jquery";
-import { initialiseHUD } from './hud';
+import { initialiseHUD } from './HUD';
+import { chanceCardHandler } from './ChanceCard';
 
 let hudVisible = true;
 $('#settings').on("click",
@@ -74,16 +75,12 @@ class Buccaneer {
     readonly settings;
 
     water: WaterMaterial;
-
-    selectedBoat = null;
-    boatMesh = null;
     boats: Boat[] = [];
+    player: Boat;
     chestLid;
     cardAnimation;
 
     time = 0;
-
-    boatIndex = 0;
 
     wasBoatAtPirateIsland = false;
     chestAnimationStartTime = 0;
@@ -91,7 +88,7 @@ class Buccaneer {
 
     currentTurnPortIndex = 7;
 
-    drawnCard;
+    drawnCard: number;
     lastFPSUpdate = performance.now();
     fpsText = $("#fps");
 
@@ -307,6 +304,7 @@ function updateTurn(currentPort, newPort) {
         albedoTexture.vOffset = Math.floor(buccaneer.drawnCard / 8) * 0.19034;
 
         scene.getAnimationGroupByName("ChanceReveal").play();
+        console.log("Animation play");
     }
 
     currentPort.boat.deactivate();
@@ -500,8 +498,6 @@ const createScene = function () {
         terrain.loadTerrain(buccaneer);
         buccaneer.water.addToRenderList(skybox);
 
-        buccaneer.boatMesh = scene.getMeshByName("Boat");
-
         let portMeshes = [];
         for (let i = 0; i < 8; i++) {
             portMeshes[i] = scene.getMeshByName("Dock" + i);
@@ -512,13 +508,15 @@ const createScene = function () {
         }
         buccaneer.chestLid = scene.getNodeByID("ChestLid");
 
-        scene.getAnimationGroupByName("ChanceReveal").onAnimationEndObservable.add(() => {
+        scene.getAnimationGroupByName("ChanceReveal").onAnimationGroupEndObservable.add(() => {
             $("#chancecard").attr("src", "assets/cards/Chance " + (buccaneer.drawnCard + 1) + ".png");
-            $("#popup").fadeIn();
+            $("#popup").show();
+
+            chanceCardHandler(buccaneer, buccaneer.drawnCard + 1);
         });
 
         let playerPort = ports[randomInt(7)];
-        buccaneer.boats.push(new Player(playerPort.portLocation.x, playerPort.portLocation.z, playerPort, buccaneer));
+        buccaneer.boats.push(buccaneer.player = new Player(playerPort.portLocation.x, playerPort.portLocation.z, playerPort, buccaneer));
 
         let numPlayers = 1;//randomInt(5) + 2;
         for (let i = 0; i < numPlayers; i++) {
@@ -535,7 +533,8 @@ const createScene = function () {
             port.init(buccaneer);
         }
 
-        buccaneer.boatMesh.parent.dispose();
+        // Clean-up loaded assets:
+        scene.getMeshByName("Boat").parent.dispose();
 
         buccaneer.soundEngine.init(scene);
 
