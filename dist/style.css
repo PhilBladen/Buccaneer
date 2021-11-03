@@ -384,6 +384,7 @@ img {
 
 
 
+
 @media only screen and (max-width: 1600px) {
     .actionbtn {
         font-size: x-large;
@@ -556,6 +557,21 @@ img {
     background-color: rgba(0, 0, 0, 0.05);
 }
 
+.uihorizontalscrollpanel::-webkit-scrollbar {
+    width: 20px;
+}
+
+.uihorizontalscrollpanel::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.uihorizontalscrollpanel::-webkit-scrollbar-thumb {
+    background-color: #d6dee1;
+    border-radius: 20px;
+    border: 6px solid transparent;
+    background-clip: content-box;
+}
+
 .tradingtext {
     font-family: pirate;
     font-size: xx-large;
@@ -604,6 +620,8 @@ img {
     width: 45px;
     height: 45px;
 }
+
+
 
 /*============================ VIEW CONTROLS ============================*/
 
