@@ -528,23 +528,19 @@ img {
 
 /*============================ TRADE ============================*/
 
-.tradebtn {
-    border-radius: 10px;
-    font-family: pirate;
-    font-size: x-large;
-    font-weight: bolder;
-    padding: 20px;
-    margin: 20px;
-}
+
+
 
 
 .uipane {
     /* flex: 0 0 400px;
     max-width: 600px; */
-    margin: 20px;
+    margin: 10px;
     outline: 6px black solid;
     border-radius: 20px;
 }
+
+
 
 .uihorizontalscrollpanel {
     margin-left: 10px;
@@ -554,11 +550,14 @@ img {
     overflow-x: scroll;
     white-space: nowrap;
     justify-content: space-between;
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 0 10px 10px rgba(0, 0, 0, 0.2);
+    
 }
 
+
 .uihorizontalscrollpanel::-webkit-scrollbar {
-    width: 20px;
+    height: 8px;
 }
 
 .uihorizontalscrollpanel::-webkit-scrollbar-track {
@@ -567,9 +566,41 @@ img {
 
 .uihorizontalscrollpanel::-webkit-scrollbar-thumb {
     background-color: #d6dee1;
-    border-radius: 20px;
-    border: 6px solid transparent;
+    border-radius: 10px;
+    border: 1px solid transparent;
     background-clip: content-box;
+}
+
+.tradingmasterspacing {
+    width: calc(100vw - 100px); 
+    max-width: 1500px; 
+    height: calc(100vh - 100px);
+    
+}
+
+.tradingbuttonstyle {
+    background-color: antiquewhite;
+    border: 6px black solid;
+    display: inline;
+    font-size: x-large;
+    font-weight: bolder;
+    text-align: center;
+    border-radius: 10px;
+    font-family: pirate;
+}    
+
+.tradingbuttoncenter {
+    display: inline;
+    width: 40px;
+    padding: 20px;
+    margin: 20px;
+}
+
+.tradingbuttonbottom {
+    display: none;
+    height: 30px;
+    padding: 10px;
+    margin: 4px;
 }
 
 .tradingtext {
@@ -578,8 +609,21 @@ img {
     text-align: center;
 }
 
+.tradingtexttopspacing {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.tradingtextbottomspacing {
+    /* padding-top: 0px;
+    padding-bottom: 0px; */
+    margin-top: -5px;
+    margin-bottom: 10px;
+}
+
 .tradingcardimg {
-    margin: 10px;
+    margin: 1%;
+    margin-bottom: 3px;
     outline: solid rgba(0, 0, 0, 0.2) 3px;
     border-radius: 10%;
 }
@@ -595,10 +639,21 @@ img {
 }
 
 .tradingboat {
-    /* width: 100%; */
-    height: 109px;
+    width: 100%;
+    overflow: hidden;
     min-height: 0px;
     min-width: 0px;
+    margin-top: 5px;
+    margin-bottom: 8px;
+}
+
+.tradingtreasureLHSspacing {
+    margin-top: -55px;
+}
+
+.tradingtreasureRHSspacing {
+    margin: 10px;
+    margin-bottom: 3px;
 }
 
 .tradingtreasure {
@@ -607,10 +662,7 @@ img {
     border-radius: 10px;
     width: 50px;
     height: 50px;
-    margin: 10px;
-    /* margin-top: -45px; */
-    /* overflow: hidden; */
-    /* display: flex; */
+    flex: none;
     align-items: center;
     justify-content: center;
 }
@@ -620,6 +672,183 @@ img {
     width: 45px;
     height: 45px;
 }
+
+
+/* VERTICAL SCALING PINCH-OFF @ 800PX */
+@media only screen and (max-height: 800px) {
+    .tradingmasterspacing {
+        height: 700px;
+    }
+}
+
+/* VERTICAL SCALING PINCH-OFF @ 700PX */
+@media only screen and (max-height: 700px) {
+    .tradingmasterspacing {
+        height: 100vh;
+    }
+}
+
+/* VERTICAL SCALING PINCH-OFF @ 600PX */
+@media only screen and (max-height: 600px) {
+
+    .uihorizontalscrollpanel {
+        margin-top: 0px;
+        margin-bottom: 1px;
+    }
+
+    .tradingtext {
+        font-size: large;
+    }
+
+    .tradingtexttopspacing {
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+
+    .tradingtextbottomspacing {
+        margin-top: -2px;
+        margin-bottom: 0px;
+    }
+
+    .tradingboat {
+        margin-top: 9px;
+        width: 150px;
+    }
+    
+    .tradingtreasure {
+        border-radius: 5px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .tradingtreasureLHSspacing {
+        margin-top: -30px;
+    }
+    
+    .tradingtreasureRHSspacing {
+        margin: 5px;
+    }
+    .tradingtreasure img {
+        width: 27px;
+        height: 27px;
+    }
+
+    .uipane {
+        outline: 3px black solid;
+        border-radius: 10px;
+    }
+
+    .tradingbuttonstyle {
+        border: 3px black solid;
+    }
+    
+}
+
+
+/* HORIZONTAL SCALING PINCH-OFF @ 1240PX */
+@media only screen and (max-width: 1600px) {
+    .tradingbuttoncenter {
+        margin-left: calc(5vw - 60px);
+        margin-right: calc(5vw - 60px);
+        padding-left: calc(5vw - 60px);
+        padding-right: calc(5vw - 60px);
+    }
+}
+
+
+/* HORIZONTAL SCALING PINCH-OFF @ 1200PX */
+@media only screen and (max-width: 1200px) {
+    .tradingmasterspacing {
+        width: 1100px;
+    }
+
+    .tradingbuttoncenter{
+        padding-left: 0px;
+        padding-right: 0px;
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+}
+
+/* HORIZONTAL SCALING PINCH-OFF @ 1100PX */
+@media only screen and (max-width: 1100px) {
+    .tradingmasterspacing {
+        width: 100vw;
+    }
+
+    .tradingbuttoncenter {
+        padding-left: 0px;
+        padding-right: 0px;
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+}
+
+/* HORIZONTAL SCALING PINCH-OFF @ 650PX */
+@media only screen and (max-width: 650px) {
+
+    .tradingbuttoncenter {
+        display: none;
+    }
+
+    .tradingbuttonbottom {
+        display: inline;
+    }
+
+
+    .uihorizontalscrollpanel {
+        margin-top: 0px;
+        margin-bottom: 1px;
+    }
+
+    .tradingtext {
+        font-size: large;
+    }
+
+    .tradingtexttopspacing {
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+
+    .tradingtextbottomspacing {
+        margin-top: -2px;
+        margin-bottom: 0px;
+    }
+
+    .tradingboat {
+        margin-top: 9px;
+        width: 150px;
+    }
+    
+    .tradingtreasure {
+        border-radius: 5px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .tradingtreasureLHSspacing {
+        margin-top: -30px;
+    }
+    
+    .tradingtreasureRHSspacing {
+        margin: 5px;
+    }
+    .tradingtreasure img {
+        width: 27px;
+        height: 27px;
+    }
+
+    .uipane {
+        outline: 3px black solid;
+        border-radius: 10px;
+        margin: 5px;
+    }
+
+    .tradingbuttonstyle {
+        border: 3px black solid;
+    }
+}
+
 
 
 
