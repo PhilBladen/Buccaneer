@@ -5,19 +5,16 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1" />
     <title>Buccaneer</title>
-
     <link rel="stylesheet" href="style.css">
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
     <link rel="manifest" href="manifest.webmanifest">
-
     <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 
 <body>
     <canvas id="renderCanvas" class="" touch-action="none"></canvas>
-
     <!-- <div id="cards" class=" " style="position: fixed; width: 100%; left: 0; bottom: 0; pointer-events: none; ">
         <div id="cards " class="container " style="max-width: 50%; height: 300px; margin-left: auto; margin-right: auto; bottom: 0; flex-direction: row; justify-content: space-evenly; ">
             <div class="container cards " style="flex-direction: row; ">
@@ -48,10 +45,8 @@
             </div>
         </div>
     </div> -->
-
     <!-- Whole HUD -->
     <div id="hud" class="column" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none; overflow: hidden;">
-
         <!-- Top of screen HUD -->
         <div id="hudtop" class="container clickable" style="flex: 0 0 auto;">
             <div class="" style="flex: 1 1 200px;">
@@ -63,25 +58,18 @@
                 Cadiz's Move
             </div>
             <div id="fps" class="" style="min-width: fit-content; flex: 1 1 200px; text-align: right; padding-right: 10px;">
-
             </div>
         </div>
-
         <div class="container" style="flex: 1 1 auto; ">
         </div>
-
         <!-- Bottom HUD -->
         <div id="hudbottom" class="container" style="flex: 0 0 auto; flex-direction: row; align-items: flex-end; transition: transform ease-in-out 0.3s;">
-
             <!-- City HUD -->
             <div class="container" style="flex: 0 1 auto;">
                 <div id="hudleft" class="column hudleft clickable" style="flex: 0 1 auto; background-color: #6A9023;">
-
                     <div id="cityname" class="city" style="flex: 1 1 auto;">BOMBAY</div>
-
                     <!-- Boat + pirate count UI -->
                     <div class="grid testgrid" style="flex: 1 1 auto; flex-direction: row;">
-
                         <!-- Boat -->
                         <div class="boatcell container">
                             <div class="row" style="justify-content: center; align-items: center; grid-column: 1 / span 2; min-width: fit-content;">
@@ -96,8 +84,6 @@
                                 <img src="assets/BoatIcon.png" alt="" class="boat">
                             </div>
                         </div>
-
-
                         <!-- Pirate count + fighting strength -->
                         <div id="btnpiratecards" class="column dummycell cellbtn" style="align-items: stretch; padding-top: 0; padding-bottom: 0;">
                             <div class="row" style="flex: 1; align-items: center; padding-left: 0px;">
@@ -105,14 +91,12 @@
                                 <div style="flex: 1"></div>
                                 <div id="sailingstrength" class="cardcount">14</div>
                             </div>
-
                             <div class="row" style="flex: 1 1; align-items: center; padding-left: 0px;">
                                 <img src="assets/FightingIcon.png" alt="" class="buccaneer icon" style="height: 48px">
                                 <div style="flex: 1"></div>
                                 <div id="fightingstrength" class="cardcount">8</div>
                             </div>
                         </div>
-
                         <!-- Rules + card button UI -->
                         <div id="btnrules" class="dummycell container cellbtn" style="justify-content: center; align-items: center; ">
                             <img src="assets/RulesIcon.png" alt=" " class="buccaneer icon ">
@@ -131,14 +115,11 @@
                     </div>
                 </div>
             </div>
-
             <!-- Action buttons -->
             <div id="actionbtnwrapper" class="column" style="">
                 <!-- <div class="row"> -->
                 <!-- <div class="dbg3" style="flex: 1 1 200px"></div> -->
-
                 <div id="dummypiratecard" class="cardimg" style="display: none;"><img class="card" src="" alt=" "></div>
-
                 <div class="row">
                     <div id="cs" class="cardviewer row" style="display: none;">
                         <div class="cardimg"><img class="card noshadow" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
@@ -159,9 +140,6 @@
                         <div class="cardimg2"><img class="card2" src="assets/cards/Chance 29.png" alt=" "></div>
                     </div>
                 </div>
-
-
-
                 <div id="actionbtnwrapper2" class="row" style="flex: 0 0 auto">
                     <div id="buttons" class="row ">
                         <div id="actionbtnturn" class="actionbtn " style="flex: 0 1; white-space: nowrap; ">END TURN</div>
@@ -171,7 +149,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Minimap -->
             <div id="minimapwrapper" class="row " style="flex: 0 1 auto; /*height: 300px;*/ justify-content: flex-end; align-items: flex-end; ">
                 <div id="hudright" class=" " style="background-color: darkred; max-width: fit-content; max-height: fit-content; ">
@@ -181,7 +158,6 @@
             </div>
         </div>
     </div>
-
     <div id="popup" class="container" style="display:none; position: fixed; left: 0; right: 0; top: 0; bottom: 0; flex-direction: column; overflow: auto; background-color: rgba(0, 0, 0, 0.5); ">
         <div class="popup container clickable" style="flex: 1 1 auto; align-items: center; padding: 20px; flex-direction: column; justify-content: center; ">
             <!-- <div style=" "> -->
@@ -198,161 +174,22 @@
         </div>
     </div>
 
-    <div id="tradingoverlay" class="container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; justify-content: center; align-items: center; background-color: rgba(0, 0, 0, 0.8); justify-content: center; pointer-events: all;"">
-        <div class = "row" style = "width: calc(100vw - 100px); max-width: 1500px; height: calc(100vh - 100px);">
-            <div id="tradingleftpane" class="uipane column" style="flex: 1 1; overflow: hidden; background-color: #6A9023; ">
-                <!-- Title row -->
-                <div class="tradingtext" style="padding-top: 10px; padding-bottom: 20px">ITEMS IN HAND</div>
-                <!-- Boat row -->
-                <div class="container" style="justify-content: center;">
-                    <div class="row" style="justify-content: center; align-items: center;; min-width: fit-content;">
-                        <div style="position: absolute;" class="row">
-                            <div id="tradinglefttreasure1" class="tradingtreasure container" style="margin-top: -45px;">
-                                <img src="assets/icon-barrel.png">
-                            </div>
-                            <div id="tradinglefttreasure2" class="tradingtreasure container" style="margin-top: -45px; margin-left: 10px;">
-                                <img src="assets/icon-gold.png">
-                            </div>
-                        </div>
-                        <img src="assets/BoatIcon.png" alt="" class="tradingboat">
-                    </div>
-                </div>
-
-                <!-- Red Card Row -->
-                <div class = "row uihorizontalscrollpanel" style="flex: 1 ; width: inherit">
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 1 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 1 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 1 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 1 NoWear.png " alt=" "></div>
-                </div>
-
-                <!-- Black Card Row -->
-                <div class = "row uihorizontalscrollpanel" style="flex: 1; width: inherit">
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 3 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 3 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 3 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
-                </div>
-
-                <!-- Chance Card Row -->
-                <div class = "row uihorizontalscrollpanel" style="flex: 1; width: inherit">
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 21.png" alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 23.png" alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 24.png" alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 25.png" alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 26.png" alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 29.png" alt=" "></div>
-                </div>
-
-                <!-- Value row -->
-                <div id="tradingleftvaluetext" class="tradingtext" style="padding-top: 20px; padding-bottom: 10px">SELECTED VALUE: 10</div>
-
-            </div>
-
-            <div class="column" style="flex: 0 1 100px; justify-content: center;">
-                <!-- <div class="dbg4 tradebtn"><i class="fa fa-arrow-left" style="padding-left: 5px;"></i></div> -->
-                <!-- <div class="dbg4 tradebtn"><i class="fa fa-arrow-right" style="padding-left: 5px;"></i></div> -->
-                <div class="dbg4 tradebtn"><i class="fa fa-arrow-right" style="padding-left: 5px;"></i><i class="fa fa-arrow-left" style="padding-left: 5px;"></i></div>
-            </div>
-
-
-            <div id="tradingrightpane" class="uipane column" style="flex: 1 1; overflow: hidden; background-color: #cc4346; ">
-                <!-- Title row -->
-                <div id="tradingrighttitletext" class="tradingtext" style="padding-top: 10px; padding-bottom: 20px">PORT OF<br>MARSEILLES</div>
-                <!-- Treasure Row: has a fixed height to match boat on LHS, and should be scaled as needed!!! -->
-                <div class = "row uihorizontalscrollpanel" style="width: inherit; align-items: center;">
-                    <div class="tradingtreasure container"><img src="assets/icon-barrel.png" alt=" "></div>
-                    <div class="tradingtreasure container"><img src="assets/icon-barrel.png" alt=" "></div>
-                    <div class="tradingtreasure container"><img src="assets/icon-pearl.png" alt=" "></div>
-                    <div class="tradingtreasure container"><img src="assets/icon-pearl.png" alt=" "></div>
-                    <div class="tradingtreasure container"><img src="assets/icon-gold.png" alt=" "></div>
-                    <div class="tradingtreasure container"><img src="assets/icon-gold.png" alt=" "></div>
-                    <div class="tradingtreasure container"><img src="assets/icon-diamond.png" alt=" "></div>
-                    <div class="tradingtreasure container"><img src="assets/icon-diamond.png" alt=" "></div>
-                    <div class="tradingtreasure container"><img src="assets/icon-ruby.png" alt=" "></div>
-                    <div class="tradingtreasure container"><img src="assets/icon-ruby.png" alt=" "></div>
-                </div>
-
-                <!-- Red Card Row -->
-                <div class = "row uihorizontalscrollpanel" style="flex: 1 ; width: inherit">
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 1 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 1 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 1 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Red 1 NoWear.png " alt=" "></div>
-                </div>
-
-                <!-- Black Card Row -->
-                <div class = "row uihorizontalscrollpanel" style="flex: 1; width: inherit">
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 3 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 3 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 3 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 2 NoWear.png " alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
-                </div>
-
-                <!-- Chance Card Row -->
-                <div class = "row uihorizontalscrollpanel" style="flex: 1; width: inherit">
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 21.png" alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 23.png" alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 24.png" alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 25.png" alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 26.png" alt=" "></div>
-                    <div class="tradingcardimg"><img class="tradingcard" src="assets/cards/Chance 29.png" alt=" "></div>
-                </div>
-
-                <!-- Value row -->
-                <div id="tradingleftvaluetext" class="tradingtext" style="padding-top: 20px; padding-bottom: 10px">SELECTED VALUE: 10</div>
-
-            </div>
-
-        </div>
+    <div id="tradingoverlay" class="container" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; justify-content: center; align-items: center; background-color: rgba(0, 0, 0, 0.8); justify-content: center; pointer-events: all;">
     </div>
 
-
-    <div class="container" style="display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; justify-content: center; align-items: center;">
+    <div class=" container" style="display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; justify-content: center; align-items: center; ">
         <div class="row" style="width: calc(100vw - 100px); height: calc(100vh - 100px); ">
-            <div class="dbg1" style="flex: 1 1"></div>
-
-            <div class="dbg2 column" style="flex: 0 1 100px; justify-content: center;">
-                <div class="dbg4 tradebtn"><i class="fa fa-arrow-left" style="padding-left: 5px;"></i></div>
-                <div class="dbg4 tradebtn"><i class="fa fa-arrow-right" style="padding-left: 5px;"></i></div>
+            <div class="dbg1 " style="flex: 1 1 "></div>
+            <div class="dbg2 column " style="flex: 0 1 100px; justify-content: center; ">
+                <div class="dbg4 tradebtn "><i class="fa fa-arrow-left " style="padding-left: 5px; "></i></div>
+                <div class="dbg4 tradebtn "><i class="fa fa-arrow-right " style="padding-left: 5px; "></i></div>
             </div>
-
-            <div class="dbg3" style="flex: 1 1"></div>
-
+            <div class="dbg3 " style="flex: 1 1 "></div>
         </div>
     </div>
 
-    <!-- <div id="loadingcover" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none; overflow: hidden; background-color: black;"></div> -->
-
-    <!-- <script src="main.js "></script> -->
+    <div id="loadingcover" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none; overflow: hidden; background-color: black; "></div>
+    <script src="main.js "></script>
 </body>
 
 </html>

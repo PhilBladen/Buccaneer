@@ -4,8 +4,27 @@ import { Player } from "./Player";
 
 function initialiseHUD(buccaneer: Buccaneer) {
     $(() => {
-        $("#rulescontent").load("rules.html");
-    });    
+        // $("#rulescontent").load("rules.html");
+
+
+        let contentMap = $.getJSON("content/map.json", (json) => {
+            // console.log(json);
+
+            for (let key of Object.keys(json)) {
+                console.log(key + ": " + json[key]);
+
+                $("#" + key).load("content/" + json[key], (response, status, xhr) => {
+                    if (status == "error") {
+                        let msg = "Failed to load " + json[key] + ": ";
+                        $("#error").html(msg + xhr.status + " " + xhr.statusText);
+                    } else {
+                        console.log("Loaded " + json[key] + ".");
+                    }
+                });
+            }
+        });
+
+    });
 
     $("#btnClosePopup").on("click", () => $("#popup").hide());
     $("#actionbtnturn").on({
@@ -17,10 +36,14 @@ function initialiseHUD(buccaneer: Buccaneer) {
         mouseover: () => { buccaneer.soundEngine.buttonHover() }
     });
 
+    $("#actionbtnattacktrade").on("click", () => {
+        $("#tradingoverlay").show();
+    });
+
     $("#rules").on("click", () => {
         $("#rules").hide();
     });
-    
+
     $('#btnrules').on("click", () => {
         $("#rules").show();
     });
@@ -51,7 +74,7 @@ function initialiseHUD(buccaneer: Buccaneer) {
             buccaneer.isCameraLockedToPlayerBoat = false;
         }
     });
-    
+
     $("#btncameralockboat").on("pointerdown", () => {
         let button = $("#btncameralockboat");
         if (button.hasClass("cameralocktoggleon")) {
@@ -65,19 +88,19 @@ function initialiseHUD(buccaneer: Buccaneer) {
 
     let btnChanceCards = $("#btnchancecards");
     let btnPirateCards = $("#btnpiratecards");
-    const showPirateCards = function() {
+    const showPirateCards = function () {
         btnPirateCards.addClass("cameralocktoggleon");
         $("#cs").show();
     }
-    const hidePirateCards = function() {
+    const hidePirateCards = function () {
         btnPirateCards.removeClass("cameralocktoggleon");
         $("#cs").hide();
     }
-    const showChanceCards = function() {
+    const showChanceCards = function () {
         btnChanceCards.addClass("cameralocktoggleon");
         $("#chancecardviewer").show();
     }
-    const hideChanceCards = function() {
+    const hideChanceCards = function () {
         btnChanceCards.removeClass("cameralocktoggleon");
         $("#chancecardviewer").hide();
     }
@@ -106,7 +129,7 @@ function initialiseHUD(buccaneer: Buccaneer) {
 
     let numCards = 7;
 
-    const layoutCards = function() {
+    const layoutCards = function () {
         let c = $("#c1");
         let cards = $("#cs");
 
@@ -130,7 +153,7 @@ function initialiseHUD(buccaneer: Buccaneer) {
         }
     }
 
-    const layoutCards2 = function() {
+    const layoutCards2 = function () {
         let cards = $("#chancecardviewer");
 
         let element = cards[0];
@@ -154,7 +177,7 @@ function initialiseHUD(buccaneer: Buccaneer) {
         }
     }
 
-    
+
     // setInterval(() => {
     //     let cards = $("#cs");
     //     let c = $("#c1");
@@ -182,7 +205,7 @@ function initialiseHUD(buccaneer: Buccaneer) {
 
 }
 
-const updatePlayerPirateCards = function(player: Player): void {
+const updatePlayerPirateCards = function (player: Player): void {
     let cards = $("#cs");
     cards.empty();
     let firstCard = false;
@@ -192,7 +215,7 @@ const updatePlayerPirateCards = function(player: Player): void {
             newCard.addClass("noshadow");
             firstCard = false;
         }
-        newCard.children().attr("src","assets/pirates/Pirate " + (card.type == PirateType.BLACK ? "Black" : "Red") + " " + (card.value) + " NoWear.png ");
+        newCard.children().attr("src", "assets/pirates/Pirate " + (card.type == PirateType.BLACK ? "Black" : "Red") + " " + (card.value) + " NoWear.png ");
         newCard.show();
         cards.append(newCard);
     }
