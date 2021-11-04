@@ -246,7 +246,6 @@ class BoatMotionController {
                 this.animationRunning = false;
             }
         }
-
     }
 }
 

@@ -15,6 +15,7 @@ import { Terrain } from "./Terrain";
 import $ from "jquery";
 import { initialiseHUD } from './HUD';
 import { chanceCardHandler } from './ChanceCard';
+import { TreasureChest } from './GameItemManagement';
 
 declare let DISABLE_LOADING_SCREEN: boolean;
 
@@ -79,6 +80,7 @@ class Buccaneer {
     water: WaterMaterial;
     boats: Boat[] = [];
     player: Boat;
+    treasureChestInventory: TreasureChest;
     chestLid;
     cardAnimation;
 
@@ -105,6 +107,8 @@ class Buccaneer {
             this.settings = settingsLow;
         else
             this.settings = settingsMed;
+
+        this.treasureChestInventory = new TreasureChest();
     }
 
     nextTurn() {

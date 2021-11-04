@@ -20,7 +20,6 @@ const chanceCardHandler = function(buccaneer: Buccaneer, cardID: number) {
     if(ChanceCard.isTradeable(cardID)){
         buccaneer.player.addChanceCard(new ChanceCard(cardID));
     }
-    console.log("Ran card handler: " + cardID);
 }
 
 export {

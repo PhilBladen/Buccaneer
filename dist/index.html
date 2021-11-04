@@ -44,11 +44,11 @@
                         <div class="boatcell container">
                             <div class="row" style="justify-content: center; align-items: center; grid-column: 1 / span 2; min-width: fit-content;">
                                 <div style="position: absolute;" class="row">
-                                    <div class="treasure container">
-                                        <img id="hudtreasure1" src="assets/empty64.png">
+                                    <div id="hudtreasure1" class="treasure container">
+                                        <img src="assets/empty64.png">
                                     </div>
-                                    <div class="treasure container" style="margin-left: 10px;">
-                                        <img id="hudtreasure2" src="assets/empty64.png">
+                                    <div id="hudtreasure2" class="treasure container" style="margin-left: 10px;">
+                                        <img src="assets/empty64.png">
                                     </div>
                                 </div>
                                 <img src="assets/BoatIcon.png" alt="" class="boat">
@@ -143,6 +143,10 @@
     <div id="treasureoverlay" class="container" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; justify-content: center; align-items: center; background-color: rgba(0, 0, 0, 0.7); justify-content: center; pointer-events: all;">
     </div>
 
+    <!-- BELOW IS THE MASTER dummytradingcard &  OBJECT; do not get rid of it!! -->
+    <div id="dummytradingcard" class="tradingcardimg" style="display: none;"><img class="tradingcard" src="" alt=" "></div>
+    <div id="dummyRHStreasure" class="tradingtreasure tradingtreasureRHSspacing container" style="display: none;"><img src="" alt=" "></div>
+    <div id="phantomRHStreasure" class="tradingtreasure tradingtreasureRHSspacing container" style="display: none; background: none; outline: none;"></div>
 
 
 

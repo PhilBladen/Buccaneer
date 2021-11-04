@@ -1,8 +1,7 @@
 import { Buccaneer } from "src";
-import { isUndefined } from "util";
-import { PirateType, TreasureItem, TreasureType } from "./Boat";
+import { PirateType, TreasureItem, TreasureType } from "./GameItemManagement";
 import { Player } from "./Player";
-import { initialiseTradingOverlay } from "./UIoverlays";
+import { initialiseTradingOverlay, populatePirateCards, populateChanceCards, setTreasureItem, initialiseDockOverlay } from "./UIoverlays";
 
 function initialiseHUD(buccaneer: Buccaneer) {
     $(() => {
@@ -39,8 +38,15 @@ function initialiseHUD(buccaneer: Buccaneer) {
     });
 
     $("#actionbtnattacktrade").on("click", () => {
-        initialiseTradingOverlay(buccaneer);
-        $("#tradingoverlay").show();
+        let btnText = $("#actionbtnattacktrade").text();
+        if(btnText== "TRADE"){
+            initialiseTradingOverlay(buccaneer);
+            $("#tradingoverlay").show();
+        }
+        else if(btnText == "DOCK"){
+            initialiseDockOverlay(buccaneer);
+            $("#dockoverlay").show();
+        }
     });
 
     $("#rules").on("click", () => {
@@ -132,7 +138,7 @@ function initialiseHUD(buccaneer: Buccaneer) {
 
     let numCards = 7;
 
-    const layoutCards = function () {
+    const layoutPirateCards = function () {
         let c = $("#c1");
         let cards = $("#cs");
 
@@ -156,7 +162,7 @@ function initialiseHUD(buccaneer: Buccaneer) {
         }
     }
 
-    const layoutCards2 = function () {
+    const layoutChanceCards = function () {
         let cards = $("#chancecardviewer");
 
         let element = cards[0];
@@ -193,85 +199,34 @@ function initialiseHUD(buccaneer: Buccaneer) {
 
     if (window.ResizeObserver) {
         console.log("Using resize observer")
-        new ResizeObserver(layoutCards).observe(document.getElementById("cs"));
-        new ResizeObserver(layoutCards2).observe(document.getElementById("chancecardviewer")); // TODO
+        new ResizeObserver(layoutPirateCards).observe(document.getElementById("cs"));
+        new ResizeObserver(layoutChanceCards).observe(document.getElementById("chancecardviewer")); // TODO
     } else {
         console.log("Using native")
         window.onresize = () => {
-            layoutCards();
-            layoutCards2();
+            layoutPirateCards();
+            layoutChanceCards();
         }
     }
 
-    layoutCards();
-    layoutCards2();
+    layoutPirateCards();
+    layoutChanceCards();
 
 }
 
 const updatePlayerPirateCards = function (player: Player): void {
-    let cards = $("#cs");
-    cards.empty();
-    let firstCard = false;
-    for (let card of player.inventory.pirateCards) {
-        let newCard = $("#dummypiratecard").clone();
-        if (firstCard) {
-            newCard.addClass("noshadow");
-            firstCard = false;
-        }
-        newCard.children().attr("src", "assets/pirates/Pirate " + (card.type == PirateType.BLACK ? "Black" : "Red") + " " + (card.value) + " NoWear.png ");
-        newCard.show();
-        cards.append(newCard);
-    }
+    populatePirateCards(player.inventory, $("#cs"), $("#dummypiratecard"), PirateType.NONE, true);
 }
 
 const updatePlayerChanceCards = function (player: Player) : void {
-    console.log("Updated Player Chance Cards");
-    let cards = $("#chancecardviewer");
-    cards.empty();
-    let firstCard = false;
-    for(let card of player.inventory.chanceCards) {
-        let newCard = $("#dummychancecard").clone();
-        if(firstCard) {
-            newCard.addClass("noshadow");
-            firstCard = false;
-        }
-        newCard.children().attr("src", "assets/cards/Chance " + (card.cardNum) + ".png");
-        newCard.show();
-        cards.append(newCard);
-    }
+    populateChanceCards(player.inventory, $("#chancecardviewer"), $("#dummychancecard"), true);
 }
 
 const updatePlayerTreasureGraphics = function(player : Player) : void {
-    let slot1 = $("#hudtreasure1");
-    let slot2 = $("#hudtreasure2");
-
-    slot1.attr("src", getTreasureGraphicsPath(player.inventory.treasureSlot1));
-    slot2.attr("src", getTreasureGraphicsPath(player.inventory.treasureSlot2));
-
+    setTreasureItem(player.inventory.treasureSlot1, $("#hudtreasure1"));
+    setTreasureItem(player.inventory.treasureSlot2, $("#hudtreasure2"));
 }
 
-
-const getTreasureGraphicsPath = function(t: TreasureItem): string {
-    if(!t){
-        console.log("I think my treasure is undefined!");
-        return "assets/empty64.png";
-    }
-
-    switch(t.type){
-        case TreasureType.RUM:
-            return "assets/icon-barrel.png";
-        case TreasureType.PEARL:
-            return "assets/icon-pearl.png";
-        case TreasureType.GOLD:
-            return "assets/icon-gold.png";
-        case TreasureType.DIAMOND:
-            return "assets/icon-diamond.png";
-        case TreasureType.RUBY:
-            return "assets/icon-ruby.png";
-        default:
-            return "assets/empty64.png";
-    }
-}
 
 export {
     initialiseHUD,

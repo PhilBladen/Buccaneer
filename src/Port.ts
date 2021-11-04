@@ -3,6 +3,7 @@ import { AbstractMesh, Axis, Color3, FloatArray, Mesh, Scene, StandardMaterial, 
 import { Buccaneer } from "src";
 import { AssetManager } from "./Assets";
 import { Boat } from "./Boat";
+import { ChanceCard, Inventory, PirateCard, PirateType, TreasureItem, TreasureType } from "./GameItemManagement";
 import { offsetMeshUVs, randomInt } from "./Utils";
 
 let portMaterial: StandardMaterial = null;
@@ -15,8 +16,10 @@ class Port {
     portColor: string;
     portName: string;
     inventoryLocation: number[];
+    inventory: Inventory;
     boat: Boat;
-    mesh: Mesh;
+    dockMesh: Mesh;
+    inventoryMeshInstances: AbstractMesh[];
 
     constructor(resourceIndex: number, portLocation: Vector3, portColor: string, portName: string, inventoryLocation: number[]) {
         this.resourceIndex = resourceIndex;
@@ -24,9 +27,57 @@ class Port {
         this.portColor = portColor;
         this.portName = portName;
         this.inventoryLocation = inventoryLocation;
+        this.inventory = new Inventory();
+        this.inventoryMeshInstances = [];
     }
 
-    generateInventory() {
+    generateInventoryContent() {
+        // //2 cards
+        // this.inventory.pirateCards.push(PirateCard.random());
+        // this.inventory.pirateCards.push(PirateCard.random());
+
+        // //up to 2 of each treasure - for now
+        // for(let i=1;i<6;i++){
+        //     let numOfThisType = randomInt(2);
+        //     for (let j = 0; j < numOfThisType; j++) {
+        //         this.inventory.treasures.push(new TreasureItem(i));
+        //     }
+        // }
+
+        // //As a test - two chance cards!
+        // this.inventory.chanceCards.push(new ChanceCard(21));
+        // this.inventory.chanceCards.push(new ChanceCard(25));
+
+        //For Trading ports only
+        //2 cards
+        this.inventory.pirateCards.push(PirateCard.random());
+        this.inventory.pirateCards.push(PirateCard.random());
+
+        //Treasure up to a value of 8
+
+        let treasureValue = 8 - this.inventory.getPirateValue();
+        let treasureItems : TreasureItem[] = this.buccaneer.treasureChestInventory.getItemsByValue(treasureValue);
+        for(let i of treasureItems){
+            this.inventory.treasures.push(i);
+        }
+        // console.log("Generated inventory for " + this.portName + ":");
+        // console.log("\tPirate total: " + this.inventory.getPirateValue());
+        // console.log("\tTreasure total: " + treasureValue);
+        // for(let i of this.inventory.treasures){
+        //     console.log("\t\tGot treasure id " + i.type + " of value " + i.getValue());
+        // }
+    }
+
+    drawInventory() {
+        // this.generateInventoryContent();
+
+        //Clear old meshes
+        for(let inst of this.inventoryMeshInstances){
+            inst.dispose();
+        }
+        this.inventoryMeshInstances = [];
+
+
         let scene = this.buccaneer.scene;
         let assetManager = this.buccaneer.assetManager;
 
@@ -45,10 +96,8 @@ class Port {
             inventoryTransform.rotation.y = 0;
         }
 
-        let possibleCards = [34, 35, 36, 37, 38, 39];//[20, 22, 23, 24, 25, 28, 34, 35, 36, 37, 38, 39];
-
-        let numCards = 2;
-        for (let i = 0; i < numCards; i++) {
+        let totalCardCount = this.inventory.pirateCards.length + this.inventory.chanceCards.length
+        for (let i = 0; i < totalCardCount; i++) {
             let cardMesh = scene.getMeshByName("GenericCardFace").clone(this.portName + " card", null);
             cardMesh.setParent(null);
             cardMesh.scaling.x = 1;
@@ -67,61 +116,55 @@ class Port {
             cardMesh.material = material;
             cardMesh.animations = [];
 
-            // cardMesh.renderOverlay = true;
-            // cardMesh.overlayColor = BABYLON.Color3.FromHexString(this.portColor);
-            // cardMesh.overlayAlpha = 0.0;
+            let drawnCard = 0;
+            if(i<this.inventory.pirateCards.length){
+                drawnCard = this.inventory.pirateCards[i].value + ((this.inventory.pirateCards[i].type == PirateType.RED)?36:33); 
+            }
+            else{
+                drawnCard = this.inventory.chanceCards[i-this.inventory.pirateCards.length].cardNum - 1;
+            }
 
-
-            let drawnCard = possibleCards[Math.floor(Math.random() * possibleCards.length)];
             let cardTexture: Texture = <Texture>(<StandardMaterial>cardMesh.material).diffuseTexture;
             cardTexture.uOffset = (drawnCard % 8) * (1 / 8);
             cardTexture.vOffset = 1 - Math.floor(drawnCard / 8) * 0.19034;
 
-            cardMesh.position.x = (i - numCards / 2 + 0.5) * 0.25;
-            cardMesh.position.y = -i * 0.001;
+            cardMesh.position.x = -(i - totalCardCount / 2 + 0.5) * 0.5;
+            cardMesh.position.y = i * 0.001;
+
+            this.inventoryMeshInstances.push(cardMesh);
         }
 
-        // if (this.portName != "Bombay") return;
-        let treasures: number[] = [];
-        for (let i = 0; i < 5; i++) {
-            let numOfThisType = randomInt(2);
-            for (let j = 0; j < numOfThisType; j++) {
-                treasures.push(i);
-            }
+
+
+        let treasuresOrderedIndices : number[] = [];
+        let treasuresRandomisedIndices : number[] = [];
+        for(let i = 0; i < this.inventory.treasures.length;i++){
+            treasuresOrderedIndices.push(i);
         }
 
-        let numTreasures = treasures.length;
-        let i = 0;
+        while(treasuresOrderedIndices.length > 0){
+            treasuresRandomisedIndices.push(treasuresOrderedIndices.splice(randomInt(treasuresOrderedIndices.length - 1), 1)[0]);
+        }
 
-        while (treasures.length > 0) {
-            let treasureMesh: AbstractMesh;
-            let rand = treasures.splice(randomInt(treasures.length - 1), 1)[0];
-
-            switch (rand) {
-                case 0:
-                    treasureMesh = assetManager.getRubyInstance();
-                    break;
-                case 1:
-                    treasureMesh = assetManager.getGoldInstance();
-                    break;
-                case 2:
-                    treasureMesh = assetManager.getBarrelInstance();
-                    break;
-                case 3:
-                    treasureMesh = assetManager.getPearlInstance();
-                    break;
-                case 4:
-                    treasureMesh = assetManager.getDiamondInstance();
-                    break;
-                default:
-                    // Sad
+        for(let i of treasuresRandomisedIndices){
+            let treasureMesh : AbstractMesh;
+            switch(this.inventory.treasures[i].type){
+                case TreasureType.RUM:      treasureMesh = assetManager.getBarrelInstance();    break;
+                case TreasureType.PEARL:    treasureMesh = assetManager.getPearlInstance();     break;
+                case TreasureType.GOLD:     treasureMesh = assetManager.getGoldInstance();      break;
+                case TreasureType.DIAMOND:  treasureMesh = assetManager.getDiamondInstance();   break;
+                case TreasureType.RUBY:     treasureMesh = assetManager.getRubyInstance();      break;
+                default:                    /*sad*/                                             break;
             }
+
+            let numTreasures = treasuresRandomisedIndices.length;
+        
             let parent = new BABYLON.TransformNode("Treasure", scene);
 
 
 
 
-            parent.position.copyFrom(this.mesh.getAbsolutePosition());
+            parent.position.copyFrom(this.dockMesh.getAbsolutePosition());
 
             if (l.x < -10) { // West
                 parent.rotation.y = -Math.PI / 2;
@@ -140,9 +183,12 @@ class Port {
 
             treasureMesh.parent = parent;
 
-            i++;
+            this.inventoryMeshInstances.push(treasureMesh);
         }
     }
+
+
+
 
     init(buccaneer: Buccaneer) {
         this.buccaneer = buccaneer;
@@ -156,15 +202,16 @@ class Port {
 
         let isActive = this.boat != null;
 
-        this.mesh = <Mesh>buccaneer.scene.getMeshByID("Dock" + this.resourceIndex);
-        this.mesh.material = portMaterial;
-        offsetMeshUVs(this.mesh, Math.floor(this.resourceIndex / 4) * 0.25 + (isActive ? 0 : 0.5), (this.resourceIndex % 4) * 0.1416); // Adjust mesh UVs to correctly render port texture without requiring a unique material
+        this.dockMesh = <Mesh>buccaneer.scene.getMeshByID("Dock" + this.resourceIndex);
+        this.dockMesh.material = portMaterial;
+        offsetMeshUVs(this.dockMesh, Math.floor(this.resourceIndex / 4) * 0.25 + (isActive ? 0 : 0.5), (this.resourceIndex % 4) * 0.1416); // Adjust mesh UVs to correctly render port texture without requiring a unique material
 
         let safeMesh = <Mesh>buccaneer.scene.getMeshByID("Safe" + this.resourceIndex);
         safeMesh.material = portMaterial;
         offsetMeshUVs(safeMesh, this.resourceIndex * 0.11194, isActive ? 0.1791 : 0); // Adjust mesh UVs to correctly render safe texture without requiring a unique material
 
-        this.generateInventory();
+        if (isActive == false) this.generateInventoryContent();
+        this.drawInventory();
     }
 }
 
@@ -178,6 +225,14 @@ const ports = [
     new Port(6, new BABYLON.Vector3(-5, 0, 12), "#B37F39", "Amsterdam", [-2.5, 3]),
     new Port(7, new BABYLON.Vector3(3, 0, 12), "#E84D4C", "Marseilles", [2.5, 3]),
 ];
+
+// function portLookup(x : number, z : number) : Port{
+//     for (let p of ports){
+//         if((Math.floor(x) == p.portLocation.x) && (Math.floor(z) == p.portLocation.z)){
+
+//         }
+//     }
+// }
 
 export {
     Port,

@@ -257,7 +257,8 @@ class Player extends Boat {
         // TODO optimize calls
         let tradeBtn = $("#actionbtnattacktrade");
         if (this.isInPort()) {
-            tradeBtn.html("TRADE");
+            if(this.currentPort() == this.port) tradeBtn.html("DOCK");
+            else                                tradeBtn.html("TRADE");
             tradeBtn.removeClass("disabled");
         } else {
             if (!tradeBtn.hasClass("disabled"))
