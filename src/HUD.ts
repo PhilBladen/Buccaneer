@@ -1,6 +1,7 @@
 import { Buccaneer } from "src";
 import { PirateType } from "./Boat";
 import { Player } from "./Player";
+import { initialiseTradingOverlay } from "./UIoverlays";
 
 function initialiseHUD(buccaneer: Buccaneer) {
     $(() => {
@@ -37,6 +38,7 @@ function initialiseHUD(buccaneer: Buccaneer) {
     });
 
     $("#actionbtnattacktrade").on("click", () => {
+        initialiseTradingOverlay(buccaneer);
         $("#tradingoverlay").show();
     });
 
