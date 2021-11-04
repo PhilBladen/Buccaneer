@@ -45,10 +45,10 @@
                             <div class="row" style="justify-content: center; align-items: center; grid-column: 1 / span 2; min-width: fit-content;">
                                 <div style="position: absolute;" class="row">
                                     <div class="treasure container">
-                                        <img src="assets/icon-barrel.png">
+                                        <img id="hudtreasure1" src="assets/empty64.png">
                                     </div>
                                     <div class="treasure container" style="margin-left: 10px;">
-                                        <img src="assets/icon-gold.png">
+                                        <img id="hudtreasure2" src="assets/empty64.png">
                                     </div>
                                 </div>
                                 <img src="assets/BoatIcon.png" alt="" class="boat">
@@ -80,7 +80,7 @@
                         <div id="btnchancecards" class="dummycell container cellbtn" style="justify-content: center; align-items: center; ">
                             <img src="assets/CardIcon.png" alt=" " class="buccaneer icon ">
                             <div style="flex: 1"></div>
-                            <div id="chancecardcount" class="cardcount ">6</div>
+                            <div id="chancecardcount" class="cardcount ">0</div>
                         </div>
                     </div>
                 </div>
@@ -90,24 +90,13 @@
                 <!-- <div class="row"> -->
                 <!-- <div class="dbg3" style="flex: 1 1 200px"></div> -->
                 <div id="dummypiratecard" class="cardimg" style="display: none;"><img class="card" src="" alt=" "></div>
+                <div id="dummychancecard" class="cardimg2" style="display: none;"><img class="card2" src="" alt=" "></div>
                 <div class="row">
                     <div id="cs" class="cardviewer row" style="display: none;">
-                        <div class="cardimg"><img class="card noshadow" src="assets/pirates/Pirate Black 1 NoWear.png " alt=" "></div>
-                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Black 3 NoWear.png " alt=" "></div>
-                        <!-- <div style="width: 150px;"></div> -->
-                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 1 NoWear.png " alt=" "></div>
-                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
-                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 2 NoWear.png " alt=" "></div>
-                        <div class="cardimg"><img class="card" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
-                        <div id="c1" class="cardimg"><img class="card" src="assets/pirates/Pirate Red 3 NoWear.png " alt=" "></div>
+
                     </div>
                     <div id="chancecardviewer" class="cardviewer row" style="display: none;">
-                        <div class="cardimg2"><img class="card2 noshadow" src="assets/cards/Chance 21.png" alt=" "></div>
-                        <div class="cardimg2"><img class="card2" src="assets/cards/Chance 23.png" alt=" "></div>
-                        <div class="cardimg2"><img class="card2" src="assets/cards/Chance 24.png" alt=" "></div>
-                        <div class="cardimg2"><img class="card2" src="assets/cards/Chance 25.png" alt=" "></div>
-                        <div class="cardimg2"><img class="card2" src="assets/cards/Chance 26.png" alt=" "></div>
-                        <div class="cardimg2"><img class="card2" src="assets/cards/Chance 29.png" alt=" "></div>
+
                     </div>
                 </div>
                 <div id="actionbtnwrapper2" class="row" style="flex: 0 0 auto">
