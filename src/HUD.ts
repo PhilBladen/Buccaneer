@@ -1,7 +1,7 @@
 import { Buccaneer } from "src";
 import { PirateType, TreasureItem, TreasureType } from "./GameItemManagement";
 import { Player } from "./Player";
-import { initialiseTradingOverlay, populatePirateCards, populateChanceCards, setTreasureItem, initialiseDockOverlay } from "./UIoverlays";
+import { initialiseTradingOverlay, populatePirateCards, populateChanceCards, setTreasureItem, initialiseDockOverlay, initialiseTreasureOverlay } from "./UIoverlays";
 
 function initialiseHUD(buccaneer: Buccaneer) {
     $(() => {
@@ -27,7 +27,20 @@ function initialiseHUD(buccaneer: Buccaneer) {
 
     });
 
-    $("#btnClosePopup").on("click", () => $("#popup").hide());
+    $("#chance_btnOK").on("click", () => $("#chance_popup").hide());
+    $("#chance_btncrew").on("click", () =>{
+        console.log("CREW");
+        $("#chance_popup").hide();
+    })
+    $("#chance_btntreasure").on("click", () =>{
+        console.log("TREASURE");
+        $("#chance_popup").hide();
+
+        initialiseTreasureOverlay(buccaneer);
+        $("#treasureoverlay").show();
+
+    })
+
     $("#actionbtnturn").on({
         click: () => {
             $("#actionbtnturn").addClass("disabled");

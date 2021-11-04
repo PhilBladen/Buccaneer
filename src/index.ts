@@ -14,7 +14,7 @@ import { Player } from "./Player";
 import { Terrain } from "./Terrain";
 import $ from "jquery";
 import { initialiseHUD } from './HUD';
-import { chanceCardHandler } from './ChanceCard';
+import { chanceCardDisplayHandler, chanceCardHandler } from './ChanceCard';
 import { TreasureChest } from './GameItemManagement';
 
 declare let DISABLE_LOADING_SCREEN: boolean;
@@ -520,8 +520,8 @@ const createScene = function () {
 
         scene.getAnimationGroupByName("ChanceReveal").onAnimationGroupEndObservable.add(() => {
             $("#chancecard").attr("src", "assets/cards/Chance " + (buccaneer.drawnCard + 1) + ".png");
-            $("#popup").show();
-
+            // $("#chance_popup").show();
+            chanceCardDisplayHandler(buccaneer, buccaneer.drawnCard + 1);
             chanceCardHandler(buccaneer, buccaneer.drawnCard + 1);
         });
 

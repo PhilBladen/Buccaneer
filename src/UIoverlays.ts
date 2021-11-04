@@ -42,13 +42,11 @@ function initialiseDockOverlay(buccaneer: Buccaneer) {
     $("#dock_button_quitbottom").on("click", () => $("#dockoverlay").hide());
 
     $("#dock_button_unloadcenter").on("click", () => {
-        initialiseTreasureOverlay(buccaneer);
-        $("#treasureoverlay").show();
+        
     });
 
     $("#dock_button_loadcenter").on("click", () => {
-        initialiseTreasureOverlay(buccaneer);
-        $("#treasureoverlay").show();
+        
     });
 
     $("#dock_button_unloadbottom").on("click", () => {

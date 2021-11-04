@@ -117,14 +117,18 @@
             </div>
         </div>
     </div>
-    <div id="popup" class="container" style="display:none; position: fixed; left: 0; right: 0; top: 0; bottom: 0; flex-direction: column; overflow: auto; background-color: rgba(0, 0, 0, 0.5); ">
+    <div id="chance_popup" class="container" style="display:none; position: fixed; left: 0; right: 0; top: 0; bottom: 0; flex-direction: column; overflow: auto; background-color: rgba(0, 0, 0, 0.5); ">
         <div class="popup container clickable" style="flex: 1 1 auto; align-items: center; padding: 20px; flex-direction: column; justify-content: center; ">
             <!-- <div style=" "> -->
             <!-- <div style="flex: 1 1 0 "></div> -->
             <img id="chancecard" src="assets/cards/Chance 1.png " alt=" " style="flex: 1 1 0; min-height: 000px; max-height: 500px; object-fit: contain; display: block; ">
             <!-- </div> -->
             <!-- <div style="background-color: darkred; width: 100%; flex: 1 1 0; "></div> -->
-            <div id="btnClosePopup" class="btn " style="flex: 0 1; ">CLOSE</div>
+            <div id="chance_btnOK" class="btn " style="flex: 0 1; display: none">OK</div>
+            <div id="chance_btnCrewTreasure" class="row" style="flex:0 1;">
+                <div id="chance_btncrew" class="btn" style="flex: 1 1; margin-right: 10px;">CREW</div>
+                <div id="chance_btntreasure" class="btn" style="flex: 1 1; margin-right: 10px;">TREASURE</div>
+            </div>
         </div>
     </div>
 
