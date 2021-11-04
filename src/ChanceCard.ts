@@ -1,5 +1,6 @@
 import { Buccaneer } from "src";
 import { PirateCard } from "./Boat";
+import { ChanceCard } from "./Boat";
 
 const chanceCardHandler = function(buccaneer: Buccaneer, cardID: number) {
     switch (cardID) {
@@ -16,6 +17,9 @@ const chanceCardHandler = function(buccaneer: Buccaneer, cardID: number) {
             break;
     }
 
+    if(ChanceCard.isTradeable(cardID)){
+        buccaneer.player.addChanceCard(new ChanceCard(cardID));
+    }
     console.log("Ran card handler: " + cardID);
 }
 

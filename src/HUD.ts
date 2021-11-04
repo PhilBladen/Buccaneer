@@ -1,5 +1,6 @@
 import { Buccaneer } from "src";
-import { PirateType } from "./Boat";
+import { isUndefined } from "util";
+import { PirateType, TreasureItem, TreasureType } from "./Boat";
 import { Player } from "./Player";
 import { initialiseTradingOverlay } from "./UIoverlays";
 
@@ -223,7 +224,58 @@ const updatePlayerPirateCards = function (player: Player): void {
     }
 }
 
+const updatePlayerChanceCards = function (player: Player) : void {
+    console.log("Updated Player Chance Cards");
+    let cards = $("#chancecardviewer");
+    cards.empty();
+    let firstCard = false;
+    for(let card of player.inventory.chanceCards) {
+        let newCard = $("#dummychancecard").clone();
+        if(firstCard) {
+            newCard.addClass("noshadow");
+            firstCard = false;
+        }
+        newCard.children().attr("src", "assets/cards/Chance " + (card.cardNum) + ".png");
+        newCard.show();
+        cards.append(newCard);
+    }
+}
+
+const updatePlayerTreasureGraphics = function(player : Player) : void {
+    let slot1 = $("#hudtreasure1");
+    let slot2 = $("#hudtreasure2");
+
+    slot1.attr("src", getTreasureGraphicsPath(player.inventory.treasureSlot1));
+    slot2.attr("src", getTreasureGraphicsPath(player.inventory.treasureSlot2));
+
+}
+
+
+const getTreasureGraphicsPath = function(t: TreasureItem): string {
+    if(!t){
+        console.log("I think my treasure is undefined!");
+        return "assets/empty64.png";
+    }
+
+    switch(t.type){
+        case TreasureType.RUM:
+            return "assets/icon-barrel.png";
+        case TreasureType.PEARL:
+            return "assets/icon-pearl.png";
+        case TreasureType.GOLD:
+            return "assets/icon-gold.png";
+        case TreasureType.DIAMOND:
+            return "assets/icon-diamond.png";
+        case TreasureType.RUBY:
+            return "assets/icon-ruby.png";
+        default:
+            return "assets/empty64.png";
+    }
+}
+
 export {
     initialiseHUD,
-    updatePlayerPirateCards
+    updatePlayerPirateCards,
+    updatePlayerChanceCards,
+    updatePlayerTreasureGraphics
 }

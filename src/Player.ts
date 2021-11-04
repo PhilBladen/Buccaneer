@@ -1,13 +1,13 @@
 import { ActionManager, BoundingBox, Color3, ExecuteCodeAction, Matrix, Mesh, MeshBuilder, Scene, StandardMaterial, Texture, Vector3, VertexData } from "@babylonjs/core";
 import { CustomMaterial } from "@babylonjs/materials";
 import { Buccaneer } from ".";
-import { Boat, GridPosition, PirateCard } from "./Boat";
+import { Boat, GridPosition, PirateCard, ChanceCard } from "./Boat";
 import { Port } from "./Port";
 import { SoundEngine } from "./SoundEngine";
 
 import $ from "jquery";
 import { randomInt } from "./Utils";
-import { updatePlayerPirateCards } from "./HUD";
+import { updatePlayerPirateCards, updatePlayerChanceCards, updatePlayerTreasureGraphics } from "./HUD";
 
 class Player extends Boat {
     cw: Mesh = null;
@@ -29,6 +29,7 @@ class Player extends Boat {
 
         this.initialisePlayerUI();
         updatePlayerPirateCards(this);
+        updatePlayerChanceCards(this);
 
         let cw: Mesh;
         let ccw: Mesh;
@@ -224,7 +225,8 @@ class Player extends Boat {
     updatePlayerUI() {
         $("#fightingstrength").html(this.fightingStrength + "");
         $("#sailingstrength").html(this.sailingStrength + "");
-        $("#chancecardcount").html("" + randomInt(6));
+        $("#chancecardcount").html(this.numChanceCards + "");
+        updatePlayerTreasureGraphics(this);
     }
 
     addPirateCard(card: PirateCard) {
@@ -233,6 +235,16 @@ class Player extends Boat {
         this.updatePlayerUI();
         updatePlayerPirateCards(this);
     }
+
+    addChanceCard(card: ChanceCard) {
+        super.addChanceCard(card);
+
+        this.updatePlayerUI();
+        updatePlayerChanceCards(this);
+
+    }
+
+
 
     moveToSquare(x: number, z: number) {
         super.moveToSquare(x, z);
