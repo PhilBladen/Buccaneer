@@ -14,8 +14,8 @@ import { Player } from "./Player";
 import { Terrain } from "./Terrain";
 import $ from "jquery";
 import { initialiseHUD } from './HUD';
-import { chanceCardDisplayHandler, chanceCardHandler } from './ChanceCard';
-import { Inventory, TreasureChest } from './GameItemManagement';
+import { chanceCardDisplayHandler } from './ChanceCard';
+import { ChanceCard, Inventory, TreasureChest } from './GameItemManagement';
 import { ChanceCardStack, PirateCardStack } from './CardStacks';
 
 declare let DISABLE_LOADING_SCREEN: boolean;
@@ -99,7 +99,7 @@ class Buccaneer {
 
     currentTurnPortIndex = 7;
 
-    drawnCard: number;
+    drawnChanceCard: number;
     lastFPSUpdate = performance.now();
     fpsText = $("#fps");
 
@@ -124,11 +124,6 @@ class Buccaneer {
 
         this.chanceCardStack.shuffle();
         this.pirateCardStack.shuffle();
-
-        console.log("TEST OF CHANCECARDSTACK");
-        this.chanceCardStack.debug_PrintDeck();
-        console.log("\nTEST OF PIRATECARDSTACK");
-        this.pirateCardStack.debug_PrintDeck();
     }
 
     nextTurn() {
@@ -148,8 +143,27 @@ class Buccaneer {
     }
 }
 
+class GameAnimations{
+
+    static chanceCardPickAnimation(){
+        scene.getAnimationGroupByName("ChanceReveal").play();
+    }
+    
+    static chanceCardDoneAnimation(cardID : number){
+        if(!ChanceCard.isTradeable(cardID)){
+            scene.getAnimationGroupByName("ChanceReturn").play();
+            scene.getAnimationGroupByName("StackReturn").play();
+        }
+        else{
+            scene.getAnimationGroupByName("ChanceReturn").start();
+            scene.getAnimationGroupByName("ChanceReturn").goToFrame(50);
+        }
+    }
+}
+
 export {
-    Buccaneer
+    Buccaneer,
+    GameAnimations
 }
 
 class CustomCameraInput implements ICameraInput<ArcRotateCamera> {
@@ -307,14 +321,15 @@ function renderMinimap() {
 
 function updateTurn(currentPort, newPort) {
     if (currentPort.boat.x >= -3 && currentPort.boat.z >= -3 && currentPort.boat.x <= 2 && currentPort.boat.z <= 2) {
-        buccaneer.drawnCard = buccaneer.chanceCardStack.drawCard();
+        buccaneer.drawnChanceCard = buccaneer.chanceCardStack.drawCard();
         let cardMesh: Mesh = <Mesh>scene.getMeshByName("Face");
         let cardMaterial: StandardMaterial = <StandardMaterial>cardMesh.material;
         let albedoTexture: Texture = <Texture>cardMaterial.diffuseTexture;
-        albedoTexture.uOffset = ((buccaneer.drawnCard - 1) % 8) * (1 / 8);
-        albedoTexture.vOffset = Math.floor((buccaneer.drawnCard - 1) / 8) * 0.19034;
+        albedoTexture.uOffset = ((buccaneer.drawnChanceCard - 1) % 8) * (1 / 8);
+        albedoTexture.vOffset = Math.floor((buccaneer.drawnChanceCard - 1) / 8) * 0.19034;
 
-        scene.getAnimationGroupByName("ChanceReveal").play();
+        GameAnimations.chanceCardPickAnimation();
+        // scene.getAnimationGroupByName("ChanceReveal").play();
         console.log("Animation play");
     }
 
@@ -520,10 +535,9 @@ const createScene = function () {
         buccaneer.chestLid = scene.getNodeByID("ChestLid");
 
         scene.getAnimationGroupByName("ChanceReveal").onAnimationGroupEndObservable.add(() => {
-            $("#chancecard").attr("src", "assets/cards/Chance " + (buccaneer.drawnCard) + ".png");
+            $("#chancecard").attr("src", "assets/cards/Chance " + (buccaneer.drawnChanceCard) + ".png");
             // $("#chance_popup").show();
-            chanceCardDisplayHandler(buccaneer, buccaneer.drawnCard);
-            chanceCardHandler(buccaneer, buccaneer.drawnCard);
+            chanceCardDisplayHandler(buccaneer, buccaneer.drawnChanceCard);
 
         });
 
@@ -550,10 +564,10 @@ const createScene = function () {
 
         buccaneer.soundEngine.init(scene);
 
-        $("#chance_btnOK").on("click", () => { //TODO move me
-            scene.getAnimationGroupByName("ChanceReturn").play(); //TODO change so chance card just disappears if tradeable
-            scene.getAnimationGroupByName("StackReturn").play();
-        });
+        // $("#chance_btnOK").on("click", () => { //TODO move me
+        //     scene.getAnimationGroupByName("ChanceReturn").play(); //TODO change so chance card just disappears if tradeable
+        //     scene.getAnimationGroupByName("StackReturn").play();
+        // });
 
         scene.getAnimationGroupByName("ChanceReturn").start();
         scene.getAnimationGroupByName("ChanceReturn").goToFrame(50);
@@ -581,3 +595,4 @@ engine.runRenderLoop(() => {
 window.addEventListener("resize", () => {
     engine.resize();
 });
+

@@ -16,14 +16,6 @@ let settings: any;
 class BoatInventory extends Inventory {
     
     generateRandom() {
-        // let numCards = 6;
-        // for (let i = 0; i < numCards; i++) {
-        //     let card = new PirateCard();
-        //     card.type = Utils.randomInt(1) == 0 ? PirateType.BLACK : PirateType.RED;
-        //     card.value = Utils.randomInt(2) + 1;
-        //     this.pirateCards.push(card);
-        // }
-
         this.treasureSlot1 = TreasureItem.random();
         this.treasureSlot2 = TreasureItem.random();
         console.log("Random treasures: " + this.treasureSlot1.type + " & " + this.treasureSlot2.type);
@@ -173,6 +165,10 @@ class Boat {
     }
 
     addPirateCard(card: PirateCard) {
+        if(card == null) return;
+        if(card.type == PirateType.NONE) return;
+        if(card.value == 0) return;
+
         this.inventory.pirateCards.push(card);
         this.sailingStrength = this.inventory.calculateSailingStrength();
         this.fightingStrength = this.inventory.calculateFightingStrength();
@@ -181,6 +177,13 @@ class Boat {
     addChanceCard(card: ChanceCard){
         this.inventory.chanceCards.push(card);
         this.numChanceCards = this.inventory.getNumChanceCards();
+    }
+
+    pickUpPirateCards(quantity : number){
+        if (quantity==0) return;
+        for(let i=0; i<quantity; i++){
+            this.addPirateCard(PirateCardStack.convert(this.buccaneer.pirateCardStack.drawCard()));
+        }
     }
 
     isInPort() : boolean {

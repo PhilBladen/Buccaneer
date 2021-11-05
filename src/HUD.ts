@@ -1,4 +1,5 @@
 import { Buccaneer } from "src";
+import { chanceCardCrewHandler, chanceCardOkHandler, chanceCardTreasureHandler } from "./ChanceCard";
 import { PirateType, TreasureItem, TreasureType } from "./GameItemManagement";
 import { Player } from "./Player";
 import { initialiseTradingOverlay, populatePirateCards, populateChanceCards, setTreasureItem, initialiseDockOverlay, initialiseTreasureOverlay } from "./UIoverlays";
@@ -27,19 +28,25 @@ function initialiseHUD(buccaneer: Buccaneer) {
 
     });
 
-    $("#chance_btnOK").on("click", () => $("#chance_popup").hide());
+    $("#chance_btnOK").on("click", () => {
+        $("#chance_popup").hide()
+        chanceCardOkHandler(buccaneer, buccaneer.drawnChanceCard);
+    });
     $("#chance_btncrew").on("click", () =>{
         console.log("CREW");
         $("#chance_popup").hide();
-    })
+        chanceCardCrewHandler(buccaneer, buccaneer.drawnChanceCard);
+    });
+
+
     $("#chance_btntreasure").on("click", () =>{
         console.log("TREASURE");
         $("#chance_popup").hide();
+        chanceCardTreasureHandler(buccaneer, buccaneer.drawnChanceCard);
+        // initialiseTreasureOverlay(buccaneer);
+        // $("#treasureoverlay").show();
 
-        initialiseTreasureOverlay(buccaneer);
-        $("#treasureoverlay").show();
-
-    })
+    });
 
     $("#actionbtnturn").on({
         click: () => {

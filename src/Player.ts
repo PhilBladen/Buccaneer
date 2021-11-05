@@ -8,6 +8,7 @@ import { SoundEngine } from "./SoundEngine";
 import $ from "jquery";
 import { randomInt } from "./Utils";
 import { updatePlayerPirateCards, updatePlayerChanceCards, updatePlayerTreasureGraphics } from "./HUD";
+import { PirateCardStack } from "./CardStacks";
 
 class Player extends Boat {
     cw: Mesh = null;
@@ -231,6 +232,13 @@ class Player extends Boat {
 
     addPirateCard(card: PirateCard) {
         super.addPirateCard(card);
+
+        this.updatePlayerUI();
+        updatePlayerPirateCards(this);
+    }
+
+    pickUpPirateCards(quantity : number){
+        super.pickUpPirateCards(quantity);
 
         this.updatePlayerUI();
         updatePlayerPirateCards(this);
