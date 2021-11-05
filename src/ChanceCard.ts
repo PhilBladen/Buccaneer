@@ -3,7 +3,7 @@ import { Buccaneer, GameAnimations } from "./index";
 import { PirateCard } from "./Boat";
 import { ChanceCard } from "./Boat";
 import { PirateCardStack } from "./CardStacks";
-import { initialisePlayerSelectOverlay, initialiseTreasureOverlay } from "./UIoverlays";
+import { initialiseBoatCrewTreasureOverlay, initialiseCrewSelectionOverlay, initialisePlayerSelectOverlay, initialiseTreasureOverlay } from "./UIoverlays";
 import { bumpVertex } from "@babylonjs/core/Shaders/ShadersInclude/bumpVertex";
 import { ports } from "./Port";
 
@@ -13,8 +13,6 @@ import { ports } from "./Port";
 
 const chanceCardDisplayHandler = function(buccaneer : Buccaneer, cardID : number) {
     switch(cardID){
-        case 7:
-        case 8:
         case 11:
         case 12:
         case 13:
@@ -122,17 +120,35 @@ const chanceCardOkHandler = function(buccaneer: Buccaneer, cardID : number) {
             }
             buccaneer.player.moveToSquare(ports[minIndex].portLocation.x, ports[minIndex].portLocation.z);
             break;
+        case 7:
+            //1xTreasure or 2xCrew to flat island - show boat crew/treasure UI, limit to necessary items
+            initialiseBoatCrewTreasureOverlay(buccaneer);
+            $("#boatcrewtreasureoverlay").show();       //TODO function to drive BCT overlay :)
+            break;
+        case 8:
+            //1xTreasure or 2xCrew to flat island - show boat crew/treasure UI, limit to necessary items
+            initialiseBoatCrewTreasureOverlay(buccaneer);
+            $("#boatcrewtreasureoverlay").show();
+            break;
         case 9:
             //Treasure/crew to flat island - show boat crew/treasure UI -> blanked out to only enable selection of "Most valuable" treasure, else "Best" crew (can do automatically if unambiguous)
+            initialiseBoatCrewTreasureOverlay(buccaneer);
+            $("#boatcrewtreasureoverlay").show();
             break;
         case 10:
             //Crew desert to pirate island - show boat crew/treasure UI -> blanked out to only enable selection of "Best" crew (can do automatically if unambiguous)
+            initialiseBoatCrewTreasureOverlay(buccaneer);
+            $("#boatcrewtreasureoverlay").show();
             break;
         case 16:
             //Treasure then Reduce crew to 10 - show Treasure Island(7) THEN crew selection UI
+            initialiseTreasureOverlay(buccaneer);
+            $("#treasureoverlay").show();
             break;
         case 17:
             //Treasure then Reduce crew to 10 - show Treasure Island(6) THEN crew selection UI
+            initialiseTreasureOverlay(buccaneer);
+            $("#treasureoverlay").show();
             break;
         case 18:
             //Treasure Island(4)
@@ -150,9 +166,13 @@ const chanceCardOkHandler = function(buccaneer: Buccaneer, cardID : number) {
             break;
         case 20:
             //Exchange crew with nearest ship on coast or return two crew cards -> crew selection UI (for both) if doing else crew selection UI to allow player to choose return
+            initialiseCrewSelectionOverlay(buccaneer);
+            $("#cardviewoverlay").show();
             break;
         case 22:
             //YELLOW FEVER!! - crew selection UI (for all)
+            initialiseCrewSelectionOverlay(buccaneer);
+            $("#cardviewoverlay").show();
             break;
         default:
             //do nothing
@@ -163,12 +183,6 @@ const chanceCardOkHandler = function(buccaneer: Buccaneer, cardID : number) {
 const chanceCardTreasureHandler = function(buccaneer: Buccaneer, cardID : number) {
     GameAnimations.chanceCardDoneAnimation(cardID);
     switch(cardID){
-        case 7:
-            //Select treasure onboard to lose
-            break;
-        case 8:
-            //Select treasure onboard to lose
-            break;
         case 11:
             //Treasure Island(5)
             initialiseTreasureOverlay(buccaneer);
@@ -202,18 +216,6 @@ const chanceCardTreasureHandler = function(buccaneer: Buccaneer, cardID : number
 const chanceCardCrewHandler = function(buccaneer: Buccaneer, cardID : number) {
     GameAnimations.chanceCardDoneAnimation(cardID);
     buccaneer.player.pickUpPirateCards(ccPiratePickupCount(buccaneer, cardID));
-    
-
-    switch(cardID){
-        case 7:
-            //select crew to lose
-            break;
-        case 8:
-            //select crew to lose
-            break;
-        default:
-            break;
-    }
 }
 
 

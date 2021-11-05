@@ -57,7 +57,7 @@ class ChanceCardStack extends CardStack{
 
         for (let cardNum = 1; cardNum <= 30; cardNum++) {
             // this.cards.push(cardNum);
-            this.cards.push(2);//TODO CHEAT - to test code
+            this.cards.push(20);//TODO CHEAT - to test code
         }
     }
 

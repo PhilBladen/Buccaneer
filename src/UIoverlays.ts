@@ -1,4 +1,5 @@
 import { Buccaneer } from "src";
+import { PirateCardStack } from "./CardStacks";
 import { Inventory, PirateType, TreasureItem } from "./GameItemManagement";
 import { Player } from "./Player";
 import { ports } from "./Port";
@@ -125,7 +126,6 @@ function initialisePlayerSelectOverlay(buccaneer: Buccaneer) {
             newBtn.attr("id", newID);
 
             newBtn.on("click", () => {
-                console.log(newID);
                 $("#playerselectoverlay").hide(); //TODO change me to open card select UI, and also to notify other player through server somehow...
             });
         
@@ -138,10 +138,51 @@ function initialisePlayerSelectOverlay(buccaneer: Buccaneer) {
     }
 }
 
+function initialiseBoatCrewTreasureOverlay(buccaneer : Buccaneer){
+    $("#bct_button_ok").on("click", () => $("#boatcrewtreasureoverlay").hide());
 
 
+    setBackgroundColor($("#trading_LHSpane"), buccaneer.player.port.portColor);
+    
+
+    populatePirateCards(buccaneer.player.inventory, $("#bct_redcrew"), $("#dummytradingcard"), PirateType.RED, false);
+    populatePirateCards(buccaneer.player.inventory, $("#bct_blackcrew"), $("#dummytradingcard"), PirateType.BLACK, false);
+    setTreasureItem(buccaneer.player.inventory.treasureSlot1, $("#bct_treasure1"));
+    setTreasureItem(buccaneer.player.inventory.treasureSlot2, $("#bct_treasure2"));
+}
+
+function initialiseCrewSelectionOverlay(buccaneer : Buccaneer){
+    $("#cardview_button").on("click", () => $("#cardviewoverlay").hide());
 
 
+    setBackgroundColor($("#crewsel_pane"), buccaneer.player.port.portColor);
+    setText($("#cardview_title"), "REDUCE CREW TOTAL TO 10");
+    setText($("#cardview_button"), "OK");
+    
+
+    populatePirateCards(buccaneer.player.inventory, $("#cardview_cards"), $("#dummydynamiccard"), PirateType.NONE, false);
+}
+
+
+function initialiseCrewDisplayOverlay(buccaneer : Buccaneer){
+    $("#cardview_button").on("click", () => $("#cardviewoverlay").hide());
+
+    setBackgroundColor($("#crewsel_pane"), buccaneer.player.port.portColor);
+    setText($("#cardview_title"), "CREW");
+    setText($("#cardview_button"), "CLOSE");
+    
+    populatePirateCards(buccaneer.player.inventory, $("#cardview_cards"), $("#dummydynamiccard"), PirateType.NONE, false);
+}
+
+function initialiseChanceDisplayOverlay(buccaneer : Buccaneer){
+    $("#cardview_button").on("click", () => $("#cardviewoverlay").hide());
+
+    setBackgroundColor($("#crewsel_pane"), buccaneer.player.port.portColor);
+    setText($("#cardview_title"), "CHANCE CARDS");
+    setText($("#cardview_button"), "CLOSE");
+    
+    populateChanceCards(buccaneer.player.inventory, $("#cardview_cards"), $("#dummytradingcard"), false);
+}
 
 
 function setBackgroundColor(container: JQuery<HTMLElement>, color : string){
@@ -221,6 +262,10 @@ export {
     initialiseTreasureOverlay,
     initialiseDockOverlay,
     initialisePlayerSelectOverlay,
+    initialiseBoatCrewTreasureOverlay,
+    initialiseCrewSelectionOverlay,
+    initialiseCrewDisplayOverlay,
+    initialiseChanceDisplayOverlay,
     populatePirateCards,
     populateChanceCards,
     setTreasureItem

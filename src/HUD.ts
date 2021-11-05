@@ -2,7 +2,7 @@ import { Buccaneer } from "src";
 import { chanceCardCrewHandler, chanceCardOkHandler, chanceCardTreasureHandler } from "./ChanceCard";
 import { PirateType, TreasureItem, TreasureType } from "./GameItemManagement";
 import { Player } from "./Player";
-import { initialiseTradingOverlay, populatePirateCards, populateChanceCards, setTreasureItem, initialiseDockOverlay, initialiseTreasureOverlay, initialisePlayerSelectOverlay } from "./UIoverlays";
+import { initialiseTradingOverlay, populatePirateCards, populateChanceCards, setTreasureItem, initialiseDockOverlay, initialiseTreasureOverlay, initialisePlayerSelectOverlay, initialiseCrewDisplayOverlay, initialiseChanceDisplayOverlay } from "./UIoverlays";
 
 function initialiseHUD(buccaneer: Buccaneer) {
     $(() => {
@@ -132,26 +132,44 @@ function initialiseHUD(buccaneer: Buccaneer) {
         btnChanceCards.removeClass("cameralocktoggleon");
         $("#chancecardviewer").hide();
     }
-    btnChanceCards.on("pointerdown", () => {
-        if (btnChanceCards.hasClass("cameralocktoggleon")) {
-            hideChanceCards();
-        } else {
-            showChanceCards();
-        }
 
-        if (btnPirateCards.hasClass("cameralocktoggleon")) {
-            hidePirateCards();
+
+    btnChanceCards.on("pointerdown", () => {
+        if(window.innerWidth >= 850){
+            if (btnChanceCards.hasClass("cameralocktoggleon")) {
+                hideChanceCards();
+            } else {
+                showChanceCards();
+            }
+
+            if (btnPirateCards.hasClass("cameralocktoggleon")) {
+                hidePirateCards();
+            }
+        }
+        else{
+            hideChanceCards();
+            initialiseChanceDisplayOverlay(buccaneer);
+            $("#cardviewoverlay").show();
         }
     });
-    btnPirateCards.on("pointerdown", () => {
-        if (btnPirateCards.hasClass("cameralocktoggleon")) {
-            hidePirateCards();
-        } else {
-            showPirateCards();
-        }
 
-        if (btnChanceCards.hasClass("cameralocktoggleon")) {
-            hideChanceCards();
+
+    btnPirateCards.on("pointerdown", () => {
+        if(window.innerWidth >= 850){
+            if (btnPirateCards.hasClass("cameralocktoggleon")) {
+                hidePirateCards();
+            } else {
+                    showPirateCards(); 
+            }
+
+            if (btnChanceCards.hasClass("cameralocktoggleon")) {
+                hideChanceCards();
+            }
+        }
+        else{
+            hidePirateCards();
+            initialiseCrewDisplayOverlay(buccaneer);
+            $("#cardviewoverlay").show();
         }
     });
 
@@ -205,28 +223,29 @@ function initialiseHUD(buccaneer: Buccaneer) {
         }
     }
 
+    const screenResizeForceClose = function () {
+        if(innerWidth < 850){
+            if (btnChanceCards.hasClass("cameralocktoggleon")) {
+                hideChanceCards();
+            }
+            if (btnPirateCards.hasClass("cameralocktoggleon")) {
+                hidePirateCards();
+            }
+        }
+    }
 
-    // setInterval(() => {
-    //     let cards = $("#cs");
-    //     let c = $("#c1");
-    //     if (numCards < 15) {
-    //         numCards++;
-    //         cards.append(c.clone(true, true));
-    //         layoutCards();
-    //     }
-    // }, 100);
 
     if (window.ResizeObserver) {
         console.log("Using resize observer")
         new ResizeObserver(layoutPirateCards).observe(document.getElementById("cs"));
         new ResizeObserver(layoutChanceCards).observe(document.getElementById("chancecardviewer")); // TODO
     } else {
-        console.log("Using native")
-        window.onresize = () => {
-            layoutPirateCards();
-            layoutChanceCards();
-        }
+        console.log("Using native");
+        window.addEventListener("resize", layoutPirateCards);
+        window.addEventListener("resize", layoutChanceCards);
     }
+
+    window.addEventListener("resize", screenResizeForceClose);
 
     layoutPirateCards();
     layoutChanceCards();

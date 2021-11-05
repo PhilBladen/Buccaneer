@@ -554,34 +554,41 @@ img {
     box-shadow: inset 0 0 10px 10px rgba(0, 0, 0, 0.2);
 }
 
-.uihorizontalscrollpanel::-webkit-scrollbar {
+.horizontalscrollstyle{
+    overflow: hidden;
+    overflow-x: scroll;
+}
+
+
+.horizontalscrollstyle::-webkit-scrollbar {
     height: 8px;
 }
 
-.uihorizontalscrollpanel::-webkit-scrollbar-track {
+.horizontalscrollstyle::-webkit-scrollbar-track {
     background-color: transparent;
 }
 
-.uihorizontalscrollpanel::-webkit-scrollbar-thumb {
+.horizontalscrollstyle::-webkit-scrollbar-thumb {
     background-color: #d6dee1;
     border-radius: 10px;
     border: 1px solid transparent;
     background-clip: content-box;
 }
 
-.menuverticalscrollpanel {
-    margin: 0px;    
+.verticalscrollstyle{
+    overflow:hidden; 
+    overflow-y:scroll;
 }
 
-.menuverticalscrollpanel::-webkit-scrollbar {
+.verticalscrollstyle::-webkit-scrollbar {
     width: 8px;
 }
 
-.menuverticalscrollpanel::-webkit-scrollbar-track {
+.verticalscrollstyle::-webkit-scrollbar-track {
     background-color: transparent;
 }
 
-.menuverticalscrollpanel::-webkit-scrollbar-thumb {
+.verticalscrollstyle::-webkit-scrollbar-thumb {
     background-color: #d6dee1;
     border-radius: 10px;
     border: 1px solid transparent;
@@ -675,8 +682,19 @@ img {
     box-shadow: -2px 0 2px 0 rgba(0, 0, 0, 0.2);
     border-radius: 10%/7%;
     overflow: hidden;
-    
     pointer-events: none;
+}
+
+.dynamiccard {
+    flex: 0 1;
+    display: inline-block;
+    box-shadow: -2px 0 2px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 10%/7%;
+    overflow: hidden;
+    pointer-events: none;
+    max-height: 20vh;
+    max-width : 20vw;
+    
 }
 
 .tradingboat {
@@ -709,6 +727,47 @@ img {
 }
 
 .tradingtreasure img {
+    display: block;
+    width: 45px;
+    height: 45px;
+}
+
+.bcttext {
+    font-family: pirate;
+    font-size: xx-large;
+    text-align: center;
+}
+
+.bcttexttopspacing {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.bctboat {
+    width: 100%;
+    overflow: hidden;
+    min-height: 0px;
+    min-width: 0px;
+    margin-top: 5px;
+    margin-bottom: 8px;
+}
+
+.bcttreasureLHSspacing {
+    margin-top: -55px;
+}
+
+.bcttreasure {
+    outline: solid rgba(0, 0, 0, 0.2) 3px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    width: 50px;
+    height: 50px;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.bcttreasure img {
     display: block;
     width: 45px;
     height: 45px;
@@ -770,6 +829,38 @@ img {
         margin: 5px;
     }
     .tradingtreasure img {
+        width: 27px;
+        height: 27px;
+    }
+
+    .bcttext {
+        font-size: large;
+    }
+
+    .bcttexttopspacing {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    .bctboat {
+        margin-top: 9px;
+        width: 150px;
+    }
+    
+    .bcttreasure {
+        border-radius: 5px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .bcttreasureLHSspacing {
+        margin-top: -30px;
+    }
+    
+    .bcttreasureRHSspacing {
+        margin: 5px;
+    }
+    .bcttreasure img {
         width: 27px;
         height: 27px;
     }
