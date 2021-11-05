@@ -1,6 +1,8 @@
 import { Buccaneer } from "src";
-import { PirateType } from "./Boat";
+import { chanceCardCrewHandler, chanceCardOkHandler, chanceCardTreasureHandler } from "./ChanceCard";
+import { PirateType, TreasureItem, TreasureType } from "./GameItemManagement";
 import { Player } from "./Player";
+import { initialiseTradingOverlay, populatePirateCards, populateChanceCards, setTreasureItem, initialiseDockOverlay, initialiseTreasureOverlay, initialisePlayerSelectOverlay, initialiseCrewDisplayOverlay, initialiseChanceDisplayOverlay } from "./UIoverlays";
 
 function initialiseHUD(buccaneer: Buccaneer) {
     $(() => {
@@ -23,10 +25,28 @@ function initialiseHUD(buccaneer: Buccaneer) {
                 });
             }
         });
+    });
+
+    $("#chance_btnOK").on("click", () => {
+        $("#chance_popup").hide()
+        chanceCardOkHandler(buccaneer, buccaneer.drawnChanceCard);
+    });
+    $("#chance_btncrew").on("click", () =>{
+        console.log("CREW");
+        $("#chance_popup").hide();
+        chanceCardCrewHandler(buccaneer, buccaneer.drawnChanceCard);
+    });
+
+
+    $("#chance_btntreasure").on("click", () =>{
+        console.log("TREASURE");
+        $("#chance_popup").hide();
+        chanceCardTreasureHandler(buccaneer, buccaneer.drawnChanceCard);
+        // initialiseTreasureOverlay(buccaneer);
+        // $("#treasureoverlay").show();
 
     });
 
-    $("#btnClosePopup").on("click", () => $("#popup").hide());
     $("#actionbtnturn").on({
         click: () => {
             $("#actionbtnturn").addClass("disabled");
@@ -37,7 +57,15 @@ function initialiseHUD(buccaneer: Buccaneer) {
     });
 
     $("#actionbtnattacktrade").on("click", () => {
-        $("#tradingoverlay").show();
+        let btnText = $("#actionbtnattacktrade").text();
+        if(btnText== "TRADE"){
+            initialiseTradingOverlay(buccaneer);
+            $("#tradingoverlay").show();
+        }
+        else if(btnText == "DOCK"){
+            initialiseDockOverlay(buccaneer);
+            $("#dockoverlay").show();
+        }
     });
 
     $("#rules").on("click", () => {
@@ -104,32 +132,50 @@ function initialiseHUD(buccaneer: Buccaneer) {
         btnChanceCards.removeClass("cameralocktoggleon");
         $("#chancecardviewer").hide();
     }
-    btnChanceCards.on("pointerdown", () => {
-        if (btnChanceCards.hasClass("cameralocktoggleon")) {
-            hideChanceCards();
-        } else {
-            showChanceCards();
-        }
 
-        if (btnPirateCards.hasClass("cameralocktoggleon")) {
-            hidePirateCards();
+
+    btnChanceCards.on("pointerdown", () => {
+        if(window.innerWidth >= 850){
+            if (btnChanceCards.hasClass("cameralocktoggleon")) {
+                hideChanceCards();
+            } else {
+                showChanceCards();
+            }
+
+            if (btnPirateCards.hasClass("cameralocktoggleon")) {
+                hidePirateCards();
+            }
+        }
+        else{
+            hideChanceCards();
+            initialiseChanceDisplayOverlay(buccaneer);
+            $("#cardviewoverlay").show();
         }
     });
-    btnPirateCards.on("pointerdown", () => {
-        if (btnPirateCards.hasClass("cameralocktoggleon")) {
-            hidePirateCards();
-        } else {
-            showPirateCards();
-        }
 
-        if (btnChanceCards.hasClass("cameralocktoggleon")) {
-            hideChanceCards();
+
+    btnPirateCards.on("pointerdown", () => {
+        if(window.innerWidth >= 850){
+            if (btnPirateCards.hasClass("cameralocktoggleon")) {
+                hidePirateCards();
+            } else {
+                    showPirateCards(); 
+            }
+
+            if (btnChanceCards.hasClass("cameralocktoggleon")) {
+                hideChanceCards();
+            }
+        }
+        else{
+            hidePirateCards();
+            initialiseCrewDisplayOverlay(buccaneer);
+            $("#cardviewoverlay").show();
         }
     });
 
     let numCards = 7;
 
-    const layoutCards = function () {
+    const layoutPirateCards = function () {
         let c = $("#c1");
         let cards = $("#cs");
 
@@ -153,7 +199,7 @@ function initialiseHUD(buccaneer: Buccaneer) {
         }
     }
 
-    const layoutCards2 = function () {
+    const layoutChanceCards = function () {
         let cards = $("#chancecardviewer");
 
         let element = cards[0];
@@ -177,51 +223,53 @@ function initialiseHUD(buccaneer: Buccaneer) {
         }
     }
 
-
-    // setInterval(() => {
-    //     let cards = $("#cs");
-    //     let c = $("#c1");
-    //     if (numCards < 15) {
-    //         numCards++;
-    //         cards.append(c.clone(true, true));
-    //         layoutCards();
-    //     }
-    // }, 100);
-
-    if (window.ResizeObserver) {
-        console.log("Using resize observer")
-        new ResizeObserver(layoutCards).observe(document.getElementById("cs"));
-        new ResizeObserver(layoutCards2).observe(document.getElementById("chancecardviewer")); // TODO
-    } else {
-        console.log("Using native")
-        window.onresize = () => {
-            layoutCards();
-            layoutCards2();
+    const screenResizeForceClose = function () {
+        if(innerWidth < 850){
+            if (btnChanceCards.hasClass("cameralocktoggleon")) {
+                hideChanceCards();
+            }
+            if (btnPirateCards.hasClass("cameralocktoggleon")) {
+                hidePirateCards();
+            }
         }
     }
 
-    layoutCards();
-    layoutCards2();
+
+    if (window.ResizeObserver) {
+        console.log("Using resize observer")
+        new ResizeObserver(layoutPirateCards).observe(document.getElementById("cs"));
+        new ResizeObserver(layoutChanceCards).observe(document.getElementById("chancecardviewer")); // TODO
+    } else {
+        console.log("Using native");
+        window.addEventListener("resize", layoutPirateCards);
+        window.addEventListener("resize", layoutChanceCards);
+    }
+
+    window.addEventListener("resize", screenResizeForceClose);
+
+    layoutPirateCards();
+    layoutChanceCards();
+
 
 }
 
 const updatePlayerPirateCards = function (player: Player): void {
-    let cards = $("#cs");
-    cards.empty();
-    let firstCard = false;
-    for (let card of player.inventory.pirateCards) {
-        let newCard = $("#dummypiratecard").clone();
-        if (firstCard) {
-            newCard.addClass("noshadow");
-            firstCard = false;
-        }
-        newCard.children().attr("src", "assets/pirates/Pirate " + (card.type == PirateType.BLACK ? "Black" : "Red") + " " + (card.value) + " NoWear.png ");
-        newCard.show();
-        cards.append(newCard);
-    }
+    populatePirateCards(player.inventory, $("#cs"), $("#dummypiratecard"), PirateType.NONE, true);
 }
+
+const updatePlayerChanceCards = function (player: Player) : void {
+    populateChanceCards(player.inventory, $("#chancecardviewer"), $("#dummychancecard"), true);
+}
+
+const updatePlayerTreasureGraphics = function(player : Player) : void {
+    setTreasureItem(player.inventory.treasureSlot1, $("#hudtreasure1"));
+    setTreasureItem(player.inventory.treasureSlot2, $("#hudtreasure2"));
+}
+
 
 export {
     initialiseHUD,
-    updatePlayerPirateCards
+    updatePlayerPirateCards,
+    updatePlayerChanceCards,
+    updatePlayerTreasureGraphics
 }

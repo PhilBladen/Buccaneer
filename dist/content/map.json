@@ -1,4 +1,10 @@
 {
     "tradingoverlay": "tradingUI.html",
+    "dockoverlay": "dockUI.html",
+    "treasureoverlay": "treasureUI.html",
+    "playerselectoverlay": "playerselectUI.html",
+    "boatcrewtreasureoverlay": "boatcrewtreasureUI.html",
+    "cardviewoverlay": "crewselectionUI.html",
     "rulescontent": "rules.html"
+
 }

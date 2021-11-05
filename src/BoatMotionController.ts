@@ -1,6 +1,4 @@
 import { Axis, MeshBuilder, Tools, Vector3 } from "@babylonjs/core";
-
-import hermite from "cubic-hermite";
 import { Boat } from "./Boat";
 import { cosineInterpolate } from "./Utils";
 
@@ -113,6 +111,7 @@ class BoatMotionController {
         // this.animationTargetDirection = this.boat.direction;
 
         this.rotationAnimation.setTargetDirection(this.boat.direction);
+        console.log(this.boat.direction);
     }
 
     setDestination(x: number, z: number) {
@@ -246,7 +245,6 @@ class BoatMotionController {
                 this.animationRunning = false;
             }
         }
-
     }
 }
 

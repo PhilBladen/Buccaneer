@@ -7,41 +7,18 @@ import { Buccaneer } from '.';
 import { CustomMaterial } from '@babylonjs/materials';
 import { BoatMotionController } from './BoatMotionController';
 import $ from "jquery";
+import { PirateType, PirateCard, ChanceType, ChanceCard, TreasureType, TreasureItem, Inventory } from './GameItemManagement';
+import { PirateCardStack } from './CardStacks';
 
 let scene: Scene;
 let settings: any;
 
-enum PirateType {
-    NONE, BLACK, RED
-}
-
-class PirateCard {
-    type: PirateType = PirateType.NONE;
-    value: number = 0;
-
-    static random() {
-        let card = new PirateCard();
-        card.type = Utils.randomInt(1) == 0 ? PirateType.BLACK : PirateType.RED;
-        card.value = Utils.randomInt(2) + 1;
-        return card;
-    }
-}
-
-class Inventory {
-    pirateCards: PirateCard[] = [];
-
-    constructor() {
-
-    }
-
+class BoatInventory extends Inventory {
+    
     generateRandom() {
-        let numCards = 6;
-        for (let i = 0; i < numCards; i++) {
-            let card = new PirateCard();
-            card.type = Utils.randomInt(1) == 0 ? PirateType.BLACK : PirateType.RED;
-            card.value = Utils.randomInt(2) + 1;
-            this.pirateCards.push(card);
-        }
+        this.treasureSlot1 = TreasureItem.random();
+        this.treasureSlot2 = TreasureItem.random();
+        console.log("Random treasures: " + this.treasureSlot1.type + " & " + this.treasureSlot2.type);
     }
 
     calculateFightingStrength(): number {
@@ -62,18 +39,7 @@ class Inventory {
     }
 
     calculateSailingStrength(): number {
-        let sailingStrength = 0;
-        for (let pirateCard of this.pirateCards) {
-            switch (pirateCard.type) {
-                case PirateType.BLACK:
-                case PirateType.RED:
-                    sailingStrength += pirateCard.value;
-                    break;
-                default:
-                    throw new Error("Invalid pirate card type found.");
-            }
-        }
-        return sailingStrength;
+        return this.getPirateValue();
     }
 }
 
@@ -90,9 +56,10 @@ class GridPosition {
 class Boat {
     readonly buccaneer: Buccaneer;
 
-    inventory: Inventory = new Inventory();
+    inventory: BoatInventory = new BoatInventory();
     sailingStrength: number;
     fightingStrength: number;
+    numChanceCards: number;
     x: number;
     z: number;
     boatIndex: number;
@@ -120,8 +87,10 @@ class Boat {
         this.buccaneer = buccaneer;
 
         this.inventory.generateRandom();
+        this.dealHand();
         this.sailingStrength = this.inventory.calculateSailingStrength();
         this.fightingStrength = this.inventory.calculateFightingStrength();
+        this.numChanceCards = this.inventory.getNumChanceCards();
 
         scene = buccaneer.scene;
         settings = buccaneer.settings;
@@ -188,19 +157,49 @@ class Boat {
         this.deactivate();
     }
 
+    dealHand(){
+        let numCards=6;
+        for(let i=0;i<numCards;i++){
+            this.inventory.pirateCards.push(PirateCardStack.convert(this.buccaneer.pirateCardStack.drawCard()));
+        }
+    }
+
     addPirateCard(card: PirateCard) {
+        if(card == null) return;
+        if(card.type == PirateType.NONE) return;
+        if(card.value == 0) return;
+
         this.inventory.pirateCards.push(card);
         this.sailingStrength = this.inventory.calculateSailingStrength();
         this.fightingStrength = this.inventory.calculateFightingStrength();
     }
 
-    isInPort() {
+    addChanceCard(card: ChanceCard){
+        this.inventory.chanceCards.push(card);
+        this.numChanceCards = this.inventory.getNumChanceCards();
+    }
+
+    pickUpPirateCards(quantity : number){
+        if (quantity==0) return;
+        for(let i=0; i<quantity; i++){
+            this.addPirateCard(PirateCardStack.convert(this.buccaneer.pirateCardStack.drawCard()));
+        }
+    }
+
+    isInPort() : boolean {
+        if(this.currentPort() == null){
+            return false;
+        }
+        return true;
+    }
+
+    currentPort() : Port {
         for (let port of ports) {
             if (port.portLocation.x == this.x && port.portLocation.z == this.z) {
-                return true;
+                return port;
             }
         }
-        return false;
+        return null;
     }
 
     hasMovedSinceTurnStart() {
@@ -220,6 +219,86 @@ class Boat {
         this.buccaneer.soundEngine.boatRotate();
         this.direction--;
         this.motionController.updateDirection();
+    }
+
+    getDirection() : number{
+        return this.direction - Math.floor(this.direction/8)*8;
+    }
+
+    getEdgeIIP() : Vector3 {
+
+        let iip = new Vector3(this.x, 0, this.z);
+        let boatDir = this.getDirection();
+
+        switch(boatDir){
+            case 0:
+                iip.x = 11;
+                break;
+            case 1:{
+                    let dx = 11-iip.x;
+                    let dz = 12+iip.z;
+                    if(dx < dz){
+                        iip.x+=dx;
+                        iip.z-=dx;
+                    }
+                    else{
+                        iip.x+=dz;
+                        iip.z-= dz;
+                    }
+                }
+                break;
+            case 2:
+                iip.z = -12;
+                break;
+            case 3:{
+                    let dx = 12+iip.x;
+                    let dz = 12+iip.z;
+                    if(dx < dz){
+                        iip.x-=dx;
+                        iip.z-=dx;
+                    }
+                    else{
+                        iip.x-=dz;
+                        iip.z-= dz;
+                    }
+                }
+                break;
+            case 4:
+                iip.x = -12;
+                break;
+            case 5:{
+                    let dx = 12+iip.x;
+                    let dz = 11-iip.z;
+                    if(dx < dz){
+                        iip.x-=dx;
+                        iip.z+=dx;
+                    }
+                    else{
+                        iip.x-=dz;
+                        iip.z+= dz;
+                    }
+                }
+                break;
+            case 6:
+                iip.z = 11;
+                break;
+            case 7:{
+                    let dx = 11-iip.x;
+                    let dz = 11-iip.z;
+                    if(dx < dz){
+                        iip.x+=dx;
+                        iip.z+=dx;
+                    }
+                    else{
+                        iip.x+=dz;
+                        iip.z+= dz;
+                    }
+                }
+                break;
+            default:
+                return null;
+        }
+        return iip;
     }
 
     /**
@@ -305,6 +384,7 @@ class Boat {
         this.motionController.setDestination(this.x + 0.5, this.z + 0.5);
     }
 
+
     update(time: number) {
         this.time = time;
 
@@ -337,5 +417,10 @@ export {
     Boat,
     GridPosition,
     PirateType,
-    PirateCard
+    PirateCard,
+    ChanceType,
+    ChanceCard,
+    TreasureType,
+    TreasureItem
+    
 }
