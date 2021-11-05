@@ -5,27 +5,26 @@ const CopyWebpackPlugin = require("copy-webpack-plugin")
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin")
 const smp = new SpeedMeasurePlugin()
 
-const outputDirectory = "../dist";
-const devMode = process.env.NODE_ENV === 'development';
+const outputDirectory = "../dist"
+const devMode = process.env.NODE_ENV === "development"
 
 module.exports = smp.wrap({
     mode: "development",
     target: "web",
     devtool: "inline-source-map",
-    entry: "./src/client/ts/index.ts",
+    entry: {
+        main: [
+            // "./src/client/ts/index.ts",
+            "./src/client/ts/like_button.ts",
+        ]
+    },
     output: {
         path: path.join(__dirname, outputDirectory),
-        filename: "bundle.js",
+        filename: "[name].js",
         clean: true,
     },
-    // optimization: {
-    //     // usedExports: true,
-    //     splitChunks: {
-    //         chunks: 'all',
-    //     },
-    // },
     devServer: {
-        static: '../src/client/html',
+        // static: '../src/client/html',
         port: 8081,
         static: path.resolve(__dirname, outputDirectory),
     },
@@ -45,12 +44,17 @@ module.exports = smp.wrap({
                 use: ["style-loader", "css-loader", "sass-loader"],
             },
             {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: "babel-loader",
+            },
+            {
                 test: /\.tsx?$/,
                 use: [
                     {
-                        loader: "ts-loader",
+                        loader: "babel-loader",//"ts-loader",
                         options: {
-                            transpileOnly: false,
+                            // transpileOnly: false,
                         },
                     },
                 ],
@@ -98,4 +102,19 @@ module.exports = smp.wrap({
             ],
         }),
     ],
+    // optimization: {
+    //     chunkIds: "named",
+    //     splitChunks: {
+    //         name: "vendor",
+    //         filename: "common.js",
+    //         chunks: "all",
+    //         cacheGroups: {
+    //             commons: {
+    //                 name: "commons",
+    //                 chunks: "initial",
+    //                 minChunks: 4,
+    //             },
+    //         },
+    //     },
+    // },
 })

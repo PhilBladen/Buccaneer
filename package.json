@@ -12,14 +12,25 @@
     "license": "ISC",
     "devDependencies": {
         "@babel/core": "^7.16.0",
+        "@babel/preset-env": "^7.16.0",
+        "@babel/preset-react": "^7.16.0",
         "@swc/cli": "^0.1.51",
         "@swc/core": "^1.2.106",
         "@types/jquery": "^3.5.8",
         "@types/react": "^17.0.34",
         "@types/react-dom": "^17.0.11",
         "@types/resize-observer-browser": "^0.1.6",
+        "@typescript-eslint/eslint-plugin": "^5.3.0",
+        "@typescript-eslint/parser": "^5.3.0",
+        "babel-loader": "^8.2.3",
         "copy-webpack-plugin": "^9.0.1",
         "css-loader": "^6.5.1",
+        "eslint": "^7.32.0",
+        "eslint-config-airbnb": "^18.2.1",
+        "eslint-plugin-import": "^2.25.2",
+        "eslint-plugin-jsx-a11y": "^6.4.1",
+        "eslint-plugin-react": "^7.26.1",
+        "eslint-plugin-react-hooks": "^4.2.0",
         "html-loader": "^3.0.1",
         "html-webpack-plugin": "^5.5.0",
         "sass": "^1.43.4",
@@ -38,6 +49,8 @@
         "@babylonjs/core": "^4.2.0",
         "@babylonjs/inspector": "^4.2.0",
         "@babylonjs/materials": "^4.2.0",
-        "jquery": "^3.6.0"
+        "jquery": "^3.6.0",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2"
     }
 }

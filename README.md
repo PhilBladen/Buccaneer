@@ -19,24 +19,24 @@ We have many planned features before the first release of Buccaneer. To see a fu
 
 ## Project Structure
 ```bash
-    .
-    ├── config                  # Webpack configuration files
-    ├── dist                    # Compiled distribution of the server and client
-    ├── docs                    # Documentation files
-    ├── src
-    │   ├── client              # Client/front-end source code and assets
-    │   │   ├── assets          # All game assets, including 3D models, audio and images/textures.
-    │   │   ├── blender
-    │   │   ├── html
-    │   │   ├── style
-    │   │   └── ts
-    │   └── server              # Server source code
-    ├── .babelrc                # Babel configuration
-    ├── .prettierrc             # Configuration for the Prettier formatter 
-    ├── package.json
-    ├── README.md
-    ├── tsconfig.json           # Typescript configuration
-    └── yarn.lock
+.
+├── config                  # Webpack configuration files
+├── dist                    # Compiled distribution of the server and client
+├── docs                    # Documentation files
+├── src
+│   ├── client              # Client/front-end source code and assets
+│   │   ├── assets          # All game assets, including 3D models, audio and images/textures.
+│   │   ├── blender
+│   │   ├── html
+│   │   ├── style
+│   │   └── ts
+│   └── server              # Server source code
+├── .babelrc                # Babel configuration
+├── .prettierrc             # Configuration for the Prettier formatter 
+├── package.json
+├── README.md
+├── tsconfig.json           # Typescript configuration
+└── yarn.lock
 ```
     
 

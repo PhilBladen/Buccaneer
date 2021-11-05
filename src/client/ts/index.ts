@@ -16,7 +16,8 @@ import $ from "jquery";
 import { initialiseHUD } from './HUD';
 import { chanceCardHandler } from './ChanceCard';
 
-import "../scss/style.scss";
+import "../style/style.scss";
+// import "./like_button.js/index.js";
 
 declare let DISABLE_LOADING_SCREEN: boolean;
 
