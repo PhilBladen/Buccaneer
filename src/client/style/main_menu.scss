@@ -114,6 +114,16 @@ $borderSize: 0.1em;
     @include growRotate();
 }
 
+.disabled {
+    cursor: default;
+    background-color: grey;
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -o-transition: none !important;
+    transition: none !important;
+    transform: none !important;
+}
+
 .buttons {
     @include column();
     align-items: stretch;

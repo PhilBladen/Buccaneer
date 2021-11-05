@@ -51,7 +51,11 @@
         "@babylonjs/core": "^4.2.0",
         "@babylonjs/inspector": "^4.2.0",
         "@babylonjs/materials": "^4.2.0",
+        "@emotion/react": "^11.5.0",
+        "@emotion/styled": "^11.3.0",
+        "@mui/material": "^5.0.6",
         "jquery": "^3.6.0",
+        "materialize-css": "^1.0.0-rc.2",
         "react": "^17.0.2",
         "react-dom": "^17.0.2"
     }
