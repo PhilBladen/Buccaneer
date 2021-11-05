@@ -2,7 +2,7 @@ import { Buccaneer } from "src";
 import { chanceCardCrewHandler, chanceCardOkHandler, chanceCardTreasureHandler } from "./ChanceCard";
 import { PirateType, TreasureItem, TreasureType } from "./GameItemManagement";
 import { Player } from "./Player";
-import { initialiseTradingOverlay, populatePirateCards, populateChanceCards, setTreasureItem, initialiseDockOverlay, initialiseTreasureOverlay } from "./UIoverlays";
+import { initialiseTradingOverlay, populatePirateCards, populateChanceCards, setTreasureItem, initialiseDockOverlay, initialiseTreasureOverlay, initialisePlayerSelectOverlay } from "./UIoverlays";
 
 function initialiseHUD(buccaneer: Buccaneer) {
     $(() => {
@@ -25,7 +25,6 @@ function initialiseHUD(buccaneer: Buccaneer) {
                 });
             }
         });
-
     });
 
     $("#chance_btnOK").on("click", () => {
@@ -231,6 +230,7 @@ function initialiseHUD(buccaneer: Buccaneer) {
 
     layoutPirateCards();
     layoutChanceCards();
+
 
 }
 

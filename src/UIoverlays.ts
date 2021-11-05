@@ -1,6 +1,7 @@
 import { Buccaneer } from "src";
 import { Inventory, PirateType, TreasureItem } from "./GameItemManagement";
 import { Player } from "./Player";
+import { ports } from "./Port";
 
 function initialiseTradingOverlay(buccaneer: Buccaneer) {
     
@@ -110,7 +111,32 @@ function initialiseTreasureOverlay(buccaneer: Buccaneer) {
     populateTreasureItems(tc.diamond.concat(tc.ruby), $("#treasure_RHSvalue5"), $("#dummyRHStreasure"));
 }
 
+function initialisePlayerSelectOverlay(buccaneer: Buccaneer) {
+    let container : JQuery<HTMLElement> = $("#playerselect_buttoncontainer");
+    container.empty();
+    for(let port of ports) {
+        if(port.boat != null){
+            if(port.boat.port.portName == buccaneer.player.port.portName) continue;
+            let newBtn = $("#dummyplayerbutton").clone();
+            let newSpace = $("#dummyplayerbuttonspacing").clone();
+            newBtn.css("background-color", port.portColor);
+            newBtn.text(port.portName.toUpperCase());
+            let newID = "playerbutton" + port.portName
+            newBtn.attr("id", newID);
 
+            newBtn.on("click", () => {
+                console.log(newID);
+                $("#playerselectoverlay").hide(); //TODO change me to open card select UI, and also to notify other player through server somehow...
+            });
+        
+
+            newBtn.show();
+            newSpace.show();
+            container.append(newBtn);
+            container.append(newSpace);
+        }
+    }
+}
 
 
 
@@ -194,6 +220,7 @@ export {
     initialiseTradingOverlay,
     initialiseTreasureOverlay,
     initialiseDockOverlay,
+    initialisePlayerSelectOverlay,
     populatePirateCards,
     populateChanceCards,
     setTreasureItem

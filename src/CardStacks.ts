@@ -56,13 +56,18 @@ class ChanceCardStack extends CardStack{
         super();
 
         for (let cardNum = 1; cardNum <= 30; cardNum++) {
-            this.cards.push(cardNum);
+            // this.cards.push(cardNum);
+            this.cards.push(2);//TODO CHEAT - to test code
         }
     }
 
     static convert(n : number) : ChanceCard{
         return new ChanceCard(n);
 
+    }
+
+    static reenumerate(c : ChanceCard) : number{
+        return c.cardNum;
     }
 }
 
@@ -105,6 +110,12 @@ class PirateCardStack extends CardStack{
         }
 
         return new PirateCard(cardColour, n);
+    }
+
+    static reenumerate(c : PirateCard) : number {
+        let n = c.value;
+        if(c.type == PirateType.RED) n+=3;
+        return n;
     }
 }
 

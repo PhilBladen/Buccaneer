@@ -221,6 +221,86 @@ class Boat {
         this.motionController.updateDirection();
     }
 
+    getDirection() : number{
+        return this.direction - Math.floor(this.direction/8)*8;
+    }
+
+    getEdgeIIP() : Vector3 {
+
+        let iip = new Vector3(this.x, 0, this.z);
+        let boatDir = this.getDirection();
+
+        switch(boatDir){
+            case 0:
+                iip.x = 11;
+                break;
+            case 1:{
+                    let dx = 11-iip.x;
+                    let dz = 12+iip.z;
+                    if(dx < dz){
+                        iip.x+=dx;
+                        iip.z-=dx;
+                    }
+                    else{
+                        iip.x+=dz;
+                        iip.z-= dz;
+                    }
+                }
+                break;
+            case 2:
+                iip.z = -12;
+                break;
+            case 3:{
+                    let dx = 12+iip.x;
+                    let dz = 12+iip.z;
+                    if(dx < dz){
+                        iip.x-=dx;
+                        iip.z-=dx;
+                    }
+                    else{
+                        iip.x-=dz;
+                        iip.z-= dz;
+                    }
+                }
+                break;
+            case 4:
+                iip.x = -12;
+                break;
+            case 5:{
+                    let dx = 12+iip.x;
+                    let dz = 11-iip.z;
+                    if(dx < dz){
+                        iip.x-=dx;
+                        iip.z+=dx;
+                    }
+                    else{
+                        iip.x-=dz;
+                        iip.z+= dz;
+                    }
+                }
+                break;
+            case 6:
+                iip.z = 11;
+                break;
+            case 7:{
+                    let dx = 11-iip.x;
+                    let dz = 11-iip.z;
+                    if(dx < dz){
+                        iip.x+=dx;
+                        iip.z+=dx;
+                    }
+                    else{
+                        iip.x+=dz;
+                        iip.z+= dz;
+                    }
+                }
+                break;
+            default:
+                return null;
+        }
+        return iip;
+    }
+
     /**
      * Calculates possible moves given the terrian and current location. This does not guarantee that the move is not cheating.
      */
@@ -303,6 +383,7 @@ class Boat {
 
         this.motionController.setDestination(this.x + 0.5, this.z + 0.5);
     }
+
 
     update(time: number) {
         this.time = time;

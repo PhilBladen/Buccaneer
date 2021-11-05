@@ -2,5 +2,7 @@
     "tradingoverlay": "tradingUI.html",
     "dockoverlay": "dockUI.html",
     "treasureoverlay": "treasureUI.html",
+    "playerselectoverlay": "playerselectUI.html",
     "rulescontent": "rules.html"
+
 }

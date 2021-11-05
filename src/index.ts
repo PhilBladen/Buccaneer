@@ -17,6 +17,7 @@ import { initialiseHUD } from './HUD';
 import { chanceCardDisplayHandler } from './ChanceCard';
 import { ChanceCard, Inventory, TreasureChest } from './GameItemManagement';
 import { ChanceCardStack, PirateCardStack } from './CardStacks';
+import { initialisePlayerSelectOverlay } from './UIoverlays';
 
 declare let DISABLE_LOADING_SCREEN: boolean;
 
@@ -544,7 +545,7 @@ const createScene = function () {
         let playerPort = ports[randomInt(7)];
         buccaneer.boats.push(buccaneer.player = new Player(playerPort.portLocation.x, playerPort.portLocation.z, playerPort, buccaneer));
 
-        let numPlayers = 1;//randomInt(5) + 2;
+        let numPlayers = 0;//randomInt(5) + 2; //NUMBER OF AIs! kinda...
         for (let i = 0; i < numPlayers; i++) {
             let port = ports[i];
             if (port.boat != null) continue;
