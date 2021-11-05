@@ -17,6 +17,32 @@ The game is still in its alpha, and the following milestones must be met before 
 
 We have many planned features before the first release of Buccaneer. To see a full list of these features and to view the progress of this project's first release, [visit our Trello board](https://trello.com/b/dKwjZkLM/buccaneer).
 
+## Project Structure
+```bash
+    .
+    ├── config                  # Webpack configuration files
+    ├── dist                    # Compiled distribution of the server and client
+    ├── docs                    # Documentation files
+    ├── src
+    │   ├── client              # Client/front-end source code and assets
+    │   │   ├── assets          # All game assets, including 3D models, audio and images/textures.
+    │   │   ├── blender
+    │   │   ├── html
+    │   │   ├── style
+    │   │   └── ts
+    │   └── server              # Server source code
+    ├── .babelrc                # Babel configuration
+    ├── .prettierrc             # Configuration for the Prettier formatter 
+    ├── package.json
+    ├── README.md
+    ├── tsconfig.json           # Typescript configuration
+    └── yarn.lock
+```
+    
+
 ## Screenshots
-![Alt text](/docs/screenshot1.jpg?raw=true)
-![Alt text](/docs/screenshot2.jpg?raw=true)
+### Game view with full heads-up display (HUD) visible
+![](/docs/screenshot1.jpg?raw=true)
+
+### Port trading UI
+![](/docs/screenshot2.jpg?raw=true)
