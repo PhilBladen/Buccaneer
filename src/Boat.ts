@@ -8,6 +8,7 @@ import { CustomMaterial } from '@babylonjs/materials';
 import { BoatMotionController } from './BoatMotionController';
 import $ from "jquery";
 import { PirateType, PirateCard, ChanceType, ChanceCard, TreasureType, TreasureItem, Inventory } from './GameItemManagement';
+import { PirateCardStack } from './CardStacks';
 
 let scene: Scene;
 let settings: any;
@@ -15,13 +16,13 @@ let settings: any;
 class BoatInventory extends Inventory {
     
     generateRandom() {
-        let numCards = 6;
-        for (let i = 0; i < numCards; i++) {
-            let card = new PirateCard();
-            card.type = Utils.randomInt(1) == 0 ? PirateType.BLACK : PirateType.RED;
-            card.value = Utils.randomInt(2) + 1;
-            this.pirateCards.push(card);
-        }
+        // let numCards = 6;
+        // for (let i = 0; i < numCards; i++) {
+        //     let card = new PirateCard();
+        //     card.type = Utils.randomInt(1) == 0 ? PirateType.BLACK : PirateType.RED;
+        //     card.value = Utils.randomInt(2) + 1;
+        //     this.pirateCards.push(card);
+        // }
 
         this.treasureSlot1 = TreasureItem.random();
         this.treasureSlot2 = TreasureItem.random();
@@ -47,10 +48,6 @@ class BoatInventory extends Inventory {
 
     calculateSailingStrength(): number {
         return this.getPirateValue();
-    }
-
-    getNumChanceCards() : number {
-        return this.chanceCards.length;
     }
 }
 
@@ -98,6 +95,7 @@ class Boat {
         this.buccaneer = buccaneer;
 
         this.inventory.generateRandom();
+        this.dealHand();
         this.sailingStrength = this.inventory.calculateSailingStrength();
         this.fightingStrength = this.inventory.calculateFightingStrength();
         this.numChanceCards = this.inventory.getNumChanceCards();
@@ -167,6 +165,13 @@ class Boat {
         this.deactivate();
     }
 
+    dealHand(){
+        let numCards=6;
+        for(let i=0;i<numCards;i++){
+            this.inventory.pirateCards.push(PirateCardStack.convert(this.buccaneer.pirateCardStack.drawCard()));
+        }
+    }
+
     addPirateCard(card: PirateCard) {
         this.inventory.pirateCards.push(card);
         this.sailingStrength = this.inventory.calculateSailingStrength();
@@ -176,11 +181,6 @@ class Boat {
     addChanceCard(card: ChanceCard){
         this.inventory.chanceCards.push(card);
         this.numChanceCards = this.inventory.getNumChanceCards();
-        console.log("Added a chance card. Inventory currently contains " + this.numChanceCards +" cards:"); //TODO
-        for (let card of this.inventory.chanceCards){
-            console.log("Card " + card.cardNum);
-        }
-        console.log("(ends)");
     }
 
     isInPort() : boolean {

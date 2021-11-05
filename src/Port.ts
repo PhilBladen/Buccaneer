@@ -3,6 +3,7 @@ import { AbstractMesh, Axis, Color3, FloatArray, Mesh, Scene, StandardMaterial, 
 import { Buccaneer } from "src";
 import { AssetManager } from "./Assets";
 import { Boat } from "./Boat";
+import { PirateCardStack } from "./CardStacks";
 import { ChanceCard, Inventory, PirateCard, PirateType, TreasureItem, TreasureType } from "./GameItemManagement";
 import { offsetMeshUVs, randomInt } from "./Utils";
 
@@ -32,27 +33,10 @@ class Port {
     }
 
     generateInventoryContent() {
-        // //2 cards
-        // this.inventory.pirateCards.push(PirateCard.random());
-        // this.inventory.pirateCards.push(PirateCard.random());
-
-        // //up to 2 of each treasure - for now
-        // for(let i=1;i<6;i++){
-        //     let numOfThisType = randomInt(2);
-        //     for (let j = 0; j < numOfThisType; j++) {
-        //         this.inventory.treasures.push(new TreasureItem(i));
-        //     }
-        // }
-
-        // //As a test - two chance cards!
-        // this.inventory.chanceCards.push(new ChanceCard(21));
-        // this.inventory.chanceCards.push(new ChanceCard(25));
-
         //For Trading ports only
         //2 cards
-        this.inventory.pirateCards.push(PirateCard.random());
-        this.inventory.pirateCards.push(PirateCard.random());
-
+        this.inventory.pirateCards.push(PirateCardStack.convert(this.buccaneer.pirateCardStack.drawCard()));
+        this.inventory.pirateCards.push(PirateCardStack.convert(this.buccaneer.pirateCardStack.drawCard()));
         //Treasure up to a value of 8
 
         let treasureValue = 8 - this.inventory.getPirateValue();
@@ -60,16 +44,9 @@ class Port {
         for(let i of treasureItems){
             this.inventory.treasures.push(i);
         }
-        // console.log("Generated inventory for " + this.portName + ":");
-        // console.log("\tPirate total: " + this.inventory.getPirateValue());
-        // console.log("\tTreasure total: " + treasureValue);
-        // for(let i of this.inventory.treasures){
-        //     console.log("\t\tGot treasure id " + i.type + " of value " + i.getValue());
-        // }
     }
 
     drawInventory() {
-        // this.generateInventoryContent();
 
         //Clear old meshes
         for(let inst of this.inventoryMeshInstances){
@@ -225,14 +202,6 @@ const ports = [
     new Port(6, new BABYLON.Vector3(-5, 0, 12), "#B37F39", "Amsterdam", [-2.5, 3]),
     new Port(7, new BABYLON.Vector3(3, 0, 12), "#E84D4C", "Marseilles", [2.5, 3]),
 ];
-
-// function portLookup(x : number, z : number) : Port{
-//     for (let p of ports){
-//         if((Math.floor(x) == p.portLocation.x) && (Math.floor(z) == p.portLocation.z)){
-
-//         }
-//     }
-// }
 
 export {
     Port,

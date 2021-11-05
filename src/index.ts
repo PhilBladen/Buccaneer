@@ -15,7 +15,8 @@ import { Terrain } from "./Terrain";
 import $ from "jquery";
 import { initialiseHUD } from './HUD';
 import { chanceCardDisplayHandler, chanceCardHandler } from './ChanceCard';
-import { TreasureChest } from './GameItemManagement';
+import { Inventory, TreasureChest } from './GameItemManagement';
+import { ChanceCardStack, PirateCardStack } from './CardStacks';
 
 declare let DISABLE_LOADING_SCREEN: boolean;
 
@@ -80,7 +81,13 @@ class Buccaneer {
     water: WaterMaterial;
     boats: Boat[] = [];
     player: Boat;
-    treasureChestInventory: TreasureChest;
+    
+    treasureChestInventory : TreasureChest;
+    flatIslandInventory : Inventory;
+
+    chanceCardStack : ChanceCardStack;
+    pirateCardStack : PirateCardStack;
+
     chestLid;
     cardAnimation;
 
@@ -108,7 +115,20 @@ class Buccaneer {
         else
             this.settings = settingsMed;
 
+        //TODO move game setup to own function - outside scene construction
         this.treasureChestInventory = new TreasureChest();
+        this.flatIslandInventory = new Inventory();
+
+        this.chanceCardStack = new ChanceCardStack();
+        this.pirateCardStack = new PirateCardStack();
+
+        this.chanceCardStack.shuffle();
+        this.pirateCardStack.shuffle();
+
+        console.log("TEST OF CHANCECARDSTACK");
+        this.chanceCardStack.debug_PrintDeck();
+        console.log("\nTEST OF PIRATECARDSTACK");
+        this.pirateCardStack.debug_PrintDeck();
     }
 
     nextTurn() {
@@ -221,18 +241,6 @@ if (DISABLE_LOADING_SCREEN) {
 //     Engine.audioEngine.setGlobalVolume(0);
 // });
 
-let cardDeck = [];
-for (let cardIndex = 0; cardIndex < 30; cardIndex++) {
-    cardDeck.push(cardIndex);
-}
-// Randomly swap pairs of cards
-for (let i = 0; i < 3000; i++) {
-    let cardIndex = Math.floor(Math.random() * 29);
-    let c1 = cardDeck[cardIndex];
-    let c2 = cardDeck[cardIndex + 1];
-    cardDeck[cardIndex] = c2;
-    cardDeck[cardIndex + 1] = c1;
-}
 
 function screenXYToSeaPosition(screenX: number, screenY: number) {
     let screenPosition = new Vector3(screenX, screenY, 0);
@@ -252,13 +260,6 @@ function screenXYToSeaPosition(screenX: number, screenY: number) {
     let ray = screenPosition.subtractInPlace(cameraPosition);
     let f = cameraPosition.y / ray.y;
     return cameraPosition.subtract(ray.scaleInPlace(f));
-}
-
-function drawCard() {
-    let card = cardDeck[0];
-    cardDeck.shift();
-    cardDeck.push(card);
-    return card;
 }
 
 let minimapCanvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("minimap");
@@ -306,12 +307,12 @@ function renderMinimap() {
 
 function updateTurn(currentPort, newPort) {
     if (currentPort.boat.x >= -3 && currentPort.boat.z >= -3 && currentPort.boat.x <= 2 && currentPort.boat.z <= 2) {
-        buccaneer.drawnCard = drawCard();
+        buccaneer.drawnCard = buccaneer.chanceCardStack.drawCard();
         let cardMesh: Mesh = <Mesh>scene.getMeshByName("Face");
         let cardMaterial: StandardMaterial = <StandardMaterial>cardMesh.material;
         let albedoTexture: Texture = <Texture>cardMaterial.diffuseTexture;
-        albedoTexture.uOffset = (buccaneer.drawnCard % 8) * (1 / 8);
-        albedoTexture.vOffset = Math.floor(buccaneer.drawnCard / 8) * 0.19034;
+        albedoTexture.uOffset = ((buccaneer.drawnCard - 1) % 8) * (1 / 8);
+        albedoTexture.vOffset = Math.floor((buccaneer.drawnCard - 1) / 8) * 0.19034;
 
         scene.getAnimationGroupByName("ChanceReveal").play();
         console.log("Animation play");
@@ -519,10 +520,11 @@ const createScene = function () {
         buccaneer.chestLid = scene.getNodeByID("ChestLid");
 
         scene.getAnimationGroupByName("ChanceReveal").onAnimationGroupEndObservable.add(() => {
-            $("#chancecard").attr("src", "assets/cards/Chance " + (buccaneer.drawnCard + 1) + ".png");
+            $("#chancecard").attr("src", "assets/cards/Chance " + (buccaneer.drawnCard) + ".png");
             // $("#chance_popup").show();
-            chanceCardDisplayHandler(buccaneer, buccaneer.drawnCard + 1);
-            chanceCardHandler(buccaneer, buccaneer.drawnCard + 1);
+            chanceCardDisplayHandler(buccaneer, buccaneer.drawnCard);
+            chanceCardHandler(buccaneer, buccaneer.drawnCard);
+
         });
 
         let playerPort = ports[randomInt(7)];
@@ -548,8 +550,8 @@ const createScene = function () {
 
         buccaneer.soundEngine.init(scene);
 
-        $("#btnClosePopup").on("click", () => {
-            scene.getAnimationGroupByName("ChanceReturn").play();
+        $("#chance_btnOK").on("click", () => { //TODO move me
+            scene.getAnimationGroupByName("ChanceReturn").play(); //TODO change so chance card just disappears if tradeable
             scene.getAnimationGroupByName("StackReturn").play();
         });
 

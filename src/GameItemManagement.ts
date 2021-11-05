@@ -11,6 +11,11 @@ class PirateCard {
     type: PirateType = PirateType.NONE;
     value: number = 0;
 
+    constructor(type : PirateType = PirateType.NONE, value: number = 0){
+        this.type = type;
+        this.value = value;
+    }
+
     static random() {
         let card = new PirateCard();
         card.type = Utils.randomInt(1) == 0 ? PirateType.BLACK : PirateType.RED;
@@ -138,6 +143,29 @@ class Inventory {
 
     getTotalValue() : number{
         return this.getPirateValue() + this.getTreasureValue();
+    }
+
+    getNumChanceCards() : number{
+        return this.chanceCards.length;
+    }
+
+    getNumPirateCards() : number{
+        return this.pirateCards.length;
+    }
+
+    getNumTreasures() : number{
+        return this.treasures.length;
+    }
+
+    getNumSlotTreasures() : number{
+        let n = 0;
+        if (this.treasureSlot1.type != TreasureType.NONE){
+            n++;
+        }
+        if (this.treasureSlot2.type != TreasureType.NONE){
+            n++;
+        }
+        return n;
     }
     
 }
