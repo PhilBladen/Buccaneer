@@ -15,7 +15,7 @@ module.exports = smp.wrap({
     entry: {
         main: [
             // "./src/client/ts/index.ts",
-            "./src/client/ts/like_button.ts",
+            "./src/client/ts/main_menu/Main.tsx",
         ]
     },
     output: {
@@ -35,7 +35,7 @@ module.exports = smp.wrap({
     module: {
         rules: [
             {
-                test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                test: /\.(png|svg|jpg|jpeg|gif|mp4)$/i,
                 type: "asset/resource",
             },
             {
